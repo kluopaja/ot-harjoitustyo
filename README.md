@@ -2,8 +2,6 @@
 
 Repository for the University of Helsinki couse *Ohjelmistotekniikka*.
 
-Edit for the exercises
-
 **Required bold text**
 
 ### Exercises
