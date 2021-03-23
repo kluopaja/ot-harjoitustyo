@@ -2,6 +2,11 @@
 
 Repository for the University of Helsinki couse *Ohjelmistotekniikka*.
 
-Solutions for the weekly exercises can be found in *laskarit/*
-
 **Required bold text**
+
+### Exercises
+#### Week1 1
+
+[gitlog.txt](https://github.com/kluopaja/ot-harjoitustyo/blob/master/laskarit/viikko1/gitlog.txt)
+
+[komentorivi.txt](https://github.com/kluopaja/ot-harjoitustyo/blob/master/laskarit/viikko1/komentorivi.txt)
