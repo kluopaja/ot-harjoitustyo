@@ -2,7 +2,6 @@ from pygame import Rect
 import logging
 import graphics
 from pathlib import Path
-from pygame.sprite import Group
 import pygame
 import time
 class GameInput:
@@ -102,12 +101,11 @@ class GameView:
 
     def render(self, surface, game_objects):
         rendering_region = self._rendering_region()
-        visible_group = Group()
 
         dirty_rects = []
         for game_object in game_objects:
             dirty_rects.extend(
-                game_object.sprite.draw(surface, offset=rendering_region.topleft))
+                game_object.graphic.draw(surface, offset=rendering_region.topleft))
 
         return dirty_rects
 
@@ -115,8 +113,4 @@ class GameView:
         center = self.view_locator()
         left_top = (center[0] - self.size[0]/2, center[1] - self.size[1]/2)
         return Rect(left_top, self.size)
-
-    def _translate_group(self, group, movement):
-        for sprite in group:
-            sprite.rect.move_ip(movement[0], movement[1])
 

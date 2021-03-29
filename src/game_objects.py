@@ -6,9 +6,9 @@ class Plane:
     '''
     For lift and drag see http://www.aerospaceweb.org/question/airfoils/q0150b.shtml
     '''
-    def __init__(self, sprite, max_acceleration=4, max_rotation=5,
+    def __init__(self, graphic, max_acceleration=4, max_rotation=5,
                  body_drag=0.01, wing_size=0.3, gravity=5):
-        self.sprite = sprite
+        self.graphic = graphic
         self.max_acceleration = max_acceleration
         self.max_rotation = max_rotation
         self.body_drag = body_drag
@@ -43,8 +43,8 @@ class Plane:
         self._next_rotation = 0
         self._next_acceleration = 0
 
-        self.sprite.location = (self.location[0], self.location[1])
-        self.sprite.rotation = -math.radians(self.front.as_polar()[1])
+        self.graphic.location = (self.location[0], self.location[1])
+        self.graphic.rotation = -math.radians(self.front.as_polar()[1])
 
     def _new_front(self, delta_time):
         return self.front.rotate(-delta_time * math.degrees(self._next_rotation))
@@ -105,6 +105,12 @@ class Plane:
     def _lift_velocity(self):
         return self.velocity.rotate_rad(-math.pi/2)
 
+class Ground:
+    def __init__(self, graphic):
+        self.graphic = graphic
+
+    def update(self, delta_time):
+        pass
 
 def angle_between(start, end):
     '''Angle from `start` end `end`.

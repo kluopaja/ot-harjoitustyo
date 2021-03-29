@@ -21,11 +21,14 @@ plane_image = graphics.ImageGraphic((400, 400), project_root / "assets/plane.png
 plane = game_objects.Plane(plane_image)
 plane.location = Vector2(400, 400)
 
+ground_graphics = graphics.PolylineGraphic([(0, 1200), (200, 1000), (500, 1250), (2000, 500)], (50, 255, 0))
+ground = game_objects.Ground(ground_graphics)
+
 event_handler = EventHandler()
 game_input = GameInput(event_handler)
 game_input.bind_keys({pygame.K_LEFT: plane.up, pygame.K_RIGHT: plane.down,
                       pygame.K_UP: plane.accelerate})
-game_state = GameState([plane])
+game_state = GameState([plane, ground])
 renderer = game.GameRenderer(display, game_view)
 
 game_loop = GameLoop(game_input, game_state, renderer)
