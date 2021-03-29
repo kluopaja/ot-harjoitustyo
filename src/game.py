@@ -1,4 +1,5 @@
 from pygame import Rect
+import logging
 import sprite
 from pathlib import Path
 from pygame.sprite import Group
@@ -64,7 +65,7 @@ class GameLoop:
             self.game_renderer.render(self.game_state.game_objects)
             sleep_until(previous_time + 1/60)
             curr_time = time.time()
-            print(f'fps: {1/(curr_time - previous_time)}')
+            logging.debug(f'fps: {1/(curr_time - previous_time)}')
             previous_time = curr_time
 
 

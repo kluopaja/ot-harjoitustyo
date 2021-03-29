@@ -1,4 +1,5 @@
 import math
+import logging
 from constants import EPS
 from pygame import Vector2
 class Plane:
@@ -59,10 +60,10 @@ class Plane:
         d_velocity += self._calculate_thrust()
         d_velocity += self._calculate_gravity()
 
-        print(f"lift: {self._calculate_wing_lift(angle_of_attack)}")
-        print(f"drag: {self._calculate_wing_drag(angle_of_attack)}")
-        print(f"rotation: {self.front.as_polar()[1]}")
-        print(f"angle_of_attack: {angle_of_attack}")
+        logging.debug(f"lift: {self._calculate_wing_lift(angle_of_attack)}")
+        logging.debug(f"drag: {self._calculate_wing_drag(angle_of_attack)}")
+        logging.debug(f"rotation: {self.front.as_polar()[1]}")
+        logging.debug(f"angle_of_attack: {angle_of_attack}")
 
         return self.velocity + delta_time * d_velocity
 
@@ -91,8 +92,9 @@ class Plane:
             lift_coefficient = -(math.pi - angle_mod) * 9 / math.pi
         else:
             lift_coefficient = math.sin(2*angle_mod)
-        print(f'lift_coef {lift_coefficient}')
-        print(f'lift_velo: {self._lift_velocity()}')
+
+        logging.debug(f'lift_coef {lift_coefficient}')
+        logging.debug(f'lift_velo: {self._lift_velocity()}')
 
         return self.wing_size * lift_coefficient \
                * self.velocity.magnitude() * self._lift_velocity()

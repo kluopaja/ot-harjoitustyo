@@ -6,8 +6,10 @@ import game_objects
 from pygame import Vector2
 from events import EventHandler
 from game import GameInput, GameState, GameLoop
-import os
+import logging
 
+
+logging.basicConfig(level=logging.INFO)
 pygame.init()
 #flags = pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.HWSURFACE
 display = pygame.display.set_mode((2000, 1300), vsync=1)
