@@ -1,5 +1,5 @@
 import game
-import sprite
+import graphics
 from pathlib import Path
 import pygame
 import game_objects
@@ -17,7 +17,7 @@ display = pygame.display.set_mode((2000, 1300), vsync=1)
 game_view = game.GameView(game.constant_view_locator(1000, 650), (2000, 1300))
 project_root = Path(__file__).parent.parent
 
-plane_image = sprite.ImageSprite((400, 400), project_root / "assets/plane.png")
+plane_image = graphics.ImageGraphic((400, 400), project_root / "assets/plane.png")
 plane = game_objects.Plane(plane_image)
 plane.location = Vector2(400, 400)
 

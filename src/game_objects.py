@@ -43,7 +43,7 @@ class Plane:
         self._next_rotation = 0
         self._next_acceleration = 0
 
-        self.sprite.center = (self.location[0], self.location[1])
+        self.sprite.location = (self.location[0], self.location[1])
         self.sprite.rotation = -math.radians(self.front.as_polar()[1])
 
     def _new_front(self, delta_time):

@@ -1,6 +1,6 @@
 from pygame import Rect
 import logging
-import sprite
+import graphics
 from pathlib import Path
 from pygame.sprite import Group
 import pygame
@@ -104,15 +104,11 @@ class GameView:
         rendering_region = self._rendering_region()
         visible_group = Group()
 
+        dirty_rects = []
         for game_object in game_objects:
-            if not game_object.sprite.overlaps(rendering_region):
-                continue
-            visible_group.add(game_object.sprite)
+            dirty_rects.extend(
+                game_object.sprite.draw(surface, offset=rendering_region.topleft))
 
-        self._translate_group(visible_group, (-rendering_region.x, -rendering_region.y))
-        dirty_rects = [x.rect.copy() for x in visible_group]
-        visible_group.draw(surface)
-        self._translate_group(visible_group, (rendering_region.x, rendering_region.y))
         return dirty_rects
 
     def _rendering_region(self):
