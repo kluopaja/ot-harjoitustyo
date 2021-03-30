@@ -13,6 +13,6 @@ class Maksukortti:
         return True
 
     def __str__(self):
-        saldo_euroissa = round(self.saldo / 100, 2)
+        saldo_euroissa = round(self.saldo, 2)
 
         return f"saldo: {saldo_euroissa}"
