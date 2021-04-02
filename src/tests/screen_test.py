@@ -12,7 +12,7 @@ class ScreenStub:
         self.blit_calls.append({'source': source, 'dest': dest})
         return self.surface.blit(source, dest)
 
-    def draw_line(self, color, begin, end, width=1):
+    def draw_line(self, begin, end, color, width=1):
         self.draw_line_calls.append({'color': color, 'begin': begin, 'end': end,
                                      'width': width})
         return pygame.draw.line(self.surface, color, begin, end, width)

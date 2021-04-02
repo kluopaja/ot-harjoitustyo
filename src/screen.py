@@ -11,7 +11,7 @@ class Screen:
         """
         return self.surface.blit(source, dest)
 
-    def draw_line(self, color, begin, end, width=1):
+    def draw_line(self, begin, end, color, width=1):
         """Draws a line to `self.surface`
 
         Args:
