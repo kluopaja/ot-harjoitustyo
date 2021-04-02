@@ -72,21 +72,23 @@ class GameRenderer:
     def __init__(self, screen, game_view):
         self._screen = screen
         self._game_view = game_view
-        self._screen.fill((50, 50, 255))
+
+        self._screen.fill((174, 186, 232))
         self._previous_dirty_rects = []
-        pygame.display.update()
+        self._screen.update()
 
     def add_game_view(self, tracked_object):
-        resolution = self.screen.get_window_size()
-        size = self._screen.get_window_size()
-        self.game_view = GameView(tracked_object, size, resolution)
+        pass
+        # resolution = self.screen.get_window_size()
+        # size = self._screen.get_window_size()
+        # self.game_view = GameView(tracked_object, size, resolution)
 
     def render(self, game_objects):
-        self._screen.fill((50, 50, 255))
+        self._screen.fill((174, 186, 232))
         dirty_rects = self._game_view.render(self._screen, game_objects)
         #pygame.display.update()
-        pygame.display.update(self._previous_dirty_rects)
-        pygame.display.update(dirty_rects)
+        self._screen.update(self._previous_dirty_rects)
+        self._screen.update(dirty_rects)
         self._previous_dirty_rects = dirty_rects
 
 def constant_view_locator(x, y):
@@ -99,13 +101,13 @@ class GameView:
         self.view_locator = view_locator
         self.size = size
 
-    def render(self, surface, game_objects):
+    def render(self, screen, game_objects):
         rendering_region = self._rendering_region()
 
         dirty_rects = []
         for game_object in game_objects:
             dirty_rects.extend(
-                game_object.graphic.draw(surface, offset=rendering_region.topleft))
+                game_object.graphic.draw(screen, offset=rendering_region.topleft))
 
         return dirty_rects
 
