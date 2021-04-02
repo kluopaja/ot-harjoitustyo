@@ -2,6 +2,40 @@ import math
 import logging
 from constants import EPS
 from pygame import Vector2
+from graphics import ImageGraphic
+from shapes import Rectangle
+
+class PlaneFactory:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.size = Vector2(80, 40)
+        self.acceleration = 4
+        self.rotation = 5
+        self.body_drag = 0.01
+        self.wing_size = 0.3
+        self.gravity = 5
+        self.health = 100
+        self.collision_damage = 100
+
+    def plane(self, player_input):
+        image_graphic = ImageGraphic.from_image_path(self.file_path,
+                                                     Vector2(0, 0), self.size)
+        rectangle = self._plane_rectangle(self.size)
+        plane = Plane(rectangle, image_graphic, max_acceleration=self.acceleration,
+                      max_rotation=self.rotation, body_drag=self.body_drag,
+                      wing_size=self.wing_size, gravity=self.gravity,
+                      health=self.health, collision_damage=self.collision_damage)
+        player_input.bind_to_plane(plane)
+        print("new_plane")
+
+        return plane
+
+    def _plane_rectangle(self, size):
+        return Rectangle(Vector2(-size[0]/2, -size[1]/2),
+                         Vector2(size[0]/2, -size[1]/2),
+                         Vector2(-size[0]/2, size[1]/2))
+
+
 class Plane:
     '''
     For lift and drag see http://www.aerospaceweb.org/question/airfoils/q0150b.shtml
