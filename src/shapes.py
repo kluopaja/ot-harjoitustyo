@@ -172,6 +172,10 @@ class Rectangle(Shape):
         self._location = Vector2(0, 0)
         self._rotation = 0.0
 
+    @classmethod
+    def from_rect(cls, rect):
+        return Rectangle(Vector2(rect.topleft), Vector2(rect.topright),
+                         Vector2(rect.bottomleft))
     @property
     def location(self):
         return self._location
@@ -225,6 +229,16 @@ class Rectangle(Shape):
             return True
         if any([self._contains(side.begin) for side in rect.sides]):
             return True
+
+    def center(self):
+        """Returns the coordinates of the center point of the rectangle"""
+        return (self.sides[0].begin + self.sides[2].begin)/2
+
+    def size(self):
+        """Returns width and height of the rectangle"""
+        width = (self.sides[3].end - self.sides[3].begin).magnitude()
+        height = (self.sides[0].end - self.sides[0].begin).magnitude()
+        return Vector2(width, height)
 
     def __repr__(self):
         return f"Rectangle(topleft = {self.sides[0].begin}, topright = {self.sides[3].begin}, \
