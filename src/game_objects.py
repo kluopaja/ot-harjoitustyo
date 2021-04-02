@@ -6,15 +6,22 @@ class Plane:
     '''
     For lift and drag see http://www.aerospaceweb.org/question/airfoils/q0150b.shtml
     '''
-    def __init__(self, graphic, max_acceleration=4, max_rotation=5,
-                 body_drag=0.01, wing_size=0.3, gravity=5):
+    def __init__(self, shape, graphic, max_acceleration=4, max_rotation=5,
+                 body_drag=0.01, wing_size=0.3, gravity=5, health=100,
+                 collision_damage=100):
         self.graphic = graphic
+        self.shape = shape
         self.max_acceleration = max_acceleration
         self.max_rotation = max_rotation
         self.body_drag = body_drag
         self.wing_size = wing_size
 
         self.gravity = gravity
+
+        self.health = health
+        self.alive = True
+
+        self.collision_damage = collision_damage
 
         self.location = Vector2(0)
         self.velocity = Vector2(0)
@@ -32,7 +39,17 @@ class Plane:
     def accelerate(self):
         self._next_acceleration = self.max_acceleration
 
+    def damage(self, amount):
+        self.health -= amount
+
+
     def update(self, delta_time):
+        if self.health <= 0:
+            self.alive = 0
+
+        if not self.alive:
+            return
+
         new_front = self._new_front(delta_time)
         new_velocity = self._new_velocity(delta_time)
         self.front = new_front
@@ -43,8 +60,17 @@ class Plane:
         self._next_rotation = 0
         self._next_acceleration = 0
 
-        self.graphic.location = (self.location[0], self.location[1])
+        self.graphic.location = Vector2(self.location)
         self.graphic.rotation = -math.radians(self.front.as_polar()[1])
+
+        self.shape.location = Vector2(self.location)
+        self.shape.rotation = -math.radians(self.front.as_polar()[1])
+
+    def new_objects(self):
+        if not self.alive:
+            return []
+
+        return [self]
 
     def _new_front(self, delta_time):
         return self.front.rotate(-delta_time * math.degrees(self._next_rotation))
