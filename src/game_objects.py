@@ -166,10 +166,19 @@ class Plane:
         return self.velocity.rotate_rad(-math.pi/2)
 
 class Ground:
-    def __init__(self, graphic):
+    def __init__(self, shape, graphic):
         self.graphic = graphic
+        self.shape = shape
+        self.collision_damage = 100
 
     def update(self, delta_time):
+        pass
+
+    def new_objects(self):
+        return [self]
+
+    def damage(self, amount):
+        logging.info("something hit ground")
         pass
 
 def angle_between(start, end):
