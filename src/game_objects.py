@@ -178,7 +178,6 @@ class Ground:
         return [self]
 
     def damage(self, amount):
-        logging.info("something hit ground")
         pass
 
 def angle_between(start, end):

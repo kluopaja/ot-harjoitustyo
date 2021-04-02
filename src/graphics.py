@@ -164,7 +164,5 @@ class Image:
 
     def draw(self, screen, center):
         rect = self.image.get_rect()
-        print(center[0], center[1])
         rect.center = (math.floor(center[0]), math.floor(center[1]))
-        logging.info(f"drawing image at {rect}")
         return [screen.blit(self.image, rect)]
