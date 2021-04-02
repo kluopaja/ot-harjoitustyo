@@ -1,7 +1,9 @@
 import pygame
-from pygame import Vector2
+import logging
+from pygame import Vector2, Rect
 import math
 from abc import ABC, abstractmethod
+from shapes import Rectangle
 class Graphic(ABC):
     @abstractmethod
     def draw(self, surface, offset=(0, 0)):
@@ -28,20 +30,35 @@ class Graphic(ABC):
         pass
 
 class PolylineGraphic(Graphic):
-    def __init__(self, polyline, color):
+    def __init__(self, polyline, color, width):
         self._polyline = polyline
         self.color = color
+        self.width = width
 
-    def draw(self, surface, offset=(0, 0)):
-        '''Draws image on `surface`.
+    def draw(self, screen, offset=None):
+        """Draws image on `surface`.
 
-        Returns a list Rects containing the changed pixels'''
+        Arguments:
+            `screen`: Screen
+                The target of drawing
+            `offset`: Vector2 or None
+                Sets the coordinates of `screen` that are used as an origo
+                for the drawing.
+                If None, then Vector2(0, 0) is used as an origo
+
+        Returns:
+            `dirty_rects`: a list of Rect
+                contains the changed pixels"""
+
+        if offset is None:
+            offset = Vector2(0)
 
         dirty_rects = []
         # TODO draw only visible if necessary
         for line in self._polyline.lines:
-            dirty_rects.append(
-                pygame.draw.aaline(surface, self.color, line.begin, line.end))
+            begin = line.begin - offset
+            end = line.end - offset
+            dirty_rects.append(screen.draw_line(begin, end, self.color, self.width))
         return dirty_rects
 
     @property
@@ -61,73 +78,93 @@ class PolylineGraphic(Graphic):
         self._polyline.rotation = value
 
 class ImageGraphic(Graphic):
-    def __init__(self, location, image_path):
-        self._sprite = Sprite(location, image_path)
-        self._single_group = pygame.sprite.GroupSingle(self._sprite)
+    """Class for movable and rotatable images."""
+    def __init__(self, rectangle, image):
+        self._rectangle = rectangle
+        self._image = image
+        self._image.resize(self._rectangle.size())
 
-    def draw(self, surface, offset=(0, 0)):
-        '''Draws image on `surface`.
+    @classmethod
+    def from_image_path(cls, image_path, center_offset, size):
+        """Creates ImageGraphic from an image file.
+
+        Arguments:
+            `image_path`: pathlib.Path object
+                Denotes the path to the image.
+            `center_offset`: Vector2
+                The position of the center of the image relative to the
+                `location` of the ImageGraphic
+            `size`: Vector2
+                The dimensions of the image
+
+        Returns:
+            An ImageGraphic object
+        """
+        helper_rect = Rect(0, 0, size[0], size[1])
+        helper_rect.center = (math.floor(center_offset[0]), math.floor(center_offset[1]))
+        rectangle = Rectangle.from_rect(helper_rect)
+        image = Image(image_path)
+        return ImageGraphic(rectangle, image)
+
+    def draw(self, screen, offset=None):
+        '''Draws image on `screen`.
 
         Returns a list of Rects containing the changed pixels'''
 
-        if not self._sprite.overlaps(surface.get_rect().move(offset)):
+        if offset is None:
+            offset = Vector2(0)
+
+        target_rectangle = Rectangle.from_rect(screen.get_rect().move(offset))
+        if not self._rectangle.intersects(target_rectangle):
             return []
 
-        self._sprite.rect.move_ip(-offset[0], -offset[1])
-        self._single_group.draw(surface)
-        self._sprite.rect.move_ip(offset[0], offset[1])
-        return [self._sprite.rect.copy()]
+        return self._image.draw(screen, self._rectangle.center() - Vector2(offset))
 
     @property
     def location(self):
-        return self._sprite.center
+        return self._rectangle.location
 
     @location.setter
     def location(self, value):
-        self._sprite.center = value
+        self._rectangle.location = value
 
     @property
     def rotation(self):
-        return self._sprite.rotation
+        return self._rectangle.rotation
 
     @rotation.setter
     def rotation(self, value):
-        self._sprite.rotation = value
+        self._rectangle.rotation = value
+        self._image.rotate_to(self._rectangle.rotation)
 
-class Sprite(pygame.sprite.Sprite):
-    def __init__(self, center_pos, image_path):
-        super().__init__()
+class Image:
+    """Class for storing and drawing an image.
+
+    """
+    def __init__(self, image_path):
         self.image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(self.image, (80, 40))
-        self._image_original = self.image
-        self.rect = self.image.get_rect()
-        self.rect.center = center_pos
-
-        self._rotation = 0
+        self._image_not_rotated = self.image
 
     def rotate_to(self, radians):
+        """Changes the image rotation to `radians`.
+
+        Arguments:
+            `radians` the amount of rotation.
+        """
         degrees = math.degrees(radians)
-        self.image = pygame.transform.rotate(self._image_original, degrees)
-        old_center = self.rect.center
-        self.rect = self.image.get_rect()
-        self.rect.center = old_center
+        self.image = pygame.transform.rotate(self._image_not_rotated, degrees)
 
-    @property
-    def center(self):
-        return self.rect.center
+    def resize(self, size):
+        if size[0] < 0 or size[1] < 0:
+            raise ValueError("The resize dimensions cannot be negative")
 
-    @center.setter
-    def center(self, value):
-        self.rect.center = value
+        size_tuple = (int(size[0]), int(size[1]))
+        self.image = pygame.transform.scale(self.image, size_tuple)
+        self._image_not_rotated = pygame.transform.scale(self._image_not_rotated, size_tuple)
 
-    @property
-    def rotation(self):
-        return self._rotation
-
-    @rotation.setter
-    def rotation(self, value):
-        self._rotation = value
-        self.rotate_to(value)
-
-    def overlaps(self, region):
-        return self.rect.colliderect(region)
+    def draw(self, screen, center):
+        rect = self.image.get_rect()
+        print(center[0], center[1])
+        rect.center = (math.floor(center[0]), math.floor(center[1]))
+        logging.info(f"drawing image at {rect}")
+        return [screen.blit(self.image, rect)]
