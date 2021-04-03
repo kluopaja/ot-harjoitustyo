@@ -3,6 +3,7 @@ class DrawingSurface:
     """A wrapper around the pygame.Surface"""
     def __init__(self, surface):
         self.surface = surface
+        self.font = pygame.font.SysFont("monospace", 24)
 
     def subsurface(self, area):
         return DrawingSurface(self.surface.subsurface(area))
@@ -13,6 +14,9 @@ class DrawingSurface:
         Returns:
             A pygame.Rect corresponding to the changed area.
         """
+        if dest is None:
+            return self.surface.blit(source, self.surface.get_rect())
+
         return self.surface.blit(source, dest)
 
     def draw_line(self, begin, end, color, width=1):
@@ -39,3 +43,12 @@ class DrawingSurface:
     def get_rect(self):
         """Returns a Rect of the screen area"""
         return self.surface.get_rect()
+
+    def centered_text(self, text, position, color):
+        """Draws `text` centered at `position`
+        """
+        # TODO read about performance issues related to this!
+        text_surface = self.font.render(text, True, color)
+        dest = text_surface.get_rect()
+        dest.center = (position[0], position[1])
+        return self.blit(text_surface, dest)

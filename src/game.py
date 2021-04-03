@@ -19,15 +19,20 @@ class Player:
         self._new_objects = []
         self.player_input.bind_shoot(self._start_new_flight)
 
+        self.notification = ""
+
     def _start_new_flight(self):
         self.player_input.clear_shoot()
         self.plane = self.plane_factory.plane(self.player_input)
         self._new_objects.append(self.plane)
+        self.notification = ""
 
     def update(self, delta_time):
         self.since_last_plane += delta_time
         if self.plane == None:
+            self.notification = f"{self.plane_interval -self.since_last_plane:.1f} s to go"
             if self.since_last_plane > self.plane_interval:
+                self.notification = "press `shoot` to start flying"
                 self.player_input.bind_shoot(self._start_new_flight)
             return
 
@@ -45,6 +50,7 @@ class Player:
             return Vector2(100, 100)
 
         return self.plane.location
+
 
 class GameState:
     def __init__(self, game_objects, players):
@@ -135,7 +141,6 @@ class GameRenderer:
             whole_area.left = whole_area.width
             self.game_view_areas.append(Rect(whole_area))
 
-        print(self.game_view_areas)
 
 
     def render(self, game_objects):
@@ -172,12 +177,22 @@ class GameView:
 
     def render(self, surface, game_objects):
         rendering_region = surface.get_rect()
-        rendering_region.center = self.player.view_location
+        rendering_region.center = self.player.view_location()
 
-        print(rendering_region)
         dirty_rects = []
         for game_object in game_objects:
             dirty_rects.extend(
                 game_object.graphic.draw(surface, offset=rendering_region.topleft))
+
+
+        dirty_rects.extend(self._render_notification(surface))
+        return dirty_rects
+
+    def _render_notification(self, surface):
+        text_center = Vector2(surface.get_rect().center)
+        dirty_rects = []
+        dirty_rects.append(
+            surface.centered_text(self.player.notification, text_center,
+                                  (200, 55, 55)))
 
         return dirty_rects
