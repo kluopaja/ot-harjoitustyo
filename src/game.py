@@ -22,16 +22,26 @@ class GameNotification:
     def clear(self):
         self.message = ""
 
-# Timer
-#
+class Timer:
+    def __init__(self, length):
+        self.time_left = length
+        self.length = length
+
+    def start(self):
+        self.time_left = self.length
+
+    def update(self, delta_time):
+        self.time_left -= delta_time
+
+    def expired(self):
+        return self.time_left <= 0
+
 class Player:
-    def __init__(self, plane_factory, player_input, game_notification):
+    def __init__(self, plane_factory, player_input, game_notification, spawn_timer):
         self.plane_factory = plane_factory
         self.player_input = player_input
         self.plane = None
-
-        self.since_last_plane = 0
-        self.plane_interval = 2
+        self.spawn_timer = spawn_timer
 
         self._new_objects = []
         self.player_input.bind_shoot(self._start_new_flight)
@@ -45,17 +55,17 @@ class Player:
         self.notification.clear()
 
     def update(self, delta_time):
-        self.since_last_plane += delta_time
+        self.spawn_timer.update(delta_time)
         if self.plane == None:
-            self.notification.until_spawn(self.plane_interval - self.since_last_plane)
-            if self.since_last_plane > self.plane_interval:
+            self.notification.until_spawn(self.spawn_timer.time_left)
+            if self.spawn_timer.expired():
                 self.notification.press_key_to_start()
                 self.player_input.bind_shoot(self._start_new_flight)
             return
 
         if not self.plane.alive:
             self.plane = None
-            self.since_last_plane = 0
+            self.spawn_timer.start()
 
     def new_objects(self):
         tmp = self._new_objects
