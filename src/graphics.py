@@ -35,14 +35,14 @@ class PolylineGraphic(Graphic):
         self.color = color
         self.width = width
 
-    def draw(self, screen, offset=None):
+    def draw(self, surface, offset=None):
         """Draws image on `surface`.
 
         Arguments:
-            `screen`: Screen
+            `surface`: DrawingSurface
                 The target of drawing
             `offset`: Vector2 or None
-                Sets the coordinates of `screen` that are used as an origo
+                Sets the coordinates of `surface` that are used as an origo
                 for the drawing.
                 If None, then Vector2(0, 0) is used as an origo
 
@@ -58,7 +58,7 @@ class PolylineGraphic(Graphic):
         for line in self._polyline.lines:
             begin = line.begin - offset
             end = line.end - offset
-            dirty_rects.append(screen.draw_line(begin, end, self.color, self.width))
+            dirty_rects.append(surface.draw_line(begin, end, self.color, self.width))
         return dirty_rects
 
     @property
@@ -106,19 +106,19 @@ class ImageGraphic(Graphic):
         image = Image(image_path)
         return ImageGraphic(rectangle, image)
 
-    def draw(self, screen, offset=None):
-        '''Draws image on `screen`.
+    def draw(self, surface, offset=None):
+        '''Draws image on `surface`.
 
         Returns a list of Rects containing the changed pixels'''
 
         if offset is None:
             offset = Vector2(0)
 
-        target_rectangle = Rectangle.from_rect(screen.get_rect().move(offset))
+        target_rectangle = Rectangle.from_rect(surface.get_rect().move(offset))
         if not self._rectangle.intersects(target_rectangle):
             return []
 
-        return self._image.draw(screen, self._rectangle.center() - Vector2(offset))
+        return self._image.draw(surface, self._rectangle.center() - Vector2(offset))
 
     @property
     def location(self):
@@ -162,7 +162,7 @@ class Image:
         self.image = pygame.transform.scale(self.image, size_tuple)
         self._image_not_rotated = pygame.transform.scale(self._image_not_rotated, size_tuple)
 
-    def draw(self, screen, center):
+    def draw(self, surface, center):
         rect = self.image.get_rect()
         rect.center = (math.floor(center[0]), math.floor(center[1]))
-        return [screen.blit(self.image, rect)]
+        return [surface.blit(self.image, rect)]
