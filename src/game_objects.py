@@ -16,6 +16,7 @@ class PlaneFactory:
         self.gravity = 5
         self.health = 100
         self.collision_damage = 100
+        self.start_position = Vector2(0, 0)
 
     def plane(self, player_input):
         image_graphic = ImageGraphic.from_image_path(self.file_path,

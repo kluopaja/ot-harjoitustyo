@@ -74,7 +74,7 @@ class Player:
 
     def view_location(self):
         if self.plane == None:
-            return Vector2(100, 100)
+            return self.plane_factory.start_position
 
         return self.plane.location
 
