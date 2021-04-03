@@ -1,3 +1,4 @@
+import pygame
 class DrawingSurface:
     """A wrapper around the pygame.Surface"""
     def __init__(self, surface):

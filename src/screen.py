@@ -1,4 +1,5 @@
 import pygame
+from drawing_surface import DrawingSurface
 class Screen:
     def __init__(self, width, height):
         self.surface = DrawingSurface(pygame.display.set_mode((width, height), vsync=1))

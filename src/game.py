@@ -40,6 +40,12 @@ class Player:
         self._new_objects = []
         return tmp
 
+    def view_location(self):
+        if self.plane == None:
+            return Vector2(100, 100)
+
+        return self.plane.location
+
 class GameState:
     def __init__(self, game_objects, players):
         self.game_objects = game_objects
@@ -106,27 +112,54 @@ class GameLoop:
 
 
 class GameRenderer:
-    def __init__(self, screen, game_view):
+    def __init__(self, screen, game_views):
         self._screen = screen
-        self._game_view = game_view
+        self.game_views = game_views
 
-        self._screen.fill((174, 186, 232))
+        self._screen.surface.fill((174, 186, 232))
         self._previous_dirty_rects = []
         self._screen.update()
 
-    def add_game_view(self, tracked_object):
-        pass
-        # resolution = self.screen.get_window_size()
-        # size = self._screen.get_window_size()
-        # self.game_view = GameView(tracked_object, size, resolution)
+        if len(game_views) > 2:
+            raise ValueError("Maximum of 2 game views supported")
+
+        self.game_view_areas = []
+        whole_area = screen.surface.get_rect()
+
+        if len(game_views) == 1:
+            self.game_view_areas = [whole_area]
+
+        if len(game_views) == 2:
+            whole_area.width = whole_area.width/2
+            self.game_view_areas.append(Rect(whole_area))
+            whole_area.left = whole_area.width
+            self.game_view_areas.append(Rect(whole_area))
+
+        print(self.game_view_areas)
+
 
     def render(self, game_objects):
-        self._screen.fill((174, 186, 232))
-        dirty_rects = self._game_view.render(self._screen, game_objects)
-        #pygame.display.update()
+        self._screen.surface.fill((174, 186, 232))
+        dirty_rects = []
+        for game_view, area in zip(self.game_views, self.game_view_areas):
+            subsurface = self._screen.surface.subsurface(area)
+            dirty_subrects = game_view.render(subsurface, game_objects)
+            dirty_rects.extend(self._subrects_to_absolute(dirty_subrects, area.topleft))
+
         self._screen.update(self._previous_dirty_rects)
         self._screen.update(dirty_rects)
         self._previous_dirty_rects = dirty_rects
+
+    def _subrects_to_absolute(self, subrects, offset):
+        result = []
+        for rect in subrects:
+            copy = Rect(rect)
+            copy.left += offset[0]
+            copy.top += offset[1]
+            result.append(copy)
+
+        return result
+
 
 def constant_view_locator(x, y):
     def _inner():
@@ -134,22 +167,17 @@ def constant_view_locator(x, y):
     return _inner
 
 class GameView:
-    def __init__(self, view_locator, size):
-        self.view_locator = view_locator
-        self.size = size
+    def __init__(self, player):
+        self.player = player
 
-    def render(self, screen, game_objects):
-        rendering_region = self._rendering_region()
+    def render(self, surface, game_objects):
+        rendering_region = surface.get_rect()
+        rendering_region.center = self.player.view_location
 
+        print(rendering_region)
         dirty_rects = []
         for game_object in game_objects:
             dirty_rects.extend(
-                game_object.graphic.draw(screen, offset=rendering_region.topleft))
+                game_object.graphic.draw(surface, offset=rendering_region.topleft))
 
         return dirty_rects
-
-    def _rendering_region(self):
-        center = self.view_locator()
-        left_top = (center[0] - self.size[0]/2, center[1] - self.size[1]/2)
-        return Rect(left_top, self.size)
-
