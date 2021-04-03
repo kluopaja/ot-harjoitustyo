@@ -7,8 +7,25 @@ import pygame
 import time
 import itertools
 
+class GameNotification:
+    def __init__(self, press_key_to_start_msg, until_spawn_msg):
+        self.message = ""
+        self.press_key_to_start_msg = press_key_to_start_msg
+        self.until_spawn_msg = until_spawn_msg
+
+    def press_key_to_start(self):
+        self.message = self.press_key_to_start_msg
+
+    def until_spawn(self, seconds_left):
+        self.message = f"{seconds_left:.1f} " + self.until_spawn_msg
+
+    def clear(self):
+        self.message = ""
+
+# Timer
+#
 class Player:
-    def __init__(self, plane_factory, player_input):
+    def __init__(self, plane_factory, player_input, game_notification):
         self.plane_factory = plane_factory
         self.player_input = player_input
         self.plane = None
@@ -19,20 +36,20 @@ class Player:
         self._new_objects = []
         self.player_input.bind_shoot(self._start_new_flight)
 
-        self.notification = ""
+        self.notification = game_notification
 
     def _start_new_flight(self):
         self.player_input.clear_shoot()
         self.plane = self.plane_factory.plane(self.player_input)
         self._new_objects.append(self.plane)
-        self.notification = ""
+        self.notification.clear()
 
     def update(self, delta_time):
         self.since_last_plane += delta_time
         if self.plane == None:
-            self.notification = f"{self.plane_interval -self.since_last_plane:.1f} s to go"
+            self.notification.until_spawn(self.plane_interval - self.since_last_plane)
             if self.since_last_plane > self.plane_interval:
-                self.notification = "press `shoot` to start flying"
+                self.notification.press_key_to_start()
                 self.player_input.bind_shoot(self._start_new_flight)
             return
 
@@ -192,7 +209,7 @@ class GameView:
         text_center = Vector2(surface.get_rect().center)
         dirty_rects = []
         dirty_rects.append(
-            surface.centered_text(self.player.notification, text_center,
+            surface.centered_text(self.player.notification.message, text_center,
                                   (200, 55, 55)))
 
         return dirty_rects

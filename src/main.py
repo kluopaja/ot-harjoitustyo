@@ -5,7 +5,7 @@ import pygame
 import game_objects
 from pygame import Vector2
 from events import EventHandler
-from game import Player, GameState, GameLoop
+from game import Player, GameState, GameLoop, GameNotification
 from shapes import Polyline, Rectangle
 from screen import Screen
 from game_objects import PlaneFactory
@@ -30,8 +30,10 @@ player_input = PlayerInput(game_input, pygame.K_w, pygame.K_a, pygame.K_d,
 player_input2 = PlayerInput(game_input, pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT,
                            pygame.K_SPACE)
 
-player = Player(PlaneFactory(project_root / "assets/plane.png"), player_input)
-player2 = Player(PlaneFactory(project_root / "assets/plane.png"), player_input2)
+game_notification_1 = GameNotification("press `shoot` to start flying", "seconds to go")
+game_notification_2 = GameNotification("press `shoot` to start flying", "seconds to go")
+player = Player(PlaneFactory(project_root / "assets/plane.png"), player_input, game_notification_1)
+player2 = Player(PlaneFactory(project_root / "assets/plane.png"), player_input2, game_notification_2)
 game_state = GameState([ground], [player, player2])
 game_view1 = game.GameView(player)
 game_view2 = game.GameView(player2)
