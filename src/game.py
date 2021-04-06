@@ -50,7 +50,7 @@ class Player:
 
     def _start_new_flight(self):
         self.player_input.clear_shoot()
-        self.plane = self.plane_factory.plane(self.player_input)
+        self.plane = self.plane_factory.plane(self.player_input, self)
         self._new_objects.append(self.plane)
         self.notification.clear()
 
@@ -78,6 +78,13 @@ class Player:
 
         return self.plane.location
 
+    def process_reward(self, score, issuer):
+        if issuer is self:
+            return
+
+        self.score += score
+
+
 
 class GameState:
     def __init__(self, game_objects, players):
@@ -102,8 +109,8 @@ class GameState:
     def _handle_collisions(self):
         for x, y in itertools.combinations(self.game_objects, 2):
             if x.shape.intersects(y.shape):
-                x.damage(y.collision_damage)
-                y.damage(x.collision_damage)
+                x.collide(y)
+                y.collide(x)
 
     def _update_game_object_list(self):
         new_game_objects = []
