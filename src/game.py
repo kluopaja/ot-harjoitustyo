@@ -42,6 +42,7 @@ class Player:
         self.player_input = player_input
         self.plane = None
         self.spawn_timer = spawn_timer
+        self.score = 0
 
         self._new_objects = []
 
@@ -212,6 +213,7 @@ class GameView:
 
 
         dirty_rects.extend(self._render_notification(surface))
+        dirty_rects.extend(self._render_score(surface))
         return dirty_rects
 
     def _render_notification(self, surface):
@@ -220,5 +222,14 @@ class GameView:
         dirty_rects.append(
             surface.centered_text(self.player.notification.message, text_center,
                                   (200, 55, 55)))
+
+        return dirty_rects
+
+    def _render_score(self, surface):
+        text_topleft = Vector2(surface.get_rect().topleft)
+        dirty_rects = []
+        dirty_rects.append(
+            surface.topleft_text(str(self.player.score), text_topleft,
+                                 (200, 55, 55)))
 
         return dirty_rects
