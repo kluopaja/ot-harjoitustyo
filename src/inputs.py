@@ -66,3 +66,4 @@ class PlayerInput:
         self.bind_up(plane.accelerate)
         self.bind_left(plane.up)
         self.bind_right(plane.down)
+        self.bind_shoot(plane.shoot)
