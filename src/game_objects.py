@@ -41,6 +41,30 @@ class PlaneFactory:
         return Rectangle(Vector2(-size[0]/2, -size[1]/2),
                          Vector2(size[0]/2, -size[1]/2),
                          Vector2(-size[0]/2, size[1]/2))
+
+class BulletFactory:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.size = Vector2(10, 10)
+        self.gravity = 5
+        self.body_grad = 0.001
+        self.health = 1
+        self.collision_damage=100
+
+    def bullet(self, location, velocity, front):
+        image_graphic = ImageGraphic.from_image_path(self.file_path,
+                                                     Vector2(0, 0), self.size)
+        rectangle = self._bullet_rectangle(self.size)
+        tmp = BasePhysics(location, velocity, front)
+        tmp = GravityPhysics(tmp, self.gravity)
+        physics = BodyPhysics(tmp, self.body_grad)
+        return Bullet(rectangle, image_graphic, physics, self.health,
+                      self.collision_damage)
+
+    def _bullet_rectangle(self, size):
+        return Rectangle(Vector2(-size[0]/2, -size[1]/2),
+                         Vector2(size[0]/2, -size[1]/2),
+                         Vector2(-size[0]/2, size[1]/2))
 class Plane:
     '''
     For lift and drag see http://www.aerospaceweb.org/question/airfoils/q0150b.shtml
@@ -96,6 +120,47 @@ class Plane:
 
         return [self]
 
+class Bullet:
+    def __init__(self, shape, graphic, physics, health=100,
+                 collision_damage=100):
+        self.graphic = graphic
+        self.shape = shape
+        self.physics = physics
+        self.health = health
+        self.alive = True
+
+        self.collision_damage = collision_damage
+
+        self.location = Vector2(0)
+        self.velocity = Vector2(0)
+
+    def damage(self, amount):
+        self.health -= amount
+
+    def update(self, delta_time):
+        if self.health <= 0:
+            self.alive = 0
+
+        if not self.alive:
+            return
+
+        self.physics.update(delta_time)
+
+        self.location = Vector2(self.physics.location)
+        self.rotation = -math.radians(self.physics.front.as_polar()[1])
+
+        self.graphic.location = Vector2(self.physics.location)
+        self.graphic.rotation = -math.radians(self.physics.front.as_polar()[1])
+
+        self.shape.location = Vector2(self.physics.location)
+        self.shape.rotation = -math.radians(self.physics.front.as_polar()[1])
+
+
+    def new_objects(self):
+        if not self.alive:
+            return []
+
+        return [self]
 
 class Ground:
     def __init__(self, shape, graphic):
