@@ -44,7 +44,6 @@ class Player:
         self.spawn_timer = spawn_timer
 
         self._new_objects = []
-        self.player_input.bind_shoot(self._start_new_flight)
 
         self.notification = game_notification
 
