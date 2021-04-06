@@ -94,13 +94,13 @@ class Plane:
         self.gun = gun
         self.health = health
         self.alive = True
-
         self.collision_damage = collision_damage
-
         self.location = Vector2(0)
-        self.velocity = Vector2(0)
 
         self._new_objects = []
+
+        self._update_locations()
+
 
     def up(self):
         self.plane_physics.up()
@@ -129,8 +129,11 @@ class Plane:
         self.gun.update(delta_time)
         self.plane_physics.update(delta_time)
 
+
+        self._update_locations()
+
+    def _update_locations(self):
         self.location = Vector2(self.plane_physics.location)
-        self.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
 
         self.graphic.location = Vector2(self.plane_physics.location)
         self.graphic.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
@@ -160,7 +163,7 @@ class Bullet:
         self.collision_damage = collision_damage
 
         self.location = Vector2(0)
-        self.velocity = Vector2(0)
+        self._update_locations()
 
     def damage(self, amount):
         self.health -= amount
@@ -173,22 +176,22 @@ class Bullet:
             return
 
         self.physics.update(delta_time)
-
-        self.location = Vector2(self.physics.location)
-        self.rotation = -math.radians(self.physics.front.as_polar()[1])
-
-        self.graphic.location = Vector2(self.physics.location)
-        self.graphic.rotation = -math.radians(self.physics.front.as_polar()[1])
-
-        self.shape.location = Vector2(self.physics.location)
-        self.shape.rotation = -math.radians(self.physics.front.as_polar()[1])
-
+        self._update_locations()
 
     def new_objects(self):
         if not self.alive:
             return []
 
         return [self]
+
+    def _update_locations(self):
+        self.location = Vector2(self.physics.location)
+
+        self.graphic.location = Vector2(self.physics.location)
+        self.graphic.rotation = -math.radians(self.physics.front.as_polar()[1])
+
+        self.shape.location = Vector2(self.physics.location)
+        self.shape.rotation = -math.radians(self.physics.front.as_polar()[1])
 
 class Ground:
     def __init__(self, shape, graphic):
