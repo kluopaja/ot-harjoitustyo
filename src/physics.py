@@ -73,6 +73,9 @@ class BodyPhysics(PhysicsDecorator):
         self.physics.update(delta_time)
 
 class WingPhysics(PhysicsDecorator):
+    '''
+    For lift and drag see http://www.aerospaceweb.org/question/airfoils/q0150b.shtml
+    '''
     def __init__(self, physics, wing_size):
         super().__init__(physics)
         self.wing_size = wing_size
