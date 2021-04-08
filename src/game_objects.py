@@ -89,22 +89,36 @@ class Gun:
             return [self.bullet_factory.bullet(bullet_location, bullet_velocity, bullet_front, owner)]
         return []
 
-class Plane:
+class GameObject:
+    def __init__(self, shape, graphic, owner, collision_damage):
+        self.shape = shape
+        self.graphic = graphic
+        self.owner = owner
+        self.collision_damage = collision_damage
+
+    def alive(self):
+        return True
+
+    def collide(self, other):
+        pass
+
+    def update(self, delta_time):
+        pass
+
+    def new_objects(self):
+        return [self]
+
+class Plane(GameObject):
     def __init__(self, shape, graphic, plane_physics, gun, score_generator, owner, health=100,
                  collision_damage=100):
-        self.graphic = graphic
-        self.shape = shape
+        super().__init__(shape, graphic, owner, collision_damage)
+
         self.plane_physics = plane_physics
         self.gun = gun
-        self.health = health
         self.score_generator = score_generator
-        self.owner = owner
-        self.alive = True
-        self.collision_damage = collision_damage
-        self.location = Vector2(0)
+        self.health = health
 
         self._new_objects = []
-
         self._update_locations()
 
 
@@ -122,50 +136,48 @@ class Plane:
             self.gun.shoot(self.plane_physics.location, self.plane_physics.velocity,
                            self.plane_physics.front, self.owner))
 
-    # TODO self.alive --> self.alive()
-    def damage(self, amount):
+
+    def alive(self):
+        return self.health > 0
+
+    def collide(self, other):
+        if not self.alive():
+            return
+
+        damage_taken, destroyed = self._damage(other.collision_damage)
+        if other.owner is not None:
+            other.owner.process_reward(self.score_generator(damage_taken, destroyed), self.owner)
+
+    def _damage(self, amount):
+        if not self.alive():
+            return (0, False)
+
         damage_taken = min(amount, self.health)
         self.health -= damage_taken
         destroyed = False
-        if self.health <= 0:
-            self.alive = 0
+        if not self.alive():
             destroyed = True
 
         return damage_taken, destroyed
 
-    def collide(self, other):
-        if not self.alive:
-            return
-
-        damage_taken, destroyed = self.damage(other.collision_damage)
-        if other.owner is not None:
-            other.owner.process_reward(self.score_generator(damage_taken, destroyed), self.owner)
-
     def update(self, delta_time):
-        if self.health <= 0:
-            self.alive = 0
-
-        if not self.alive:
+        if not self.alive():
             return
 
         self.gun.update(delta_time)
         self.plane_physics.update(delta_time)
 
-
         self._update_locations()
 
     def _update_locations(self):
-        self.location = Vector2(self.plane_physics.location)
-
         self.graphic.location = Vector2(self.plane_physics.location)
         self.graphic.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
 
         self.shape.location = Vector2(self.plane_physics.location)
         self.shape.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
 
-
     def new_objects(self):
-        if not self.alive:
+        if not self.alive():
             return []
         tmp = self._new_objects
         self._new_objects = []
@@ -173,30 +185,19 @@ class Plane:
 
         return tmp
 
-class Bullet:
+class Bullet(GameObject):
     def __init__(self, shape, graphic, physics, owner, health=100,
                  collision_damage=100):
-        self.graphic = graphic
-        self.shape = shape
+        super().__init__(shape, graphic, owner, collision_damage)
         self.physics = physics
-        self.owner = owner
         self.health = health
-        self.alive = True
 
         self.collision_damage = collision_damage
 
-        self.location = Vector2(0)
         self._update_locations()
 
-    def damage(self, amount):
-        damage_taken = min(amount, self.health)
-        self.health -= damage_taken
-        destroyed = False
-        if self.health <= 0:
-            self.alive = 0
-            destroyed = True
-
-        return damage_taken, destroyed
+    def alive(self):
+        return self.health > 0
 
     def collide(self, other):
         if not self.alive:
@@ -204,46 +205,37 @@ class Bullet:
 
         self.damage(other.collision_damage)
 
-    def update(self, delta_time):
-        if self.health <= 0:
-            self.alive = 0
+    def _damage(self, amount):
+        if not self.alive():
+            return (0, False)
+        damage_taken = min(amount, self.health)
+        self.health -= damage_taken
+        destroyed = False
+        if not self.alive():
+            destroyed = True
 
-        if not self.alive:
+        return damage_taken, destroyed
+
+    def update(self, delta_time):
+        if not self.alive():
             return
 
         self.physics.update(delta_time)
         self._update_locations()
 
     def new_objects(self):
-        if not self.alive:
+        if not self.alive():
             return []
 
         return [self]
 
     def _update_locations(self):
-        self.location = Vector2(self.physics.location)
-
         self.graphic.location = Vector2(self.physics.location)
         self.graphic.rotation = -math.radians(self.physics.front.as_polar()[1])
 
         self.shape.location = Vector2(self.physics.location)
         self.shape.rotation = -math.radians(self.physics.front.as_polar()[1])
 
-class Ground:
-    def __init__(self, shape, graphic):
-        self.graphic = graphic
-        self.shape = shape
-        self.collision_damage = 100
-        self.owner = None
-
-    def update(self, delta_time):
-        pass
-
-    def new_objects(self):
-        return [self]
-
-    def damage(self, amount):
-        pass
-
-    def collide(self, other):
-        pass
+class Ground(GameObject):
+    def __init__(self, shape, graphic, owner=None, collision_damage=100):
+        super().__init__(shape, graphic, owner, collision_damage)

@@ -76,7 +76,7 @@ class Player:
         if self.plane == None:
             return self.plane_factory.start_position
 
-        return self.plane.location
+        return self.plane.graphic.location
 
     def process_reward(self, score, issuer):
         if issuer is self:
