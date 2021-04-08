@@ -33,7 +33,7 @@ class PlaneFactory:
         rectangle = self._plane_rectangle(self.size)
 
         tmp = BasePhysics(Vector2(self.start_position), Vector2(0, 0), Vector2(1, 0))
-        tmp = BodyPhysics(tmp, self.body_drag, lambda x: Vector2(5, 0))
+        tmp = BodyPhysics(tmp, self.body_drag, lambda x: Vector2(0, 5))
         tmp = WingPhysics(tmp, self.wing_size)
         plane_physics = PhysicsController(tmp, self.acceleration, self.rotation)
 
@@ -66,7 +66,7 @@ class BulletFactory:
                                                      Vector2(0, 0), self.size)
         circle = Circle(Vector2(0), self.size[0]/2)
         tmp = BasePhysics(location, velocity, front)
-        physics = BodyPhysics(tmp, self.body_grad, lambda x: Vector2(5, 0))
+        physics = BodyPhysics(tmp, self.body_grad, lambda x: Vector2(0, 5))
         return Bullet(circle, image_graphic, physics, owner, self.health,
                       self.collision_damage)
 
