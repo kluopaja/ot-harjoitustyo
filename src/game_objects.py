@@ -4,7 +4,7 @@ from constants import EPS
 from pygame import Vector2
 from graphics import ImageGraphic
 from shapes import Rectangle, Circle
-from physics import BasePhysics, GravityPhysics, BodyPhysics, WingPhysics, angle_between, PhysicsController
+from physics import BasePhysics, BodyPhysics, WingPhysics, angle_between, PhysicsController
 from game import Timer
 
 def score_generator(damage_score, destroying_score):
@@ -33,8 +33,7 @@ class PlaneFactory:
         rectangle = self._plane_rectangle(self.size)
 
         tmp = BasePhysics(Vector2(self.start_position), Vector2(0, 0), Vector2(1, 0))
-        tmp = GravityPhysics(tmp, self.gravity)
-        tmp = BodyPhysics(tmp, self.body_drag)
+        tmp = BodyPhysics(tmp, self.body_drag, lambda x: Vector2(5, 0))
         tmp = WingPhysics(tmp, self.wing_size)
         plane_physics = PhysicsController(tmp, self.acceleration, self.rotation)
 
@@ -67,8 +66,7 @@ class BulletFactory:
                                                      Vector2(0, 0), self.size)
         circle = Circle(Vector2(0), self.size[0]/2)
         tmp = BasePhysics(location, velocity, front)
-        tmp = GravityPhysics(tmp, self.gravity)
-        physics = BodyPhysics(tmp, self.body_grad)
+        physics = BodyPhysics(tmp, self.body_grad, lambda x: Vector2(5, 0))
         return Bullet(circle, image_graphic, physics, owner, self.health,
                       self.collision_damage)
 

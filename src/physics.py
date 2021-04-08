@@ -54,22 +54,23 @@ class PhysicsDecorator:
     def acceleration(self, value):
         self.physics.acceleration = value
 
-class GravityPhysics(PhysicsDecorator):
-    def __init__(self, physics, gravity):
+class BodyPhysics(PhysicsDecorator):
+    def __init__(self, physics, body_drag, gravity):
+        """Inits BodyPhysics.
+
+        Arguments:
+            `physics`: An object implementing the interface of BasePhysics.
+            `body_drag`: a non-negative scalar
+            `gravity`: a function Vector2 -> Vector2
+                `gravity(x)` should return the gravity at `x`
+        """
         super().__init__(physics)
+        self.body_drag = body_drag
         self.gravity = gravity
 
     def update(self, delta_time):
-        self.acceleration += Vector2(0, 1) * self.gravity
-        self.physics.update(delta_time)
-
-class BodyPhysics(PhysicsDecorator):
-    def __init__(self, physics, body_drag):
-        super().__init__(physics)
-        self.body_drag = body_drag
-
-    def update(self, delta_time):
         self.acceleration += -self.body_drag * self.velocity.magnitude() * self.velocity
+        self.acceleration += self.gravity(self.location)
         self.physics.update(delta_time)
 
 class WingPhysics(PhysicsDecorator):
