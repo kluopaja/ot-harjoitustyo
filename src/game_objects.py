@@ -90,27 +90,100 @@ class Gun:
         return []
 
 class GameObject:
+    """Base class for game objects.
+
+    All game objects should implement the interface defined by this
+
+    Attributes:
+        shape: a Shape class object
+        graphic: a Graphic class object
+        owner: a Player class object or None
+        collision_damage: A non-negative scalar
+            The damage done by `self` to other GameObject when colliding
+        """
+
     def __init__(self, shape, graphic, owner, collision_damage):
+        """Initializes a new GameObject"""
         self.shape = shape
         self.graphic = graphic
         self.owner = owner
         self.collision_damage = collision_damage
 
     def alive(self):
+        """Returns True if `self` is alive"""
         return True
 
     def collide(self, other):
+        """Collides `other` to `self`.
+
+        Arguments:
+            other: a GameObject class object
+
+        Does not modify the state of `other`"""
         pass
 
     def update(self, delta_time):
+        """Updates the state of `self`.
+
+        Arguments:
+            delta_time: a non-negative scalar
+        """
+
         pass
 
     def new_objects(self):
+        """Returns the new GameObjects created by `self`.
+
+        Only returns the objects created since last `new_objects` call.
+
+        Returns: A list of GameObjects
+
+        NOTE: also returns `self` if `self` should still exist in the game
+        object pool"""
         return [self]
 
 class Plane(GameObject):
+    """Class for Planes.
+
+    Attributes:
+        plane_physics: A PhysicsController class object
+            The object responsible for moving the plane
+        gun: A Gun class object
+        score_generator: A function (damage, destroyed) -> float
+            A function returning the score given to the owner of some
+            other game object when the other game object damages `self`
+            with `damage`. If `destroyed` == True, assumes `self` was
+            destroyed and stayed alive otherwise.
+        health: A scalar
+            The remaining health of the plane
+
+    """
     def __init__(self, shape, graphic, plane_physics, gun, score_generator, owner, health=100,
                  collision_damage=100):
+        """Initializes Plane
+
+
+        Arguments:
+            shape: A Shape class object
+                The object responsible for calculating the collisions
+            graphic: A Graphic class object
+                The object responsible for drawing the plane
+            plane_physics: A PhysicsController class object
+                The object responsible for moving the plane
+            gun: A Gun class object
+            score_generator: A function (damage, destroyed) -> float
+                A function returning the score given to the owner of some
+                other game object when the other game object damages `self`
+                with `damage`. If `destroyed` == True, assumes `self` was
+                destroyed and stayed alive otherwise.
+            owner: A Player class object or None
+                The owner of the plane
+            health: A positive scalar
+                The initial health of the plane
+            collision_damage: A non-negative scalar
+                The damage that the plane does to other game objects
+                when colliding
+            """
         super().__init__(shape, graphic, owner, collision_damage)
 
         self.plane_physics = plane_physics
@@ -123,15 +196,21 @@ class Plane(GameObject):
 
 
     def up(self):
+        """Turns plane upwards"""
         self.plane_physics.up()
 
     def down(self):
+        """Turns plane downwards"""
         self.plane_physics.down()
 
     def accelerate(self):
+        """Accelerates the plane to the direction it is facing"""
         self.plane_physics.accelerate()
 
     def shoot(self):
+        """Shoots a bullet
+
+        Requests self.gun to shoot a bullet."""
         self._new_objects.extend(
             self.gun.shoot(self.plane_physics.location, self.plane_physics.velocity,
                            self.plane_physics.front, self.owner))
@@ -141,6 +220,10 @@ class Plane(GameObject):
         return self.health > 0
 
     def collide(self, other):
+        """Collides `other` to `self`.
+
+        Damages `self` but doesn't modify `other`.
+        Gives the owner of `other` the appropriate reward."""
         if not self.alive():
             return
 
@@ -161,6 +244,7 @@ class Plane(GameObject):
         return damage_taken, destroyed
 
     def update(self, delta_time):
+        """See base class"""
         if not self.alive():
             return
 
@@ -177,6 +261,7 @@ class Plane(GameObject):
         self.shape.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
 
     def new_objects(self):
+        """See base class"""
         if not self.alive():
             return []
         tmp = self._new_objects
@@ -186,8 +271,34 @@ class Plane(GameObject):
         return tmp
 
 class Bullet(GameObject):
+    """Class for Bullets.
+
+    Attributes:
+        physics: An object implementing BasePhysics interface
+            The object responsible for moving the bullet
+        health: A scalar
+            The remaining health of the bullet
+    """
     def __init__(self, shape, graphic, physics, owner, health=100,
                  collision_damage=100):
+        """Initializes the bullet.
+
+        Arguments:
+            shape: A Shape class object
+                The object responsible for calculating the collisions
+            graphic: A Graphic class object
+                The object responsible for drawing the bullet
+            physics: A PhysicsController class object
+                The object responsible for moving the bullet
+            owner: A Player class object or None
+                The owner of the bullet
+            health: A positive scalar
+                The initial health of the bullet
+            collision_damage: A non-negative scalar
+                The damage that the bullet does to other game objects
+                when colliding
+        """
+
         super().__init__(shape, graphic, owner, collision_damage)
         self.physics = physics
         self.health = health
@@ -198,6 +309,9 @@ class Bullet(GameObject):
         return self.health > 0
 
     def collide(self, other):
+        """Collides `other` to `self`.
+
+        Damages `self` but doesn't modify `other`."""
         if not self.alive:
             return
 
@@ -205,6 +319,7 @@ class Bullet(GameObject):
         self.health -= damage_taken
 
     def update(self, delta_time):
+        """See base class"""
         if not self.alive():
             return
 
@@ -212,6 +327,7 @@ class Bullet(GameObject):
         self._update_locations()
 
     def new_objects(self):
+        """See base class"""
         if not self.alive():
             return []
 
@@ -225,5 +341,7 @@ class Bullet(GameObject):
         self.shape.rotation = -math.radians(self.physics.front.as_polar()[1])
 
 class Ground(GameObject):
+    """A class for ground"""
     def __init__(self, shape, graphic, owner=None, collision_damage=100):
+        """See base class"""
         super().__init__(shape, graphic, owner, collision_damage)
