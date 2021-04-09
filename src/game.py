@@ -152,11 +152,12 @@ class GameLoop:
 
 
 class GameRenderer:
-    def __init__(self, screen, game_views):
+    def __init__(self, screen, game_views, game_background):
         self._screen = screen
         self.game_views = game_views
+        self.game_background = game_background
 
-        self._screen.surface.fill((174, 186, 232))
+        self._screen.surface.fill(self.game_background.fill_color)
         self._previous_dirty_rects = []
         self._screen.update()
 
@@ -178,11 +179,11 @@ class GameRenderer:
 
 
     def render(self, game_objects):
-        self._screen.surface.fill((174, 186, 232))
+        self._screen.surface.fill(self.game_background.fill_color)
         dirty_rects = []
         for game_view, area in zip(self.game_views, self.game_view_areas):
             subsurface = self._screen.surface.subsurface(area)
-            dirty_subrects = game_view.render(subsurface, game_objects)
+            dirty_subrects = game_view.render(subsurface, game_objects, self.game_background)
             dirty_rects.extend(self._subrects_to_absolute(dirty_subrects, area.topleft))
 
         self._screen.update(self._previous_dirty_rects)
@@ -199,6 +200,55 @@ class GameRenderer:
 
         return result
 
+import random
+class GameBackground:
+    def __init__(self, cloud_graphic, n_clouds, repeat_area, fill_color=(174, 186, 232)):
+        """Initializes GameBackground object.
+
+        Arguments:
+            repeat_area: Vector2 object
+                The size of the repeat in background.
+                NOTE: Should be large enough that at most one
+                copy of each cloud can be seen in each
+                `render` call!
+        """
+        self.cloud_graphic = cloud_graphic
+        self.n_clouds = n_clouds
+        # TODO rename to size or something
+        self.repeat_area = repeat_area
+        self.fill_color = fill_color
+        self.cloud_locations = self._generate_cloud_locations()
+
+    def _generate_cloud_locations(self):
+        random.seed(1337)
+        result = []
+        for i in range(self.n_clouds):
+            result.append(Vector2(random.randint(0, self.repeat_area[0]),
+                                  random.randint(0, self.repeat_area[1])))
+        return result
+
+    def _closest_congruent(self, target, point, mod):
+        """Returns the closest point to `target`.
+
+        Considers all points congruent with `point` modulo `mod`"""
+
+        # Note that x % mod returns non-negative values if mod > 0
+        mod_distance = Vector2((point[0] - target[0]) % mod[0],
+                               (point[1] - target[1]) % mod[1])
+        for i in range(2):
+            if mod_distance[i]*2 > mod[i]:
+                mod_distance[i] -= mod[i]
+
+        return mod_distance + target
+
+    def render(self, surface, offset):
+        center_offset = surface.get_rect().center + Vector2(offset)
+        dirty_rects = []
+        for location in self.cloud_locations:
+            cloud_location = self._closest_congruent(center_offset, location, self.repeat_area)
+            self.cloud_graphic.location = cloud_location
+            dirty_rects.extend(self.cloud_graphic.draw(surface, offset))
+        return dirty_rects
 
 def constant_view_locator(x, y):
     def _inner():
@@ -209,11 +259,15 @@ class GameView:
     def __init__(self, player):
         self.player = player
 
-    def render(self, surface, game_objects):
+    def render(self, surface, game_objects, game_background):
         rendering_region = surface.get_rect()
         rendering_region.center = self.player.view_location()
 
         dirty_rects = []
+
+        dirty_rects.extend(
+            game_background.render(surface, offset=rendering_region.topleft))
+
         for game_object in game_objects:
             dirty_rects.extend(
                 game_object.graphic.draw(surface, offset=rendering_region.topleft))
