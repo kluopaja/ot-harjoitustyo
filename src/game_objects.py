@@ -192,8 +192,6 @@ class Bullet(GameObject):
         self.physics = physics
         self.health = health
 
-        self.collision_damage = collision_damage
-
         self._update_locations()
 
     def alive(self):
@@ -203,18 +201,8 @@ class Bullet(GameObject):
         if not self.alive:
             return
 
-        self.damage(other.collision_damage)
-
-    def _damage(self, amount):
-        if not self.alive():
-            return (0, False)
-        damage_taken = min(amount, self.health)
+        damage_taken = min(other.collision_damage, self.health)
         self.health -= damage_taken
-        destroyed = False
-        if not self.alive():
-            destroyed = True
-
-        return damage_taken, destroyed
 
     def update(self, delta_time):
         if not self.alive():

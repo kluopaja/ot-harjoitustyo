@@ -63,7 +63,7 @@ class Player:
                 self.player_input.bind_shoot(self._start_new_flight)
             return
 
-        if not self.plane.alive:
+        if not self.plane.alive():
             self.plane = None
             self.spawn_timer.start()
 
