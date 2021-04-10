@@ -5,7 +5,7 @@ import pygame
 import game_objects
 from pygame import Vector2
 from events import EventHandler
-from game import Player, Timer, GameState, GameLoop, GameNotification, GameBackground
+from game import Player, Timer, GameState, GameLoop, GameNotification, GameBackground, Clock
 from graphics import ImageGraphic
 from shapes import Polyline, Rectangle
 from screen import Screen
@@ -43,8 +43,8 @@ game_state = GameState([ground], [player, player2])
 game_view1 = game.GameView(player)
 game_view2 = game.GameView(player2)
 cloud_graphic = ImageGraphic.from_image_path(project_root / "assets/cloud.png", Vector2(0, 0), Vector2(119, 81))
-background = GameBackground(cloud_graphic, n_clouds=100, repeat_area=Vector2(3000, 3000))
+background = GameBackground(cloud_graphic, n_clouds=10, repeat_area=Vector2(2000, 2000))
 renderer = game.GameRenderer(screen, [game_view1, game_view2], background)
 
-game_loop = GameLoop(game_input, game_state, renderer)
+game_loop = GameLoop(game_input, game_state, renderer, Clock(60))
 game_loop.run()

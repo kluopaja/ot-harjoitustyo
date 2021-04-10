@@ -122,33 +122,51 @@ class GameState:
 
         self.game_objects = new_game_objects
 
-def sleep_until(until):
-    if time.time() > until:
-        Exception("Too slow computer, skipping frames")
 
-    while time.time() < until:
-        pass
+class Clock:
+    def __init__(self, fps):
+        self.delta_time = 1/fps
+        self._previous_time = time.time()
+        self._last_sleep = 0
+
+    def reset(self):
+        self._previous_time = time.time()
+        self._last_sleep = 0
+
+    def tick(self):
+        next_time = self._previous_time + self.delta_time
+        self._last_sleep = next_time - time.time()
+        if self._last_sleep < 0:
+            logging.warning("Skipping frames!")
+
+        while time.time() < next_time:
+            pass
+
+        self._previous_time = time.time()
+
+    def busy_fraction(self):
+        return 1 - self._last_sleep / self.delta_time
+
 
 class GameLoop:
-    def __init__(self, game_input, game_state, game_renderer):
+    def __init__(self, game_input, game_state, game_renderer, clock):
         self.game_input = game_input
         self.game_state = game_state
         self.game_renderer = game_renderer
+        self.clock = clock
 
     def run(self):
-        previous_time = time.time()
-        clock = pygame.time.Clock()
+        self.clock.reset()
         while True:
             self.game_input.handle_inputs()
             if self.game_input.should_quit:
-                return
+                break
 
-            self.game_state.run_tick(1/60)
+            self.game_state.run_tick(self.clock.delta_time)
             self.game_renderer.render(self.game_state.game_objects)
-            sleep_until(previous_time + 1/60)
-            curr_time = time.time()
-            logging.debug(f'fps: {1/(curr_time - previous_time)}')
-            previous_time = curr_time
+            self.clock.tick()
+            logging.debug(f'busy frac: {self.clock.busy_fraction()}')
+
 
 
 class GameRenderer:
