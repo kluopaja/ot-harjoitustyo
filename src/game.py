@@ -147,8 +147,7 @@ class Clock:
     def busy_fraction(self):
         return 1 - self._last_sleep / self.delta_time
 
-
-class GameLoop:
+class Game:
     def __init__(self, game_input, game_state, game_renderer, clock):
         self.game_input = game_input
         self.game_state = game_state
@@ -166,8 +165,6 @@ class GameLoop:
             self.game_renderer.render(self.game_state.game_objects)
             self.clock.tick()
             logging.debug(f'busy frac: {self.clock.busy_fraction()}')
-
-
 
 class GameRenderer:
     def __init__(self, screen, game_views, game_background):
