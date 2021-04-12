@@ -12,6 +12,7 @@ from game_objects import PlaneFactory
 from inputs import GameInput, PlayerInput
 import logging
 from game_setup import GameFactory
+from menu import MenuRenderer, MenuItemRenderer, MenuInput, NewGameMenu, MenuKeys
 
 
 logging.basicConfig(level=logging.INFO)
@@ -23,4 +24,12 @@ event_handler = EventHandler()
 
 game_factory = GameFactory(project_root / "assets", event_handler)
 game_factory.remove_player()
-game_factory.game(screen).run()
+
+menu_item_renderer = MenuItemRenderer(font_color=(50, 69, 63))
+menu_renderer = MenuRenderer(screen, background_color=(186, 204, 200),
+                             item_spacing=100, item_renderer=menu_item_renderer)
+menu_keys = MenuKeys(pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP,
+                     pygame.K_RIGHT, pygame.K_LEFT, pygame.K_RETURN)
+menu_input = MenuInput(event_handler, menu_keys)
+menu = NewGameMenu(menu_renderer, menu_input, game_factory)
+menu.run(screen)
