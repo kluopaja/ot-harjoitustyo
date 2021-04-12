@@ -12,3 +12,5 @@ Date | Hours | What did I do
 7.4. | 2     | Add point counting
 8.4. | 2     | Refactoring
 9.4. | 2     | Refactoring
+10.4.| 3     | Add background and some modifications
+12.4.| 5     | Add menu, refactoring, add invoke tasks, finish weekly requirements
