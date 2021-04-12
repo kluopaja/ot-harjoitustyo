@@ -1,4 +1,5 @@
 import pygame
+# TODO should be somehow combined with MenuInput
 class GameInput:
     def __init__(self, event_handler):
         self.event_handler = event_handler

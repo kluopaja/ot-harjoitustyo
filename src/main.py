@@ -1,15 +1,8 @@
-import game
-import graphics
 from pathlib import Path
 import pygame
-import game_objects
 from pygame import Vector2
 from events import EventHandler
-from graphics import ImageGraphic
-from shapes import Polyline, Rectangle
 from screen import Screen
-from game_objects import PlaneFactory
-from inputs import GameInput, PlayerInput
 import logging
 from game_setup import GameFactory
 from menu import MenuRenderer, MenuItemRenderer, MenuInput, NewGameMenu, MenuKeys

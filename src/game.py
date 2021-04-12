@@ -124,6 +124,9 @@ class GameState:
 
 
 class Clock:
+    """A class for timing the game speed.
+
+        NOTE: Using similar class from Pygame resulted in jitter"""
     def __init__(self, fps):
         self.delta_time = 1/fps
         self._previous_time = time.time()
