@@ -274,8 +274,9 @@ def constant_view_locator(x, y):
     return _inner
 
 class GameView:
-    def __init__(self, player):
+    def __init__(self, player, font_color):
         self.player = player
+        self.font_color = font_color
 
     def render(self, surface, game_objects, game_background):
         rendering_region = surface.get_rect()
@@ -300,7 +301,7 @@ class GameView:
         dirty_rects = []
         dirty_rects.append(
             surface.centered_text(self.player.notification.message, text_center,
-                                  (200, 55, 55)))
+                                  self.font_color))
 
         return dirty_rects
 
@@ -309,6 +310,6 @@ class GameView:
         dirty_rects = []
         dirty_rects.append(
             surface.topleft_text(str(self.player.score), text_topleft,
-                                 (200, 55, 55)))
+                                 self.font_color))
 
         return dirty_rects
