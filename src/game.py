@@ -90,13 +90,15 @@ class GameState:
     def __init__(self, game_objects, players):
         self.game_objects = game_objects
         self.players = players
-        self._update_game_object_list()
 
     def run_tick(self, delta_time):
         self._update_players(delta_time)
+        # update the game object list _before_ game object update so that
+        # the newly created bullets will be moved with the plane (otherwise
+        # the plane might hit the bullets at high speeds)
+        self._update_game_object_list()
         self._update_game_objects(delta_time)
         self._handle_collisions()
-        self._update_game_object_list()
 
     def _update_players(self, delta_time):
         for player in self.players:
