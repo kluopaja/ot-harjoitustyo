@@ -14,3 +14,4 @@ Date | Hours | What did I do
 9.4. | 2     | Refactoring
 10.4.| 3     | Add background and some modifications
 12.4.| 5     | Add menu, refactoring, add invoke tasks, finish weekly requirements
+13.4 | 2     | Fix bug, finishing weekly requirements
