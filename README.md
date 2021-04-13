@@ -46,6 +46,7 @@ shoot: space
 accelerate: up
 turn down: right
 turn up: left
+```
 
 
 It is not yet possible to configure the keys.
