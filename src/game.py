@@ -22,20 +22,6 @@ class GameNotification:
     def clear(self):
         self.message = ""
 
-class Timer:
-    def __init__(self, length):
-        self.time_left = length
-        self.length = length
-
-    def start(self):
-        self.time_left = self.length
-
-    def update(self, delta_time):
-        self.time_left -= delta_time
-
-    def expired(self):
-        return self.time_left <= 0
-
 class Player:
     def __init__(self, plane_factory, player_input, game_notification, spawn_timer):
         self.plane_factory = plane_factory
@@ -123,34 +109,6 @@ class GameState:
             new_game_objects.extend(player.new_objects())
 
         self.game_objects = new_game_objects
-
-
-class Clock:
-    """A class for timing the game speed.
-
-        NOTE: Using similar class from Pygame resulted in jitter"""
-    def __init__(self, fps):
-        self.delta_time = 1/fps
-        self._previous_time = time.time()
-        self._last_sleep = 0
-
-    def reset(self):
-        self._previous_time = time.time()
-        self._last_sleep = 0
-
-    def tick(self):
-        next_time = self._previous_time + self.delta_time
-        self._last_sleep = next_time - time.time()
-        if self._last_sleep < 0:
-            logging.warning("Skipping frames!")
-
-        while time.time() < next_time:
-            pass
-
-        self._previous_time = time.time()
-
-    def busy_fraction(self):
-        return 1 - self._last_sleep / self.delta_time
 
 class Game:
     def __init__(self, game_input, game_state, game_renderer, clock):

@@ -6,6 +6,8 @@ from screen import Screen
 import logging
 from game_setup import GameFactory
 from menu import MenuRenderer, MenuItemRenderer, MenuInput, NewGameMenu, MenuKeys
+from timing import Clock, sleep_wait
+import sys
 
 
 logging.basicConfig(level=logging.INFO)

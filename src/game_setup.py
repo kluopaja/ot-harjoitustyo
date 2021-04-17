@@ -1,5 +1,6 @@
-from game import Player, Timer, GameState, Game, GameNotification, GameBackground
-from game import Clock, GameRenderer, GameView
+from game import Player, GameState, Game, GameNotification, GameBackground
+from game import GameRenderer, GameView
+from timing import Timer, Clock, busy_wait
 from graphics import ImageGraphic, PolylineGraphic
 from shapes import Polyline, Rectangle
 from screen import Screen
@@ -60,7 +61,7 @@ class GameFactory:
                                     fill_color = (180, 213, 224))
         renderer = GameRenderer(screen, game_views, background)
 
-        game = Game(game_input, game_state, renderer, Clock(60))
+        game = Game(game_input, game_state, renderer, Clock(60, busy_wait))
         return game
 
     def add_player(self):

@@ -5,8 +5,7 @@ from pygame import Vector2
 from graphics import ImageGraphic
 from shapes import Rectangle, Circle
 from physics import BasePhysics, BodyPhysics, WingPhysics, angle_between, PhysicsController
-from game import Timer
-
+from timing import Timer
 def score_generator(damage_score, destroying_score):
     def _inner(damage, destroyed):
         return damage * damage_score + destroyed * destroying_score
