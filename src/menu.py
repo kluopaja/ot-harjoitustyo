@@ -1,5 +1,6 @@
 from pygame import Vector2
 from menu_item import ButtonMenuItem
+from game_setup import game_factory_menu_items
 import pygame
 class MenuKeys:
     def __init__(self, quit_menu, next_item, prev_item, increase, decrease, accept):
@@ -70,7 +71,7 @@ class NewGameMenu:
         self.menu_renderer = menu_renderer
         self.menu_input = menu_input
         self.game_factory = game_factory
-        self.items = game_factory.menu_item_modifiers() \
+        self.items = game_factory_menu_items(self.game_factory) \
                      + [ButtonMenuItem(self._start_game, "start game")]
         self.selected_item = 0
         self._should_start_game = False

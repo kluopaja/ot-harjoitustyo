@@ -20,17 +20,19 @@ class MenuItem:
         """
         pass
 
-class PlayerNumberMenuItem(MenuItem):
-    def __init__(self, game_factory, description):
-        self.game_factory = game_factory
+class ValueBrowserMenuItem(MenuItem):
+    def __init__(self, decrease_function, increase_function, value_function, description):
+        self.decrease_function = decrease_function
+        self.increase_function = increase_function
+        self.value_function = value_function
         self.description = description
 
     def text(self):
-        return self.description + str(self.game_factory.n_players)
+        return self.description + str(self.value_function())
 
     def bind(self, menu_input):
-        menu_input.bind_increase(self.game_factory.add_player)
-        menu_input.bind_decrease(self.game_factory.remove_player)
+        menu_input.bind_increase(self.increase_function)
+        menu_input.bind_decrease(self.decrease_function)
 
     def update(self, menu_input):
         return True
