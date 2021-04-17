@@ -60,6 +60,7 @@ class BulletFactory:
         self.body_grad = 0.001
         self.health = 1
         self.collision_damage=100
+        self.timeout = 5
 
     def bullet(self, location, velocity, front, owner):
         image_graphic = ImageGraphic.from_image_path(self.file_path,
@@ -67,8 +68,8 @@ class BulletFactory:
         circle = Circle(Vector2(0), self.size[0]/2)
         tmp = BasePhysics(location, velocity, front)
         physics = BodyPhysics(tmp, self.body_grad, lambda x: Vector2(0, 5))
-        return Bullet(circle, image_graphic, physics, owner, self.health,
-                      self.collision_damage)
+        return Bullet(circle, image_graphic, physics, owner, Timer(self.timeout),
+                      self.health, self.collision_damage)
 
 class Gun:
     def __init__(self, bullet_factory, timer, spawn_offset, speed):
@@ -279,7 +280,7 @@ class Bullet(GameObject):
         health: A scalar
             The remaining health of the bullet
     """
-    def __init__(self, shape, graphic, physics, owner, health=100,
+    def __init__(self, shape, graphic, physics, owner, timer, health=100,
                  collision_damage=100):
         """Initializes the bullet.
 
@@ -297,10 +298,13 @@ class Bullet(GameObject):
             collision_damage: A non-negative scalar
                 The damage that the bullet does to other game objects
                 when colliding
+            timer: A Timer class object
+                The bullet will disappear when the timer expires.
         """
 
         super().__init__(shape, graphic, owner, collision_damage)
         self.physics = physics
+        self.timer = timer
         self.health = health
 
         self._update_locations()
@@ -320,11 +324,17 @@ class Bullet(GameObject):
 
     def update(self, delta_time):
         """See base class"""
+
+        self.timer.update(delta_time)
+        if self.timer.expired():
+            self.health = 0
+
         if not self.alive():
             return
 
         self.physics.update(delta_time)
         self._update_locations()
+
 
     def new_objects(self):
         """See base class"""
