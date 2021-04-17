@@ -23,8 +23,8 @@ game_factory.remove_player()
 menu_item_renderer = MenuItemRenderer(font_color=(50, 69, 63))
 menu_renderer = MenuRenderer(screen, background_color=(186, 204, 200),
                              item_spacing=100, item_renderer=menu_item_renderer)
-menu_keys = MenuKeys(pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP,
+menu_keys = MenuKeys(pygame.K_ESCAPE, pygame.K_UP, pygame.K_DOWN,
                      pygame.K_RIGHT, pygame.K_LEFT, pygame.K_RETURN)
 menu_input = MenuInput(event_handler, menu_keys)
-menu = NewGameMenu(menu_renderer, menu_input, game_factory)
+menu = NewGameMenu(menu_renderer, menu_input, game_factory, Clock(20, sleep_wait))
 menu.run(screen)

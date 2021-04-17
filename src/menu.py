@@ -36,7 +36,7 @@ class MenuInput:
 
     def bind_accept(self, func):
         self.keymaps[self.keys.accept] = func
-    
+
     def clear_item_bindings(self):
         if self.keys.increase in self.keymaps:
             del self.keymaps[self.keys.increase]
@@ -67,7 +67,7 @@ class MenuInput:
             f()
 
 class NewGameMenu:
-    def __init__(self, menu_renderer, menu_input, game_factory):
+    def __init__(self, menu_renderer, menu_input, game_factory, clock):
         self.menu_renderer = menu_renderer
         self.menu_input = menu_input
         self.game_factory = game_factory
@@ -75,6 +75,7 @@ class NewGameMenu:
                      + [ButtonMenuItem(self._start_game, "start game")]
         self.selected_item = 0
         self._should_start_game = False
+        self.clock = clock
 
     def run(self, screen):
         while True:
@@ -85,9 +86,11 @@ class NewGameMenu:
            if self._should_start_game:
                self._should_start_game = False
                self.game_factory.game(screen).run()
-           if self.items[self.selected_item].update(self.menu_input):
-               self.menu_renderer.render(self)
-    
+
+           self.menu_renderer.render(self)
+           self.clock.tick()
+
+
     def _prepare_menu_input(self):
         self.menu_input.clear_bindings()
         self.menu_input.bind_next_item(self._activate_next_item)

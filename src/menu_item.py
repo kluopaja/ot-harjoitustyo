@@ -8,16 +8,8 @@ class MenuItem:
     def bind(self, menu_input):
         pass
 
+    # TODO remove?
     def release(self, menu_input):
-        pass
-
-    def update(self):
-        """Updates the menu item state.
-
-        Returns: a boolean
-            True if the state of the menu item was changed
-            False otherwise
-        """
         pass
 
 class ValueBrowserMenuItem(MenuItem):
@@ -34,9 +26,6 @@ class ValueBrowserMenuItem(MenuItem):
         menu_input.bind_increase(self.increase_function)
         menu_input.bind_decrease(self.decrease_function)
 
-    def update(self, menu_input):
-        return True
-
 class ButtonMenuItem(MenuItem):
     def __init__(self, button_function, text):
         self.button_function = button_function
@@ -47,6 +36,3 @@ class ButtonMenuItem(MenuItem):
 
     def bind(self, menu_input):
         menu_input.bind_accept(self.button_function)
-
-    def update(self, menu_input):
-        return True
