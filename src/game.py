@@ -5,6 +5,7 @@ import graphics
 from pathlib import Path
 import pygame
 import time
+import math
 import itertools
 
 class GameNotification:
@@ -129,6 +130,78 @@ class Game:
             self.clock.tick()
             logging.debug(f'busy frac: {self.clock.busy_fraction()}')
 
+def rect_horizontal_split(rect):
+    """Splits `rect` along the horizontal axis`
+
+    Arguments:
+        `rect`: a pygame Rect
+
+    Returns:
+        (r1, r2) : a tuple of Rects
+            r1 is the upper Rect and r2 is the lower Rect"""
+
+    upper = rect.copy()
+    upper.height /= 2
+
+    lower = rect.copy()
+    lower.height = rect.height - upper.height
+
+    lower.top = upper.bottom
+    return (upper, lower)
+
+def rect_vertical_split(rect):
+    """Splits `rect` along the vertical axis`
+
+    Arguments:
+        `rect`: a pygame Rect
+
+    Returns:
+        (r1, r2) : a tuple of Rects
+            r1 is the left Rect and r2 is the right Rect"""
+
+    left = rect.copy()
+    left.width /= 2
+
+    right = rect.copy()
+    right.width = rect.width - left.width
+
+    right.left = left.right
+    return (left, right)
+
+def rect_splitter(split_depth, rect, start_dimension='vertical'):
+    """Recursively splits `rect`.
+
+    Alternates between horizontal and vertical splits
+
+    Arguments:
+        `split_depth`: a non-negative integer
+            The number of recursive splits
+        `rect`: a pygame Rect
+        `start_dimension`: `vertical` or `horizontal`
+            The direction of the first split
+
+    Returns:
+        a list of Rects
+            The final results of the splits"""
+
+    splitters = (rect_vertical_split, rect_horizontal_split)
+    if start_dimension == 'vertical':
+        pass
+    elif start_dimension == 'horizontal':
+        splitters[0], split_dimesions[1] = splitters[1], splitters[0]
+    else:
+        raise ValueError("Invalid `start_dimension`")
+
+    split_results = [rect.copy()]
+
+    for i in range(split_depth):
+        new_split_results = []
+        for x in split_results:
+            new_split_results.extend(splitters[i%2](x))
+        split_results = new_split_results
+
+    return split_results
+
 class GameRenderer:
     def __init__(self, screen, game_views, game_background):
         self._screen = screen
@@ -139,22 +212,12 @@ class GameRenderer:
         self._previous_dirty_rects = []
         self._screen.update()
 
-        if len(game_views) > 2:
-            raise ValueError("Maximum of 2 game views supported")
+        if len(game_views) == 0:
+            raise ValueError("At least 1 GameView needed")
 
-        self.game_view_areas = []
+        n_splits = math.ceil(math.log2(len(game_views)))
         whole_area = screen.surface.get_rect()
-
-        if len(game_views) == 1:
-            self.game_view_areas = [whole_area]
-
-        if len(game_views) == 2:
-            whole_area.width = whole_area.width/2
-            self.game_view_areas.append(Rect(whole_area))
-            whole_area.left = whole_area.width
-            self.game_view_areas.append(Rect(whole_area))
-
-
+        self.game_view_areas = rect_splitter(n_splits, whole_area)
 
     def render(self, game_objects):
         self._screen.surface.fill(self.game_background.fill_color)
