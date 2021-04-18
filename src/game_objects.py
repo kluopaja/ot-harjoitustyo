@@ -19,7 +19,7 @@ class PlaneFactory:
         self.acceleration = 4
         self.rotation = 5
         self.body_drag = 0.01
-        self.wing_size = 0.3
+        self.wing_size = 0.4
         self.gravity = 5
         self.health = 100
         self.collision_damage = 100
