@@ -27,32 +27,50 @@ Coverage report can be genreated with:
 
 Navigation in the menu is done with arrow keys, esc and enter.
 
-Currently the game only supports 1 and 2 player modes. The player's score is
-shown in the top left corner of the game view.
+The number of supported players depends on the number of player keymaps defined
+and on the map support. Currently these support 4 players.
+The player's score is shown in the top left corner of the game view.
 
 Keys for player 1:
 
 ```
-shoot: left shift
 accelerate: w
-turn down: d
 turn up: a
+turn down: d
+shoot: q
 
 ```
 Keys for player 2:
 
 ```
-shoot: space
 accelerate: up
-turn down: right
 turn up: left
+turn down: right
+shoot: right shift
+
+```
+Keys for player 3:
+
+```
+accelerate: t
+turn up: f
+turn down: h
+shoot: r
+
+```
+Keys for player 4:
+
+```
+accelerate: i
+turn up: j
+turn down: l
+shoot: u
 ```
 
 
-It is not yet possible to configure the keys.
+They keymaps can be configured by modifying the `assets/keys.json` file.
 Please note that in single player mode the keymappings for player 1 will
 be used.
-
 
 ### Tips for flying
 
