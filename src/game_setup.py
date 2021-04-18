@@ -10,33 +10,53 @@ import pygame
 from pygame import Vector2
 from menu_item import ValueBrowserMenuItem
 from level_config import LevelConfigSelector
+import json
+class PlayerInputLoader:
+    def __init__(self, keymaps_file_path):
+        self._data = json.load(open(keymaps_file_path, "r"))
+
+    def max_players(self):
+        return len(self._data["player_keys"])
+
+
+    def get_player_inputs(self, game_input):
+        """Generates a list of PlayerInput objects.
+
+        Arguments:
+            `game_input`: a GameInput object
+                The object to which the PlayerInputs will be attached to."""
+        player_inputs = []
+
+        def code(description):
+            return pygame.key.key_code(description)
+        for keys in self._data["player_keys"]:
+            player_inputs.append(PlayerInput(game_input, code(keys["accelerate"]),
+                                             code(keys["up"]), code(keys["down"]),
+                                             code(keys["shoot"])))
+        return player_inputs
+
+
 class GameFactory:
-    def __init__(self, assets_path, event_handler, n_players=2, max_players=2):
-        if max_players > 2:
-            raise Exception("Maximum of 2 players currently supported")
+    def __init__(self, assets_path, event_handler, n_players=2):
         self.n_players = n_players
-        self.max_players = max_players
         self.assets_path = assets_path
         if event_handler is None:
             event_handler = EventHandler()
         self.event_handler = event_handler
         self.level_config_selector = LevelConfigSelector(self.assets_path / "levels")
+        self.player_input_loader = PlayerInputLoader(self.assets_path / "keys.json")
 
     def game(self, screen):
         level_config = self.level_config_selector.get_selected()
         game_input = GameInput(self.event_handler)
-        # TODO read from config file
-        player_inputs = []
-        player_inputs.append(PlayerInput(game_input, pygame.K_w, pygame.K_a,
-                                         pygame.K_d, pygame.K_LSHIFT))
-        player_inputs.append(PlayerInput(game_input, pygame.K_UP, pygame.K_LEFT,
-                                         pygame.K_RIGHT, pygame.K_SPACE))
+        player_inputs = self.player_input_loader.get_player_inputs(game_input)
+
         game_notifications = []
         plane_factories = []
 
         start_positions = level_config.starting_locations()
 
-        for i in range(self.max_players):
+        for i in range(self.n_players):
             game_notifications.append(
                 GameNotification("press `shoot` to start flying", "seconds to go"))
             plane_factories.append(
@@ -83,6 +103,7 @@ class GameFactory:
     def _clamp_n_players(self):
         self.n_players = max(1, self.n_players)
         self.n_players = min(self.n_players, self.level_config_selector.max_players())
+        self.n_players = min(self.n_players, self.player_input_loader.max_players())
 
 def game_factory_menu_items(game_factory):
     """Returns a list of MenuItems that modify `game_factory`"""

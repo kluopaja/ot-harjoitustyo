@@ -1,0 +1,28 @@
+{
+	"player_keys" : [
+		{
+			"accelerate" : "w",
+			"up" : "a",
+			"down" : "d",
+			"shoot" : "q"
+		},
+		{
+			"accelerate" : "up",
+			"up" : "left",
+			"down" : "right",
+			"shoot" : "right shift"
+		},
+		{
+			"accelerate" : "t",
+			"up" : "f",
+			"down" : "h",
+			"shoot" : "r"
+		},
+		{
+			"accelerate" : "i",
+			"up" : "j",
+			"down" : "l",
+			"shoot" : "u"
+		}
+	]
+}
