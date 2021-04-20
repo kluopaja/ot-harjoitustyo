@@ -6,7 +6,7 @@ A 2D shoot 'em up flying game inspired by Sopwith.
 
 ## Documentation
 * [Requirements specification](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/requirements_specification.md)
-* [Architecture description](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/architecture_description.md)
+* [Architecture description](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/architecture.md)
 
 
 ## Installation
@@ -82,7 +82,7 @@ Please note that in single player mode the keymappings for player 1 will
 be used.
 
 
-## Levels
+### Levels
 The levels are defined in ```assets/levels/```. Currently the only way
 to edit the levels or to create new levels is to manually edit the level files.
 
