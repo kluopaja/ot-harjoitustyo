@@ -1,6 +1,7 @@
 class MenuItem:
     """Base class for menu items."""
     # TODO make abstract
+
     def text(self):
         """Returns the text for the menu item"""
         return "0"
@@ -12,8 +13,9 @@ class MenuItem:
     def release(self, menu_input):
         pass
 
+
 class ValueBrowserMenuItem(MenuItem):
-    def __init__(self, decrease_function, increase_function, value_function, description, accept_function = lambda : None):
+    def __init__(self, decrease_function, increase_function, value_function, description, accept_function=lambda: None):
         self.decrease_function = decrease_function
         self.increase_function = increase_function
         self.value_function = value_function
@@ -28,6 +30,7 @@ class ValueBrowserMenuItem(MenuItem):
         menu_input.bind_decrease(self.decrease_function)
         menu_input.bind_accept(self.accept_function)
 
+
 class ButtonMenuItem(MenuItem):
     def __init__(self, button_function, text):
         self.button_function = button_function
@@ -38,6 +41,7 @@ class ButtonMenuItem(MenuItem):
 
     def bind(self, menu_input):
         menu_input.bind_accept(self.button_function)
+
 
 class TextInputMenuItem(MenuItem):
     def __init__(self, description, get_text, set_text):

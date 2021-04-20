@@ -1,5 +1,7 @@
 import pygame
 # TODO should be somehow combined with MenuInput
+
+
 class GameInput:
     def __init__(self, event_handler):
         self.event_handler = event_handler
@@ -31,6 +33,7 @@ class GameInput:
         for f in callbacks:
             f()
 
+
 class PlayerInput:
     def __init__(self, game_input, up_key, left_key, right_key, shoot_key):
         self.game_input = game_input
@@ -43,25 +46,25 @@ class PlayerInput:
         self.game_input.bind_key(self.up_key, func)
 
     def clear_up(self):
-        self.bind_up(lambda : None)
+        self.bind_up(lambda: None)
 
     def bind_left(self, func):
         self.game_input.bind_key(self.left_key, func)
 
     def clear_left(self):
-        self.bind_left(lambda : None)
+        self.bind_left(lambda: None)
 
     def bind_right(self, func):
         self.game_input.bind_key(self.right_key, func)
 
     def clear_right(self):
-        self.bind_right(lambda : None)
+        self.bind_right(lambda: None)
 
     def bind_shoot(self, func):
         self.game_input.bind_key(self.shoot_key, func)
 
     def clear_shoot(self):
-        self.bind_shoot(lambda : None)
+        self.bind_shoot(lambda: None)
 
     def bind_to_plane(self, plane):
         self.bind_up(plane.accelerate)

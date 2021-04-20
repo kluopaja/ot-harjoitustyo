@@ -11,13 +11,14 @@ from pygame import Vector2
 from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
 from level_config import LevelConfigSelector
 import json
+
+
 class PlayerInputLoader:
     def __init__(self, keymaps_file_path):
         self._data = json.load(open(keymaps_file_path, "r"))
 
     def max_players(self):
         return len(self._data["player_keys"])
-
 
     def get_player_inputs(self, game_input):
         """Generates a list of PlayerInput objects.
@@ -31,9 +32,11 @@ class PlayerInputLoader:
             return pygame.key.key_code(description)
         for keys in self._data["player_keys"]:
             player_inputs.append(PlayerInput(game_input, code(keys["accelerate"]),
-                                             code(keys["up"]), code(keys["down"]),
+                                             code(keys["up"]), code(
+                                                 keys["down"]),
                                              code(keys["shoot"])))
         return player_inputs
+
 
 class PlayerPreferences:
     def __init__(self, name):
@@ -79,6 +82,7 @@ class PlayerPreferencesSelector:
         if n_players < 1:
             raise ValueError("`n_players` must be at least 1")
 
+
 class GameFactory:
     def __init__(self, assets_path, event_handler, screen, n_players=2):
         self.n_players = n_players
@@ -87,8 +91,10 @@ class GameFactory:
             event_handler = EventHandler()
         self.event_handler = event_handler
         self.screen = screen
-        self.level_config_selector = LevelConfigSelector(self.assets_path / "levels")
-        self.player_input_loader = PlayerInputLoader(self.assets_path / "keys.json")
+        self.level_config_selector = LevelConfigSelector(
+            self.assets_path / "levels")
+        self.player_input_loader = PlayerInputLoader(
+            self.assets_path / "keys.json")
         self.player_preferences_selector = PlayerPreferencesSelector(self.n_players,
                                                                      "Player")
 
@@ -125,7 +131,7 @@ class GameFactory:
                                                      Vector2(0, 0), Vector2(119, 81))
         background = GameBackground(cloud_graphic, n_clouds=10,
                                     repeat_area=Vector2(3000, 2000),
-                                    fill_color = (180, 213, 224))
+                                    fill_color=(180, 213, 224))
         renderer = GameRenderer(self.screen, game_views, background)
 
         game = Game(game_input, game_state, renderer, Clock(60, busy_wait))
@@ -133,19 +139,19 @@ class GameFactory:
 
     def add_player(self):
         self.n_players += 1
-        self._update_players();
+        self._update_players()
 
     def remove_player(self):
         self.n_players -= 1
-        self._update_players();
+        self._update_players()
 
     def next_level(self):
         self.level_config_selector.next_level()
-        self._update_players();
+        self._update_players()
 
     def previous_level(self):
         self.level_config_selector.previous_level()
-        self._update_players();
+        self._update_players()
 
     def activate_previous_player(self):
         self.player_preferences_selector.previous()
@@ -165,12 +171,16 @@ class GameFactory:
 
     def _clamp_n_players(self):
         self.n_players = max(1, self.n_players)
-        self.n_players = min(self.n_players, self.level_config_selector.max_players())
-        self.n_players = min(self.n_players, self.player_input_loader.max_players())
+        self.n_players = min(
+            self.n_players, self.level_config_selector.max_players())
+        self.n_players = min(
+            self.n_players, self.player_input_loader.max_players())
+
 
 def player_preferences_menu_items(preferences):
     out = []
     # callback function for the menu item
+
     def set_name(name):
         preferences.name = name
 
@@ -179,6 +189,7 @@ def player_preferences_menu_items(preferences):
     out.append(TextInputMenuItem("Name: ", get_name, set_name))
     return out
 
+
 def new_game_menu_items(game_factory, menu_factory):
     """Returns a list of MenuItem objects that modifies `game_factory`"""
     items = []
@@ -186,7 +197,7 @@ def new_game_menu_items(game_factory, menu_factory):
     items.append(ValueBrowserMenuItem(game_factory.previous_level, game_factory.next_level,
                                       level_selector.level_name, "Level: "))
     items.append(ValueBrowserMenuItem(game_factory.remove_player, game_factory.add_player,
-                                      lambda : game_factory.n_players, "Number of players: "))
+                                      lambda: game_factory.n_players, "Number of players: "))
 
     def preferences_menu_runner():
         active_player_preferences = game_factory.active_player_preferences()

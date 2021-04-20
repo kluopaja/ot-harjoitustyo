@@ -5,17 +5,23 @@ from pygame import Vector2
 
 from shapes import Circle, Line, Rectangle, Polyline
 from constants import EPS
+
+
 def vec_eq(v1, v2):
     return (v1-v2).magnitude() < EPS
+
 
 def line_eq(l1, l2):
     return vec_eq(l1.begin, l2.begin) and vec_eq(l1.end, l2.end)
 
+
 def rect_eq(r1, r2):
     return all([line_eq(x, y) for x, y in zip(r1.sides, r2.sides)])
 
+
 def polyline_eq(p1, p2):
     return all([line_eq(x, y) for x, y in zip(p1.lines, p2.lines)])
+
 
 class TestCircle:
     @pytest.fixture
@@ -56,7 +62,8 @@ class TestCircle:
 
     def test_repr(self, circle1):
         assert "Circle(center = [1, 2], radius = 3, location = [0, 0], rotation = 0.0)" \
-                == repr(circle1)
+            == repr(circle1)
+
 
 class TestLine:
     @pytest.fixture
@@ -102,7 +109,8 @@ class TestLine:
         assert vec_eq(line1.end, Vector2(1 + 1, -3 + 3))
 
     def test_projection_param_point_already_on_line(self, line1):
-        position = line1.projection_param(Vector2(1, 2) * 0.8 + Vector2(3, 1) * 0.2)
+        position = line1.projection_param(
+            Vector2(1, 2) * 0.8 + Vector2(3, 1) * 0.2)
         assert pytest.approx(position, EPS) == 0.2
 
     def test_projection_param_point_projection_on_line(self, line1):
@@ -112,14 +120,17 @@ class TestLine:
 
     def test_projection_param_point_projection_outside_line(self, line1):
         # (3, 1) - (1, 2) = (2, -1) --> (1, 2) is perpendicular
-        point = Vector2(1, 2) + (Vector2(3, 1) - Vector2(1, 2)) * 3 + Vector2(1, 2)
+        point = Vector2(1, 2) + (Vector2(3, 1) -
+                                 Vector2(1, 2)) * 3 + Vector2(1, 2)
         assert pytest.approx(line1.projection_param(point), EPS) == 3
 
     def test_distance_to_closest_at_begin(self, line_45_degrees):
-        assert pytest.approx(line_45_degrees.distance_to(Vector2(0.5, 2)), EPS) == 0.5
+        assert pytest.approx(line_45_degrees.distance_to(
+            Vector2(0.5, 2)), EPS) == 0.5
 
     def test_distance_to_closest_at_end(self, line_45_degrees):
-        assert pytest.approx(line_45_degrees.distance_to(Vector2(2, 3.5)), EPS) == 0.5
+        assert pytest.approx(line_45_degrees.distance_to(
+            Vector2(2, 3.5)), EPS) == 0.5
 
     def test_distance_to_point_on_line(self, line_45_degrees):
         point = Vector2(1, 2) + 0.5 * Vector2(1, 1)
@@ -127,11 +138,13 @@ class TestLine:
 
     def test_distance_to_closest_at_projection(self, line_45_degrees):
         point = Vector2(1, 2) + 0.5 * Vector2(1, 1) + Vector2(1, -1)
-        assert pytest.approx(line_45_degrees.distance_to(point), EPS) == math.sqrt(2)
+        assert pytest.approx(line_45_degrees.distance_to(
+            point), EPS) == math.sqrt(2)
 
     def test_repr(self, line1):
         assert "Line(begin = [1, 2], end = [3, 1], location = [0, 0], rotation = 0.0)" \
-                == repr(line1)
+            == repr(line1)
+
 
 class TestRectangle:
     @pytest.fixture
@@ -162,7 +175,8 @@ class TestRectangle:
 
     def test_setting_location_moves_sides_correctly(self, rect1):
         rect1.location = Vector2(1, 3)
-        assert rect_eq(rect1, Rectangle(Vector2(1, 3), Vector2(3, 3), Vector2(1, 4)))
+        assert rect_eq(rect1, Rectangle(
+            Vector2(1, 3), Vector2(3, 3), Vector2(1, 4)))
 
     def test_setting_rotation_changes_rotation_correctly(self, rect1):
         rect1.rotation = 1
@@ -170,7 +184,8 @@ class TestRectangle:
 
     def test_setting_rotation_moves_sides_correctly(self, rect1):
         rect1.rotation = math.pi / 2
-        assert rect_eq(rect1, Rectangle(Vector2(0, 0), Vector2(0, -2), Vector2(1, 0)))
+        assert rect_eq(rect1, Rectangle(
+            Vector2(0, 0), Vector2(0, -2), Vector2(1, 0)))
 
     def test_location_plus_rotation_change_endpoints_correctly(self, rect1):
         rect1.location = Vector2(1, 3)
@@ -180,7 +195,8 @@ class TestRectangle:
 
     def test_repr(self, rect1):
         assert "Rectangle(topleft = [0, 0], topright = [2, 0], bottomleft = [0, 1], location = [0, 0], rotation = 0.0)" \
-                == repr(rect1)
+            == repr(rect1)
+
 
 class TestPolyline:
     @pytest.fixture
@@ -193,7 +209,8 @@ class TestPolyline:
         assert line_eq(polyline1.lines[1], Line(Vector2(0, 1), Vector2(2, 2)))
 
     def test_from_points_sets_data_members_correctly(self):
-        polyline = Polyline.from_points([Vector2(0, 0), Vector2(0, 1), Vector2(1, 3)])
+        polyline = Polyline.from_points(
+            [Vector2(0, 0), Vector2(0, 1), Vector2(1, 3)])
         assert line_eq(polyline.lines[0], Line(Vector2(0, 0), Vector2(0, 1)))
         assert line_eq(polyline.lines[1], Line(Vector2(0, 1), Vector2(1, 3)))
 
@@ -210,7 +227,7 @@ class TestPolyline:
     def test_setting_location_moves_sides_correctly(self, polyline1):
         polyline1.location = Vector2(1, 3)
         assert polyline_eq(polyline1, Polyline([Line(Vector2(0+1, 0+3), Vector2(2+1, 0+3)),
-                                            Line(Vector2(0+1, 1+3), Vector2(2+1, 2+3))]))
+                                                Line(Vector2(0+1, 1+3), Vector2(2+1, 2+3))]))
 
     def test_setting_rotation_changes_rotation_correctly(self, polyline1):
         polyline1.rotation = 1
@@ -219,13 +236,13 @@ class TestPolyline:
     def test_setting_rotation_moves_sides_correctly(self, polyline1):
         polyline1.rotation = math.pi / 2
         assert polyline_eq(polyline1, Polyline([Line(Vector2(0, 0), Vector2(0, -2)),
-                                            Line(Vector2(1, 0), Vector2(2, -2))]))
+                                                Line(Vector2(1, 0), Vector2(2, -2))]))
 
     def test_location_plus_rotation_change_endpoints_correctly(self, polyline1):
         polyline1.location = Vector2(1, 3)
         polyline1.rotation = math.pi / 2
         assert polyline_eq(polyline1, Polyline([Line(Vector2(0+1, 0+3), Vector2(0+1, -2+3)),
-                                            Line(Vector2(1+1, 0+3), Vector2(2+1, -2+3))]))
+                                                Line(Vector2(1+1, 0+3), Vector2(2+1, -2+3))]))
 
     def test_repr(self, polyline1):
         assert """Polyline([
@@ -233,6 +250,7 @@ class TestPolyline:
 [[0, 1], [2, 2]]],
 location = [0, 0], rotation = 0.0)""" \
                 == repr(polyline1)
+
 
 class TestCollisions:
     @pytest.fixture
@@ -311,7 +329,8 @@ class TestCollisions:
 
     def test_rectangle_rectangle_intersection_fully_inside_other(self):
         rect1 = Rectangle(Vector2(1, 0), Vector2(2, 0), Vector2(1, 1))
-        rect2 = Rectangle(Vector2(1.1, 0.1), Vector2(1.2, 0.1), Vector2(1.1, 0.3))
+        rect2 = Rectangle(Vector2(1.1, 0.1), Vector2(
+            1.2, 0.1), Vector2(1.1, 0.3))
         assert rect1.intersects(rect2)
         assert rect2.intersects(rect1)
 
@@ -357,6 +376,7 @@ class TestCollisions:
         assert not polyline2.intersects(polyline1)
 
     def test_polyline_polyline_intersection(self, polyline1):
-        polyline2 = Polyline([Line(Vector2(2.5 + 1, 3.5 - 1), Vector2(3 - 1, 4 + 1))])
+        polyline2 = Polyline(
+            [Line(Vector2(2.5 + 1, 3.5 - 1), Vector2(3 - 1, 4 + 1))])
         assert polyline1.intersects(polyline2)
         assert polyline2.intersects(polyline1)

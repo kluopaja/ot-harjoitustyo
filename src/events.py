@@ -1,4 +1,6 @@
 import pygame
+
+
 class EventHandler:
     def get_events(self):
         return pygame.event.get()

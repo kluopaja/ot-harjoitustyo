@@ -4,6 +4,8 @@ from pygame import Vector2, Rect
 import math
 from abc import ABC, abstractmethod
 from shapes import Rectangle
+
+
 class Graphic(ABC):
     @abstractmethod
     def draw(self, surface, offset=(0, 0)):
@@ -28,6 +30,7 @@ class Graphic(ABC):
     @abstractmethod
     def rotation(self, value):
         pass
+
 
 class PolylineGraphic(Graphic):
     def __init__(self, polyline, color, width):
@@ -58,7 +61,8 @@ class PolylineGraphic(Graphic):
         for line in self._polyline.lines:
             begin = line.begin - offset
             end = line.end - offset
-            dirty_rects.append(surface.draw_line(begin, end, self.color, self.width))
+            dirty_rects.append(surface.draw_line(
+                begin, end, self.color, self.width))
         return dirty_rects
 
     @property
@@ -77,8 +81,10 @@ class PolylineGraphic(Graphic):
     def rotation(self, value):
         self._polyline.rotation = value
 
+
 class ImageGraphic(Graphic):
     """Class for movable and rotatable images."""
+
     def __init__(self, rectangle, image):
         self._rectangle = rectangle
         self._image = image
@@ -101,7 +107,8 @@ class ImageGraphic(Graphic):
             An ImageGraphic object
         """
         helper_rect = Rect(0, 0, size[0], size[1])
-        helper_rect.center = (math.floor(center_offset[0]), math.floor(center_offset[1]))
+        helper_rect.center = (math.floor(
+            center_offset[0]), math.floor(center_offset[1]))
         rectangle = Rectangle.from_rect(helper_rect)
         image = Image(image_path)
         return ImageGraphic(rectangle, image)
@@ -137,10 +144,12 @@ class ImageGraphic(Graphic):
         self._rectangle.rotation = value
         self._image.rotate_to(self._rectangle.rotation)
 
+
 class Image:
     """Class for storing and drawing an image.
 
     """
+
     def __init__(self, image_path):
         self.image = pygame.image.load(image_path)
         self._image_not_rotated = self.image
@@ -160,7 +169,8 @@ class Image:
 
         size_tuple = (int(size[0]), int(size[1]))
         self.image = pygame.transform.scale(self.image, size_tuple)
-        self._image_not_rotated = pygame.transform.scale(self._image_not_rotated, size_tuple)
+        self._image_not_rotated = pygame.transform.scale(
+            self._image_not_rotated, size_tuple)
 
     def draw(self, surface, center):
         rect = self.image.get_rect()

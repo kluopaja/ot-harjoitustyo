@@ -12,19 +12,23 @@ from tests.screen_test import ScreenStub
 from tests.drawing_surface_test import DrawingSurfaceStub
 from screen import Screen
 
+
 @pytest.fixture
 def surface_stub():
     return DrawingSurfaceStub(10, 10)
+
 
 @pytest.fixture
 def image():
     tests_path = Path(__file__).parent
     return Image(Path(tests_path / "assets/test_image_1.png"))
 
+
 class TestPolylineGraphics:
     @pytest.fixture
     def polyline_graphic(self):
-        polyline = Polyline.from_points([Vector2(0, 0), Vector2(1, 2), Vector2(5, 4)])
+        polyline = Polyline.from_points(
+            [Vector2(0, 0), Vector2(1, 2), Vector2(5, 4)])
         return PolylineGraphic(polyline, (1, 2, 3), 2)
 
     def test_constructor_sets_color_correctly(self, polyline_graphic):
@@ -36,24 +40,24 @@ class TestPolylineGraphics:
     def test_draw_no_offset(self, polyline_graphic, surface_stub):
         polyline_graphic.draw(surface_stub)
         assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(0, 0),
-                                                  'end': Vector2(1, 2),
-                                                  'width': 2}
+                                                   'begin': Vector2(0, 0),
+                                                   'end': Vector2(1, 2),
+                                                   'width': 2}
         assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(1, 2),
-                                                  'end': Vector2(5, 4),
-                                                  'width': 2}
+                                                   'begin': Vector2(1, 2),
+                                                   'end': Vector2(5, 4),
+                                                   'width': 2}
 
     def test_draw_with_offset(self, polyline_graphic, surface_stub):
         polyline_graphic.draw(surface_stub, Vector2(5, 3))
         assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                  'begin': -Vector2(5, 3),
-                                                  'end': Vector2(1, 2) - Vector2(5, 3),
-                                                  'width': 2}
+                                                   'begin': -Vector2(5, 3),
+                                                   'end': Vector2(1, 2) - Vector2(5, 3),
+                                                   'width': 2}
         assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(1, 2) - Vector2(5, 3),
-                                                  'end': Vector2(5, 4) - Vector2(5, 3),
-                                                  'width': 2}
+                                                   'begin': Vector2(1, 2) - Vector2(5, 3),
+                                                   'end': Vector2(5, 4) - Vector2(5, 3),
+                                                   'width': 2}
 
     def test_location_sets_location_correctly(self, polyline_graphic):
         polyline_graphic.location = Vector2(1, 2)
@@ -67,27 +71,27 @@ class TestPolylineGraphics:
         polyline_graphic.location = Vector2(1, 2)
         polyline_graphic.draw(surface_stub)
         assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(1, 2),
-                                                  'end': Vector2(1, 2) + Vector2(1, 2),
-                                                  'width': 2}
+                                                   'begin': Vector2(1, 2),
+                                                   'end': Vector2(1, 2) + Vector2(1, 2),
+                                                   'width': 2}
 
         assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(1, 2) + Vector2(1, 2),
-                                                  'end': Vector2(5, 4) + Vector2(1, 2),
-                                                  'width': 2}
+                                                   'begin': Vector2(1, 2) + Vector2(1, 2),
+                                                   'end': Vector2(5, 4) + Vector2(1, 2),
+                                                   'width': 2}
 
     def test_rotation_and_draw(self, polyline_graphic, surface_stub):
         polyline_graphic.rotation = math.pi/2
         polyline_graphic.draw(surface_stub)
         assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(0, 0),
-                                                  'end': Vector2(2, -1),
-                                                  'width': 2}
+                                                   'begin': Vector2(0, 0),
+                                                   'end': Vector2(2, -1),
+                                                   'width': 2}
 
         assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                  'begin': Vector2(2, -1),
-                                                  'end': Vector2(4, -5),
-                                                  'width': 2}
+                                                   'begin': Vector2(2, -1),
+                                                   'end': Vector2(4, -5),
+                                                   'width': 2}
 
 
 class TestImageGraphics:
@@ -178,6 +182,7 @@ class TestImageGraphics:
         assert surface_stub.surface.get_at((0, 0)) == (255, 255, 255, 255)
         assert surface_stub.surface.get_at((0, 1)) == (0, 0, 0, 255)
         assert surface_stub.surface.get_at((0, 2)) == (0, 0, 0, 255)
+
 
 class TestImage:
     def test_constructor_loads_correctly_shaped_image(self, image):

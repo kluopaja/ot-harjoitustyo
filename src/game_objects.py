@@ -6,10 +6,13 @@ from graphics import ImageGraphic
 from shapes import Rectangle, Circle
 from physics import BasePhysics, BodyPhysics, WingPhysics, angle_between, PhysicsController
 from timing import Timer
+
+
 def score_generator(damage_score, destroying_score):
     def _inner(damage, destroyed):
         return damage * damage_score + destroyed * destroying_score
     return _inner
+
 
 class PlaneFactory:
     def __init__(self, file_path, bullet_file_path):
@@ -31,10 +34,12 @@ class PlaneFactory:
                                                      Vector2(0, 0), self.size)
         rectangle = self._plane_rectangle(self.size)
 
-        tmp = BasePhysics(Vector2(self.start_position), Vector2(0, 0), Vector2(1, 0))
+        tmp = BasePhysics(Vector2(self.start_position),
+                          Vector2(0, 0), Vector2(1, 0))
         tmp = BodyPhysics(tmp, self.body_drag, lambda x: Vector2(0, 5))
         tmp = WingPhysics(tmp, self.wing_size)
-        plane_physics = PhysicsController(tmp, self.acceleration, self.rotation)
+        plane_physics = PhysicsController(
+            tmp, self.acceleration, self.rotation)
 
         bullet_factory = BulletFactory(self.bullet_file_path)
         gun = Gun(bullet_factory, Timer(0.2), spawn_offset=60, speed=10)
@@ -51,6 +56,7 @@ class PlaneFactory:
                          Vector2(size[0]/2, -size[1]/2),
                          Vector2(-size[0]/2, size[1]/2))
 
+
 class BulletFactory:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -58,7 +64,7 @@ class BulletFactory:
         self.gravity = 5
         self.body_grad = 0.001
         self.health = 1
-        self.collision_damage=100
+        self.collision_damage = 100
         self.timeout = 5
 
     def bullet(self, location, velocity, front, owner):
@@ -69,6 +75,7 @@ class BulletFactory:
         physics = BodyPhysics(tmp, self.body_grad, lambda x: Vector2(0, 5))
         return Bullet(circle, image_graphic, physics, owner, Timer(self.timeout),
                       self.health, self.collision_damage)
+
 
 class Gun:
     def __init__(self, bullet_factory, timer, spawn_offset, speed):
@@ -88,6 +95,7 @@ class Gun:
             bullet_front = Vector2(front)
             return [self.bullet_factory.bullet(bullet_location, bullet_velocity, bullet_front, owner)]
         return []
+
 
 class GameObject:
     """Base class for game objects.
@@ -142,6 +150,7 @@ class GameObject:
         object pool"""
         return [self]
 
+
 class Plane(GameObject):
     """Class for Planes.
 
@@ -158,6 +167,7 @@ class Plane(GameObject):
             The remaining health of the plane
 
     """
+
     def __init__(self, shape, graphic, plane_physics, gun, score_generator, owner, health=100,
                  collision_damage=100):
         """Initializes Plane
@@ -194,7 +204,6 @@ class Plane(GameObject):
         self._new_objects = []
         self._update_locations()
 
-
     def up(self):
         """Turns plane upwards"""
         self.plane_physics.up()
@@ -215,7 +224,6 @@ class Plane(GameObject):
             self.gun.shoot(self.plane_physics.location, self.plane_physics.velocity,
                            self.plane_physics.front, self.owner))
 
-
     def alive(self):
         return self.health > 0
 
@@ -229,7 +237,8 @@ class Plane(GameObject):
 
         damage_taken, destroyed = self._damage(other.collision_damage)
         if other.owner is not None:
-            other.owner.process_reward(self.score_generator(damage_taken, destroyed), self.owner)
+            other.owner.process_reward(self.score_generator(
+                damage_taken, destroyed), self.owner)
 
     def _damage(self, amount):
         if not self.alive():
@@ -255,10 +264,12 @@ class Plane(GameObject):
 
     def _update_locations(self):
         self.graphic.location = Vector2(self.plane_physics.location)
-        self.graphic.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
+        self.graphic.rotation = - \
+            math.radians(self.plane_physics.front.as_polar()[1])
 
         self.shape.location = Vector2(self.plane_physics.location)
-        self.shape.rotation = -math.radians(self.plane_physics.front.as_polar()[1])
+        self.shape.rotation = - \
+            math.radians(self.plane_physics.front.as_polar()[1])
 
     def new_objects(self):
         """See base class"""
@@ -270,6 +281,7 @@ class Plane(GameObject):
 
         return tmp
 
+
 class Bullet(GameObject):
     """Class for Bullets.
 
@@ -279,6 +291,7 @@ class Bullet(GameObject):
         health: A scalar
             The remaining health of the bullet
     """
+
     def __init__(self, shape, graphic, physics, owner, timer, health=100,
                  collision_damage=100):
         """Initializes the bullet.
@@ -334,7 +347,6 @@ class Bullet(GameObject):
         self.physics.update(delta_time)
         self._update_locations()
 
-
     def new_objects(self):
         """See base class"""
         if not self.alive():
@@ -349,8 +361,10 @@ class Bullet(GameObject):
         self.shape.location = Vector2(self.physics.location)
         self.shape.rotation = -math.radians(self.physics.front.as_polar()[1])
 
+
 class Ground(GameObject):
     """A class for ground"""
+
     def __init__(self, shape, graphic, owner=None, collision_damage=100):
         """See base class"""
         super().__init__(shape, graphic, owner, collision_damage)

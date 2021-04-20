@@ -2,6 +2,7 @@ import math
 from pygame import Vector2
 from constants import EPS
 
+
 class BasePhysics:
     def __init__(self, location, velocity, front):
         self.location = location
@@ -14,6 +15,7 @@ class BasePhysics:
         self.acceleration = Vector2(0)
         # TODO add delta_time to this!
         self.location += self.velocity
+
 
 class PhysicsDecorator:
     def __init__(self, physics):
@@ -54,6 +56,7 @@ class PhysicsDecorator:
     def acceleration(self, value):
         self.physics.acceleration = value
 
+
 class BodyPhysics(PhysicsDecorator):
     def __init__(self, physics, body_drag, gravity):
         """Inits BodyPhysics.
@@ -73,10 +76,12 @@ class BodyPhysics(PhysicsDecorator):
         self.acceleration += self.gravity(self.location)
         self.physics.update(delta_time)
 
+
 class WingPhysics(PhysicsDecorator):
     '''
     For lift and drag see http://www.aerospaceweb.org/question/airfoils/q0150b.shtml
     '''
+
     def __init__(self, physics, wing_size):
         super().__init__(physics)
         self.wing_size = wing_size
@@ -88,7 +93,7 @@ class WingPhysics(PhysicsDecorator):
     def _acceleration(self):
         result = Vector2(0)
         angle_of_attack = self._angle_of_attack()
-        result += self._calculate_wing_drag(angle_of_attack) 
+        result += self._calculate_wing_drag(angle_of_attack)
         result += self._calculate_wing_lift(angle_of_attack)
         return result
 
@@ -97,7 +102,7 @@ class WingPhysics(PhysicsDecorator):
 
     def _calculate_wing_drag(self, angle_of_attack):
         return -self.wing_size * (1 - math.cos(2*angle_of_attack)) \
-               * self.velocity.magnitude() * self.velocity
+            * self.velocity.magnitude() * self.velocity
 
     def _calculate_wing_lift(self, angle_of_attack):
         lift_coefficient = 0
@@ -113,10 +118,11 @@ class WingPhysics(PhysicsDecorator):
             lift_coefficient = math.sin(2*angle_mod)
 
         return self.wing_size * lift_coefficient \
-               * self.velocity.magnitude() * self._lift_velocity()
+            * self.velocity.magnitude() * self._lift_velocity()
 
     def _lift_velocity(self):
         return self.velocity.rotate_rad(-math.pi/2)
+
 
 class PhysicsController(PhysicsDecorator):
     def __init__(self, physics, max_acceleration, max_rotation):
@@ -171,4 +177,3 @@ def angle_between(start, end):
     if result > math.pi:
         result -= 2*math.pi
     return result
-

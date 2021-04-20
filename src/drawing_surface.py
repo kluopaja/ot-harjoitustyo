@@ -1,6 +1,9 @@
 import pygame
+
+
 class DrawingSurface:
     """A wrapper around the pygame.Surface"""
+
     def __init__(self, surface):
         self.surface = surface
         self.font = pygame.font.SysFont("monospace", 24)

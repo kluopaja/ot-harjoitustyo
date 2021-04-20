@@ -1,3 +1,4 @@
+import random
 from pygame import Rect
 from pygame import Vector2
 import logging
@@ -9,6 +10,8 @@ import math
 import itertools
 
 # TODO make this more general, also player name/score styles
+
+
 class GameNotification:
     def __init__(self, press_key_to_start_msg, until_spawn_msg):
         self.message = ""
@@ -23,6 +26,7 @@ class GameNotification:
 
     def clear(self):
         self.message = ""
+
 
 class Player:
     def __init__(self, plane_factory, player_input, game_notification, spawn_timer):
@@ -73,6 +77,7 @@ class Player:
 
         self.score += score
 
+
 class GameState:
     def __init__(self, game_objects, players):
         self.game_objects = game_objects
@@ -111,6 +116,7 @@ class GameState:
 
         self.game_objects = new_game_objects
 
+
 class Game:
     def __init__(self, game_input, game_state, game_renderer, clock):
         self.game_input = game_input
@@ -129,6 +135,7 @@ class Game:
             self.game_renderer.render(self.game_state.game_objects)
             self.clock.tick()
             logging.debug(f'busy frac: {self.clock.busy_fraction()}')
+
 
 def rect_horizontal_split(rect):
     """Splits `rect` along the horizontal axis`
@@ -149,6 +156,7 @@ def rect_horizontal_split(rect):
     lower.top = upper.bottom
     return (upper, lower)
 
+
 def rect_vertical_split(rect):
     """Splits `rect` along the vertical axis`
 
@@ -167,6 +175,7 @@ def rect_vertical_split(rect):
 
     right.left = left.right
     return (left, right)
+
 
 def rect_splitter(split_depth, rect, start_dimension='vertical'):
     """Recursively splits `rect`.
@@ -197,10 +206,11 @@ def rect_splitter(split_depth, rect, start_dimension='vertical'):
     for i in range(split_depth):
         new_split_results = []
         for x in split_results:
-            new_split_results.extend(splitters[i%2](x))
+            new_split_results.extend(splitters[i % 2](x))
         split_results = new_split_results
 
     return split_results
+
 
 class GameRenderer:
     def __init__(self, screen, game_views, game_background):
@@ -224,8 +234,10 @@ class GameRenderer:
         dirty_rects = []
         for game_view, area in zip(self.game_views, self.game_view_areas):
             subsurface = self._screen.surface.subsurface(area)
-            dirty_subrects = game_view.render(subsurface, game_objects, self.game_background)
-            dirty_rects.extend(self._subrects_to_absolute(dirty_subrects, area.topleft))
+            dirty_subrects = game_view.render(
+                subsurface, game_objects, self.game_background)
+            dirty_rects.extend(self._subrects_to_absolute(
+                dirty_subrects, area.topleft))
 
         self._screen.update(self._previous_dirty_rects)
         self._screen.update(dirty_rects)
@@ -241,7 +253,7 @@ class GameRenderer:
 
         return result
 
-import random
+
 class GameBackground:
     def __init__(self, cloud_graphic, n_clouds, repeat_area, fill_color=(174, 186, 232)):
         """Initializes GameBackground object.
@@ -286,15 +298,18 @@ class GameBackground:
         center_offset = surface.get_rect().center + Vector2(offset)
         dirty_rects = []
         for location in self.cloud_locations:
-            cloud_location = self._closest_congruent(center_offset, location, self.repeat_area)
+            cloud_location = self._closest_congruent(
+                center_offset, location, self.repeat_area)
             self.cloud_graphic.location = cloud_location
             dirty_rects.extend(self.cloud_graphic.draw(surface, offset))
         return dirty_rects
+
 
 def constant_view_locator(x, y):
     def _inner():
         return (x, y)
     return _inner
+
 
 class GameView:
     def __init__(self, player, font_color):
@@ -313,7 +328,6 @@ class GameView:
         for game_object in game_objects:
             dirty_rects.extend(
                 game_object.graphic.draw(surface, offset=rendering_region.topleft))
-
 
         dirty_rects.extend(self._render_notification(surface))
         dirty_rects.extend(self._render_score(surface))
@@ -341,5 +355,5 @@ class GameView:
         dirty_rects = []
         dirty_rects.append(
             surface.midtop_text(str(self.player.name), text_center,
-                                 self.font_color))
+                                self.font_color))
         return dirty_rects

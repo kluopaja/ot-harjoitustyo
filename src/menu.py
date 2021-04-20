@@ -1,6 +1,8 @@
 from pygame import Vector2
 from menu_item import ButtonMenuItem
 import pygame
+
+
 class MenuKeys:
     def __init__(self, quit_menu, next_item, prev_item, increase, decrease,
                  accept, erase):
@@ -11,6 +13,7 @@ class MenuKeys:
         self.decrease = decrease
         self.accept = accept
         self.erase = erase
+
 
 class MenuInput:
     def __init__(self, event_handler, menu_keys):
@@ -72,7 +75,7 @@ class MenuInput:
                 elif event.key == self.keys.erase:
                     callbacks.append(self._erase_text)
                 else:
-                    callbacks.append(lambda c=event.unicode : self._add_text(c))
+                    callbacks.append(lambda c=event.unicode: self._add_text(c))
 
         # important to call there only here to avoid the side effects
         # of the callbacks to self
@@ -88,6 +91,7 @@ class MenuInput:
         if (self.set_text_callback is None) or (self.get_text_callback is None):
             return
         self.set_text_callback(self.get_text_callback() + character)
+
 
 class MenuFactory:
     def __init__(self, menu_renderer, menu_input, clock):
@@ -110,14 +114,13 @@ class Menu:
 
     def run(self):
         while True:
-           self._prepare_menu_input()
-           self.menu_input.handle_inputs()
-           if self._should_quit:
-               return None
+            self._prepare_menu_input()
+            self.menu_input.handle_inputs()
+            if self._should_quit:
+                return None
 
-           self.menu_renderer.render(self)
-           self.clock.tick()
-
+            self.menu_renderer.render(self)
+            self.clock.tick()
 
     def _prepare_menu_input(self):
         self.menu_input.clear_bindings()
@@ -141,6 +144,7 @@ class Menu:
 
     def _activate_item(self, item_index):
         self.selected_item = item_index
+
 
 class MenuRenderer:
     def __init__(self, screen, background_color, item_spacing, item_renderer):
@@ -168,6 +172,7 @@ class MenuRenderer:
         menu_height = self.item_spacing * total_items
         menu_start = screen_center - Vector2(0, menu_height)/2
         return menu_start + Vector2(0, self.item_spacing) * item_index
+
 
 class MenuItemRenderer:
     def __init__(self, font_color):

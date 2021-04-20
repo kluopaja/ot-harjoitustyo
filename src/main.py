@@ -1,15 +1,15 @@
+import pygame
+from pygame import Vector2
+from timing import Clock, sleep_wait
+from menu import MenuRenderer, MenuItemRenderer, MenuInput, MenuKeys, MenuFactory
+from game_setup import GameFactory, new_game_menu_items
+import logging
+from screen import Screen
+from events import EventHandler
+from pathlib import Path
 import sys
 
 sys.path.insert(0, '/home/kalle/koodit/pygame')
-from pathlib import Path
-from events import EventHandler
-from screen import Screen
-import logging
-from game_setup import GameFactory, new_game_menu_items
-from menu import MenuRenderer, MenuItemRenderer, MenuInput, MenuKeys, MenuFactory
-from timing import Clock, sleep_wait
-from pygame import Vector2
-import pygame
 
 logging.basicConfig(level=logging.INFO)
 pygame.init()

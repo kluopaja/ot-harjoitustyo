@@ -1,4 +1,6 @@
 import pygame
+
+
 class DrawingSurfaceStub:
     def __init__(self, width, height):
         self.surface = pygame.Surface((width, height))

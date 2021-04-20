@@ -3,12 +3,16 @@ import json
 from shapes import Polyline
 from graphics import PolylineGraphic
 from game_objects import Ground
+
+
 class LevelConfig:
     """A class for storing the properties of a level."""
+
     def __init__(self, file_path):
         self._data = json.load(open(file_path, "r"))
         if ("starting_locations" not in self._data) or len(self._data["starting_locations"]) == 0:
-            raise ValueError(f"Error in loading {file_path}: no starting locations provided.")
+            raise ValueError(
+                f"Error in loading {file_path}: no starting locations provided.")
 
     def name(self):
         return self._data["name"]
@@ -34,10 +38,11 @@ class LevelConfig:
         width = ground_line_config["width"]
         graphic = PolylineGraphic(shape, color, width)
         return Ground(shape, graphic)
-        
+
 
 class LevelConfigSelector:
     """A class for selecting a level config file"""
+
     def __init__(self, level_path):
         """Inits LevelConfigSelctor with level config files in `level_path`"""
         self.level_configs = []

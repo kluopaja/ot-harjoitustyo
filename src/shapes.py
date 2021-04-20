@@ -2,6 +2,8 @@ import logging
 from constants import EPS
 from pygame import Vector2
 from abc import ABC, abstractmethod
+
+
 class Shape(ABC):
     @property
     @abstractmethod
@@ -26,6 +28,7 @@ class Shape(ABC):
     @abstractmethod
     def intersects(self, shape):
         pass
+
 
 class Circle(Shape):
     def __init__(self, center, radius):
@@ -134,7 +137,7 @@ class Line(Shape):
         v = self.end - self.begin
         p1 = line.begin - self.begin
         p2 = line.end - self.begin
-        if v.cross(p1) * v.cross(p2)> EPS:
+        if v.cross(p1) * v.cross(p2) > EPS:
             return False
 
         v = line.end - line.begin
@@ -176,6 +179,7 @@ class Rectangle(Shape):
     def from_rect(cls, rect):
         return Rectangle(Vector2(rect.topleft), Vector2(rect.topright),
                          Vector2(rect.bottomleft))
+
     @property
     def location(self):
         return self._location
@@ -216,7 +220,7 @@ class Rectangle(Shape):
     def _contains(self, point):
         '''Returns True if `point` is inside self, otherwise False'''
         return -EPS < self._top.projection_param(point) < 1 + EPS \
-                and -EPS < self._left.projection_param(point) < 1 + EPS
+            and -EPS < self._left.projection_param(point) < 1 + EPS
 
     def _intersects_line(self, line):
         if self._contains(line.begin) or self._contains(line.end):
@@ -243,6 +247,7 @@ class Rectangle(Shape):
     def __repr__(self):
         return f"Rectangle(topleft = {self.sides[0].begin}, topright = {self.sides[3].begin}, \
 bottomleft = {self.sides[0].end}, location = {self.location}, rotation = {self.rotation})"
+
 
 class Polyline(Shape):
     def __init__(self, lines):
@@ -285,5 +290,3 @@ class Polyline(Shape):
         line_str = ",\n".join(line_strings)
         loc_rot_str = f"location = {self.location}, rotation = {self.rotation})"
         return "Polyline([\n" + line_str + "],\n" + loc_rot_str
-
-
