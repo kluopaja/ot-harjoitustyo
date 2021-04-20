@@ -30,6 +30,7 @@ class GameNotification:
 
 class Player:
     def __init__(self, plane_factory, player_input, game_notification, spawn_timer):
+        # TODO make variables private
         self.plane_factory = plane_factory
         self.player_input = player_input
         self.plane = None
@@ -67,9 +68,9 @@ class Player:
 
     def view_location(self):
         if self.plane == None:
-            return self.plane_factory.start_position
+            return Vector2(self.plane_factory.start_position)
 
-        return self.plane.graphic.location
+        return Vector2(self.plane.graphic.location)
 
     def process_reward(self, score, issuer):
         if issuer is self:
