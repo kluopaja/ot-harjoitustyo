@@ -115,6 +115,8 @@ class GameFactory:
         for i in range(self.n_players):
             players.append(Player(plane_factories[i], player_inputs[i],
                                   game_notifications[i], Timer(0.5)))
+            player_preferences = self.player_preferences_selector.preferences[i]
+            players[-1].name = player_preferences.name
             game_views.append(GameView(players[-1], (30, 72, 102)))
 
         game_state = GameState(level_config.game_objects(), players)

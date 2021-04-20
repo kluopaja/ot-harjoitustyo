@@ -53,6 +53,15 @@ class DrawingSurface:
         dest.center = (position[0], position[1])
         return self.blit(text_surface, dest)
 
+    def midtop_text(self, text, position, color):
+        """Draws `text` with top middle at `position`
+        """
+        # TODO read about performance issues related to this!
+        text_surface = self.font.render(text, True, color)
+        dest = text_surface.get_rect()
+        dest.midtop = (position[0], position[1])
+        return self.blit(text_surface, dest)
+
     def topleft_text(self, text, position, color):
         """Draws `text` with top left edge at `position`
         """

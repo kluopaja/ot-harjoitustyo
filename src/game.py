@@ -8,6 +8,7 @@ import time
 import math
 import itertools
 
+# TODO make this more general, also player name/score styles
 class GameNotification:
     def __init__(self, press_key_to_start_msg, until_spawn_msg):
         self.message = ""
@@ -30,6 +31,7 @@ class Player:
         self.plane = None
         self.spawn_timer = spawn_timer
         self.score = 0
+        self.name = ""
 
         self._new_objects = []
 
@@ -315,6 +317,7 @@ class GameView:
 
         dirty_rects.extend(self._render_notification(surface))
         dirty_rects.extend(self._render_score(surface))
+        dirty_rects.extend(self._render_name(surface))
         return dirty_rects
 
     def _render_notification(self, surface):
@@ -323,7 +326,6 @@ class GameView:
         dirty_rects.append(
             surface.centered_text(self.player.notification.message, text_center,
                                   self.font_color))
-
         return dirty_rects
 
     def _render_score(self, surface):
@@ -332,5 +334,12 @@ class GameView:
         dirty_rects.append(
             surface.topleft_text(str(self.player.score), text_topleft,
                                  self.font_color))
+        return dirty_rects
 
+    def _render_name(self, surface):
+        text_center = Vector2(surface.get_rect().midtop)
+        dirty_rects = []
+        dirty_rects.append(
+            surface.midtop_text(str(self.player.name), text_center,
+                                 self.font_color))
         return dirty_rects
