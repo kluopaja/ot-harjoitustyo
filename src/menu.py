@@ -1,23 +1,27 @@
 from pygame import Vector2
 from menu_item import ButtonMenuItem
-from game_setup import game_factory_menu_items
 import pygame
 class MenuKeys:
-    def __init__(self, quit_menu, next_item, prev_item, increase, decrease, accept):
+    def __init__(self, quit_menu, next_item, prev_item, increase, decrease,
+                 accept, erase):
         self.quit = quit_menu
         self.next_item = next_item
         self.prev_item = prev_item
         self.increase = increase
         self.decrease = decrease
         self.accept = accept
+        self.erase = erase
 
 class MenuInput:
     def __init__(self, event_handler, menu_keys):
         self.event_handler = event_handler
         self.keys = menu_keys
         self.keymaps = {}
-        self.should_quit = False
-        self._text_input = []
+        self.get_text_callback = None
+        self.set_text_callback = None
+
+    def bind_quit(self, func):
+        self.keymaps[self.keys.quit] = func
 
     def bind_next_item(self, func):
         self.keymaps[self.keys.next_item] = func
@@ -37,6 +41,10 @@ class MenuInput:
     def bind_accept(self, func):
         self.keymaps[self.keys.accept] = func
 
+    def bind_text(self, get_text, set_text):
+        self.get_text_callback = get_text
+        self.set_text_callback = set_text
+
     def clear_item_bindings(self):
         if self.keys.increase in self.keymaps:
             del self.keymaps[self.keys.increase]
@@ -47,45 +55,65 @@ class MenuInput:
         if self.keys.accept in self.keymaps:
             del self.keymaps[self.keys.accept]
 
+        self.set_text_callback = None
+        self.get_text_callback = None
+
     def clear_bindings(self):
         self.keymaps.clear()
+        self.set_text_callback = None
+        self.get_text_callback = None
 
     def handle_inputs(self):
-        self.should_quit = False
-        self._text_input = []
         callbacks = []
         for event in self.event_handler.get_events():
             if event.type == pygame.KEYDOWN:
-                if event.key == self.keys.quit:
-                    self.should_quit = True
-                elif event.key in self.keymaps:
+                if event.key in self.keymaps:
                     callbacks.append(self.keymaps[event.key])
+                elif event.key == self.keys.erase:
+                    callbacks.append(self._erase_text)
                 else:
-                    self._text_input.append(event.unicode)
+                    callbacks.append(lambda c=event.unicode : self._add_text(c))
 
+        # important to call there only here to avoid the side effects
+        # of the callbacks to self
         for f in callbacks:
             f()
 
-class NewGameMenu:
-    def __init__(self, menu_renderer, menu_input, game_factory, clock):
+    def _erase_text(self):
+        if (self.set_text_callback is None) or (self.get_text_callback is None):
+            return
+        self.set_text_callback(self.get_text_callback()[0:-1])
+
+    def _add_text(self, character):
+        if (self.set_text_callback is None) or (self.get_text_callback is None):
+            return
+        self.set_text_callback(self.get_text_callback() + character)
+
+class MenuFactory:
+    def __init__(self, menu_renderer, menu_input, clock):
         self.menu_renderer = menu_renderer
         self.menu_input = menu_input
-        self.game_factory = game_factory
-        self.items = game_factory_menu_items(self.game_factory) \
-                     + [ButtonMenuItem(self._start_game, "start game")]
-        self.selected_item = 0
-        self._should_start_game = False
         self.clock = clock
 
-    def run(self, screen):
+    def menu(self, items):
+        return Menu(self.menu_renderer, self.menu_input, items, self.clock)
+
+
+class Menu:
+    def __init__(self, menu_renderer, menu_input, items, clock):
+        self.menu_renderer = menu_renderer
+        self.menu_input = menu_input
+        self.items = items
+        self.selected_item = 0
+        self.clock = clock
+        self._should_quit = False
+
+    def run(self):
         while True:
            self._prepare_menu_input()
            self.menu_input.handle_inputs()
-           if self.menu_input.should_quit:
+           if self._should_quit:
                return None
-           if self._should_start_game:
-               self._should_start_game = False
-               self.game_factory.game(screen).run()
 
            self.menu_renderer.render(self)
            self.clock.tick()
@@ -93,9 +121,14 @@ class NewGameMenu:
 
     def _prepare_menu_input(self):
         self.menu_input.clear_bindings()
+        self.menu_input.bind_quit(self._quit)
         self.menu_input.bind_next_item(self._activate_next_item)
         self.menu_input.bind_previous_item(self._activate_previous_item)
         self.items[self.selected_item].bind(self.menu_input)
+        self._should_quit = False
+
+    def _quit(self):
+        self._should_quit = True
 
     def _start_game(self):
         self._should_start_game = True
