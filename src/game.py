@@ -71,8 +71,6 @@ class Player:
 
         self.score += score
 
-
-
 class GameState:
     def __init__(self, game_objects, players):
         self.game_objects = game_objects
