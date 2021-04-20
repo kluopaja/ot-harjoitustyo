@@ -6,6 +6,7 @@ A 2D shoot 'em up flying game inspired by Sopwith.
 
 ## Documentation
 * [Requirements specification](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/requirements_specification.md)
+* [Architecture description](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/requirements_specification.md)
 
 
 ## Installation
