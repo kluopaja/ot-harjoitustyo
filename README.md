@@ -33,6 +33,9 @@ Pylint can be run with;
 
 Navigation in the menu is done with arrow keys, esc and enter.
 
+The player config menu can be accessed by selecting the player at `Edit preferences` menu item and pressing enter.
+Currently the player config menu only supports changing the players name.
+
 Text input is inserted simply typing something when the
 menu item is selected.
 
