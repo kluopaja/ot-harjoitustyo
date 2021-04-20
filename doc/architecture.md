@@ -1,4 +1,4 @@
 # Architecture description
 
 ## Class diagram
-![Class diagram](./architecture.png)
+![Class diagram](./class_diagram.png)

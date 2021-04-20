@@ -18,3 +18,5 @@ Date | Hours | What did I do
 17.4 | 5     | Add level selection, better multiplayer support and other improvements
 18.4 | 4     | Add config file for players' keys and other improvements.
 20.4 | 6     | Add submenu for player configuration, refactor menu, add player names, do weekly requirements
+---- | ----- | ---
+Total| 58

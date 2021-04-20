@@ -6,10 +6,12 @@ A 2D shoot 'em up flying game inspired by Sopwith.
 
 ## Documentation
 * [Requirements specification](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/requirements_specification.md)
-* [Architecture description](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/requirements_specification.md)
+* [Architecture description](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/architecture_description.md)
 
 
 ## Installation
+
+The following commands should be run at the project root.
 
 1. Set up Poetry environment:
 ```poetry install```
@@ -24,9 +26,15 @@ Tests can be run with:
 Coverage report can be genreated with:
 ```poetry run invoke coverage-report```
 
+Pylint can be run with;
+```poetry run invoke lint```
+
 ## Usage
 
 Navigation in the menu is done with arrow keys, esc and enter.
+
+Text input is inserted simply typing something when the
+menu item is selected.
 
 The number of supported players depends on the number of player keymaps defined
 and on the map support. Currently these support 4 players.
@@ -72,6 +80,12 @@ shoot: u
 They keymaps can be configured by modifying the `assets/keys.json` file.
 Please note that in single player mode the keymappings for player 1 will
 be used.
+
+
+## Levels
+The levels are defined in ```assets/levels/```. Currently the only way
+to edit the levels or to create new levels is to manually edit the level files.
+
 
 ### Tips for flying
 
