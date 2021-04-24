@@ -337,12 +337,12 @@ class Bullet(GameObject):
     def update(self, delta_time):
         """See base class"""
 
+        if not self.alive():
+            return
+
         self.timer.update(delta_time)
         if self.timer.expired():
             self.health = 0
-
-        if not self.alive():
-            return
 
         self.physics.update(delta_time)
         self._update_locations()

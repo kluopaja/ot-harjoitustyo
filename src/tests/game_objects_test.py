@@ -2,11 +2,12 @@ from unittest.mock import Mock, ANY, create_autospec
 import unittest
 from pygame import Vector2
 
-from game_objects import Plane, Gun
+from game_objects import Plane, Gun, Bullet
 from shapes import Shape
 from graphics import Graphic
 from physics import PhysicsController
 from game import Player
+from timing import Timer
 
 from math import pi
 
@@ -112,3 +113,79 @@ class TestPlane(unittest.TestCase):
         self.plane.collide(self.plane)
         assert self.plane not in self.plane.new_objects()
 
+class TestBullet(unittest.TestCase):
+    def setUp(self):
+        self.shape = create_autospec(Shape)
+        self.graphic = create_autospec(Graphic)
+        self.physics = create_autospec(PhysicsController)
+        self.physics.location = Vector2(1, 2)
+        self.physics.velocity = Vector2(1, 1)
+        self.physics.front = Vector2(0, 1)
+        self.gun = create_autospec(Gun)
+        self.gun.shoot.return_value = [Mock()]
+        self.score_generator = Mock()
+        self.owner = create_autospec(Player)
+        self.timer = create_autospec(Timer)
+        self.timer.expired.return_value = False
+        self.bullet = Bullet(self.shape, self.graphic, self.physics,
+                             self.owner,self.timer,
+                             health=100, collision_damage = 100)
+
+        self.bullet2 = Bullet(Mock(), Mock(), self.physics,
+                              Mock(), Mock(),
+                              health=100, collision_damage = 10)
+
+
+    def test_constructor_updates_locations_to_physics_location(self):
+        assert self.bullet.graphic.location == Vector2(1, 2)
+        assert self.bullet.shape.location == Vector2(1, 2)
+
+    def test_constructor_updates_rotations_to_physics_rotation(self):
+        self.assertAlmostEqual(self.bullet.graphic.rotation, -pi/2)
+        self.assertAlmostEqual(self.bullet.shape.rotation, -pi/2)
+
+    def test_alive_when_no_health(self):
+        self.bullet.health = 1
+        assert self.bullet.alive()
+
+        self.bullet.health = 0
+        assert not self.bullet.alive()
+
+    def test_collide_damages_self_bullet(self):
+        self.bullet.collide(self.bullet2)
+        assert self.bullet.health == 90
+
+    def test_collide_does_not_damage_other_bullet(self):
+        self.bullet.collide(self.bullet2)
+        assert self.bullet2.health == 100
+
+    def test_update_updates_timer_and_physics_if_alive(self):
+        self.bullet.update(10)
+        self.physics.update.assert_called_with(10)
+        self.timer.update.assert_called_with(10)
+
+    def test_update_does_not_update_physics_if_dead(self):
+        self.bullet.health = 0
+        self.bullet.update(10)
+        self.physics.update.assert_not_called()
+        self.timer.update.assert_not_called()
+
+    def test_update_updates_locations(self):
+        def f(x):
+            self.physics.location = Vector2(1, 20)
+        self.physics.update.side_effect = f
+        self.bullet.update(10)
+        assert self.bullet.shape.location == Vector2(1, 20)
+        assert self.bullet.graphic.location == Vector2(1, 20)
+
+    def test_update_kills_bullet_after_time_limit(self):
+        self.timer.expired.return_value = True
+        self.bullet.update(10)
+        assert not self.bullet.alive()
+
+    def test_new_objects_contain_bullet_when_alive(self):
+        assert self.bullet in self.bullet.new_objects()
+
+    def test_new_objects_do_not_contain_bullet_when_dead(self):
+        self.bullet.collide(self.bullet)
+        assert self.bullet not in self.bullet.new_objects()
