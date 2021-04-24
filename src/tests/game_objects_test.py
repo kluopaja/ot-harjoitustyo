@@ -2,7 +2,7 @@ from unittest.mock import Mock, ANY, create_autospec
 import unittest
 from pygame import Vector2
 
-from game_objects import Plane, Gun, Bullet
+from game_objects import Plane, Gun, Bullet, Ground
 from shapes import Shape
 from graphics import Graphic
 from physics import PhysicsController
@@ -189,3 +189,19 @@ class TestBullet(unittest.TestCase):
     def test_new_objects_do_not_contain_bullet_when_dead(self):
         self.bullet.collide(self.bullet)
         assert self.bullet not in self.bullet.new_objects()
+
+class TestGround(unittest.TestCase):
+    def setUp(self):
+        self.shape = create_autospec(Shape)
+        self.graphic = create_autospec(Graphic)
+        self.owner = create_autospec(Player)
+        self.ground = Ground(self.shape, self.graphic, self.owner, 123);
+
+    def test_constructor_initializes_correctly(self):
+        assert self.ground.shape is self.shape
+        assert self.ground.graphic is self.graphic
+        assert self.ground.owner is self.owner
+        assert self.ground.collision_damage == 123
+
+    def test_new_objects_contain_self(self):
+        assert self.ground in self.ground.new_objects()
