@@ -30,36 +30,34 @@ class GameNotification:
 
 class Player:
     def __init__(self, plane_factory, player_input, game_notification, spawn_timer):
-        # TODO make variables private
-        self.plane_factory = plane_factory
-        self.player_input = player_input
-        self.plane = None
-        self.spawn_timer = spawn_timer
+        self.notification = game_notification
         self.score = 0
         self.name = ""
 
+        self._plane_factory = plane_factory
+        self._player_input = player_input
+        self._plane = None
+        self._spawn_timer = spawn_timer
         self._new_objects = []
 
-        self.notification = game_notification
-
     def _start_new_flight(self):
-        self.player_input.clear_shoot()
-        self.plane = self.plane_factory.plane(self.player_input, self)
-        self._new_objects.append(self.plane)
+        self._player_input.clear_shoot()
+        self._plane = self._plane_factory.plane(self._player_input, self)
+        self._new_objects.append(self._plane)
         self.notification.clear()
 
     def update(self, delta_time):
-        self.spawn_timer.update(delta_time)
-        if self.plane == None:
-            self.notification.until_spawn(self.spawn_timer.time_left)
-            if self.spawn_timer.expired():
+        self._spawn_timer.update(delta_time)
+        if self._plane == None:
+            self.notification.until_spawn(self._spawn_timer.time_left)
+            if self._spawn_timer.expired():
                 self.notification.press_key_to_start()
-                self.player_input.bind_shoot(self._start_new_flight)
+                self._player_input.bind_shoot(self._start_new_flight)
             return
 
-        if not self.plane.alive():
-            self.plane = None
-            self.spawn_timer.start()
+        if not self._plane.alive():
+            self._plane = None
+            self._spawn_timer.start()
 
     def new_objects(self):
         tmp = self._new_objects
@@ -67,10 +65,10 @@ class Player:
         return tmp
 
     def view_location(self):
-        if self.plane == None:
-            return Vector2(self.plane_factory.start_position)
+        if self._plane == None:
+            return Vector2(self._plane_factory.start_position)
 
-        return Vector2(self.plane.graphic.location)
+        return Vector2(self._plane.graphic.location)
 
     def process_reward(self, score, issuer):
         if issuer is self:

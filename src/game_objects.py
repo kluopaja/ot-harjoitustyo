@@ -79,21 +79,21 @@ class BulletFactory:
 
 class Gun:
     def __init__(self, bullet_factory, timer, spawn_offset, speed):
-        self.bullet_factory = bullet_factory
-        self.spawn_offset = spawn_offset
-        self.speed = speed
-        self.timer = timer
+        self._bullet_factory = bullet_factory
+        self._spawn_offset = spawn_offset
+        self._speed = speed
+        self._timer = timer
 
     def update(self, delta_time):
-        self.timer.update(delta_time)
+        self._timer.update(delta_time)
 
     def shoot(self, location, velocity, front, owner):
-        if self.timer.expired():
-            self.timer.start()
-            bullet_location = location + self.spawn_offset * front
-            bullet_velocity = velocity + self.speed * front
+        if self._timer.expired():
+            self._timer.start()
+            bullet_location = location + self._spawn_offset * front
+            bullet_velocity = velocity + self._speed * front
             bullet_front = Vector2(front)
-            return [self.bullet_factory.bullet(bullet_location, bullet_velocity, bullet_front, owner)]
+            return [self._bullet_factory.bullet(bullet_location, bullet_velocity, bullet_front, owner)]
         return []
 
 

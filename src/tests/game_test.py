@@ -5,7 +5,6 @@ from pygame import Vector2
 
 from game import GameState, Player
 
-
 class TestPlayer(unittest.TestCase):
     def setUp(self):
         self.plane_mock = Mock()

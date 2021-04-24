@@ -19,42 +19,42 @@ class BasePhysics:
 
 class PhysicsDecorator:
     def __init__(self, physics):
-        self.physics = physics
+        self._physics = physics
 
     def update(self, delta_time):
-        self.physics.update(delta_time)
+        self._physics.update(delta_time)
 
     @property
     def location(self):
-        return self.physics.location
+        return self._physics.location
 
     @location.setter
     def location(self, value):
-        self.physics.location = value
+        self._physics.location = value
 
     @property
     def velocity(self):
-        return self.physics.velocity
+        return self._physics.velocity
 
     @velocity.setter
     def velocity(self, value):
-        self.physics.velocity = value
+        self._physics.velocity = value
 
     @property
     def front(self):
-        return self.physics.front
+        return self._physics.front
 
     @front.setter
     def front(self, value):
-        self.physics.front = value
+        self._physics.front = value
 
     @property
     def acceleration(self):
-        return self.physics.acceleration
+        return self._physics.acceleration
 
     @acceleration.setter
     def acceleration(self, value):
-        self.physics.acceleration = value
+        self._physics.acceleration = value
 
 
 class BodyPhysics(PhysicsDecorator):
@@ -74,7 +74,7 @@ class BodyPhysics(PhysicsDecorator):
     def update(self, delta_time):
         self.acceleration += -self.body_drag * self.velocity.magnitude() * self.velocity
         self.acceleration += self.gravity(self.location)
-        self.physics.update(delta_time)
+        self._physics.update(delta_time)
 
 
 class WingPhysics(PhysicsDecorator):
@@ -88,7 +88,7 @@ class WingPhysics(PhysicsDecorator):
 
     def update(self, delta_time):
         self.acceleration += self._acceleration()
-        self.physics.update(delta_time)
+        self._physics.update(delta_time)
 
     def _acceleration(self):
         result = Vector2(0)
@@ -146,7 +146,7 @@ class PhysicsController(PhysicsDecorator):
         self.acceleration += self._calculate_thrust()
         self._next_rotation = 0.0
         self._next_acceleration = 0.0
-        self.physics.update(delta_time)
+        self._physics.update(delta_time)
 
     def _new_front(self, delta_time):
         return self.front.rotate(-delta_time * math.degrees(self._next_rotation))
