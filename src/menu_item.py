@@ -32,12 +32,12 @@ class ValueBrowserMenuItem(MenuItem):
 
 
 class ButtonMenuItem(MenuItem):
-    def __init__(self, button_function, text):
+    def __init__(self, button_function, description):
         self.button_function = button_function
-        self._text = text
+        self.description = description
 
     def text(self):
-        return self._text
+        return self.description
 
     def bind(self, menu_input):
         menu_input.bind_accept(self.button_function)
@@ -54,3 +54,29 @@ class TextInputMenuItem(MenuItem):
 
     def bind(self, menu_input):
         menu_input.bind_text(self.get_text, self.set_text)
+
+class MenuItemCollection:
+    def __init__(self):
+        self._subcollections = []
+
+    def add_item(self, item):
+        self._subcollections.append(SingleMenuItemCollection(item))
+
+    def add_collection(self, collection):
+        self._subcollections.append(collection)
+
+    def clear(self):
+        self._subcollections = []
+
+    def get_item_list(self):
+        result = []
+        for subcollection in self._subcollections:
+            result.extend(subcollection.get_item_list())
+        return result
+
+class SingleMenuItemCollection:
+    def __init__(self, item):
+        self._item = item
+
+    def get_item_list(self):
+        return [self._item]
