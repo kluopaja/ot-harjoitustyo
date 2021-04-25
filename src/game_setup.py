@@ -10,6 +10,7 @@ import pygame
 from pygame import Vector2
 from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
 from level_config import LevelConfigSelector
+from user import UserSelector
 import json
 
 
@@ -37,56 +38,11 @@ class PlayerInputLoader:
                                              code(keys["shoot"])))
         return player_inputs
 
-
-class PlayerPreferences:
-    def __init__(self, name):
-        self.name = name
-
-
-class PlayerPreferencesSelector:
-    def __init__(self, n_players, default_name):
-        self._check_n_players(n_players)
-        self.n_players = n_players
-        self.default_name = default_name
-        self.preferences = []
-        self.selected_idx = 0
-        self._update()
-
-    def set_players(self, n_players):
-        self._check_n_players(n_players)
-        self.n_players = n_players
-        self._update()
-
-    def next(self):
-        if self.selected_idx + 1 < self.n_players:
-            self.selected_idx += 1
-        self._update()
-
-    def previous(self):
-        if self.selected_idx > 0:
-            self.selected_idx -= 1
-        self._update()
-
-    def get_current(self):
-        return self.preferences[self.selected_idx]
-
-    def _update(self):
-        if self.selected_idx >= self.n_players:
-            self.selected_idx = self.n_players - 1
-
-        for i in range(len(self.preferences), self.n_players):
-            name = self.default_name + " " + str(i+1)
-            self.preferences.append(PlayerPreferences(name))
-
-    def _check_n_players(self, n_players):
-        if n_players < 1:
-            raise ValueError("`n_players` must be at least 1")
-
-
 class GameFactory:
-    def __init__(self, assets_path, event_handler, screen, n_players=2):
+    def __init__(self, assets_path, user_dao, event_handler, screen, n_players=2):
         self.n_players = n_players
         self.assets_path = assets_path
+        self.user_dao = user_dao
         if event_handler is None:
             event_handler = EventHandler()
         self.event_handler = event_handler
@@ -95,8 +51,8 @@ class GameFactory:
             self.assets_path / "levels")
         self.player_input_loader = PlayerInputLoader(
             self.assets_path / "keys.json")
-        self.player_preferences_selector = PlayerPreferencesSelector(self.n_players,
-                                                                     "Player")
+        self.user_selectors = []
+        self._update_players()
 
     def game(self):
         level_config = self.level_config_selector.get_selected()
@@ -121,8 +77,8 @@ class GameFactory:
         for i in range(self.n_players):
             players.append(Player(plane_factories[i], player_inputs[i],
                                   game_notifications[i], Timer(0.5)))
-            player_preferences = self.player_preferences_selector.preferences[i]
-            players[-1].name = player_preferences.name
+            user = self.user_selectors[i].get_current()
+            players[-1].name = user.name
             game_views.append(GameView(players[-1], (30, 72, 102)))
 
         game_state = GameState(level_config.game_objects(), players)
@@ -153,21 +109,12 @@ class GameFactory:
         self.level_config_selector.previous_level()
         self._update_players()
 
-    def activate_previous_player(self):
-        self.player_preferences_selector.previous()
-
-    def activate_next_player(self):
-        self.player_preferences_selector.next()
-
-    def active_player_name(self):
-        return self.player_preferences_selector.get_current().name
-
-    def active_player_preferences(self):
-        return self.player_preferences_selector.get_current()
-
     def _update_players(self):
         self._clamp_n_players()
-        self.player_preferences_selector.set_players(self.n_players)
+        for i in range(len(self.user_selectors), self.n_players):
+            self.user_selectors.append(UserSelector(self.user_dao))
+
+        self.user_selectors = self.user_selectors[0:self.n_players]
 
     def _clamp_n_players(self):
         self.n_players = max(1, self.n_players)
@@ -175,42 +122,3 @@ class GameFactory:
             self.n_players, self.level_config_selector.max_players())
         self.n_players = min(
             self.n_players, self.player_input_loader.max_players())
-
-
-def player_preferences_menu_items(preferences):
-    out = []
-    # callback function for the menu item
-
-    def set_name(name):
-        preferences.name = name
-
-    def get_name():
-        return preferences.name
-    out.append(TextInputMenuItem("Name: ", get_name, set_name))
-    return out
-
-
-def new_game_menu_items(game_factory, menu_factory):
-    """Returns a list of MenuItem objects that modifies `game_factory`"""
-    items = []
-    level_selector = game_factory.level_config_selector
-    items.append(ValueBrowserMenuItem(game_factory.previous_level, game_factory.next_level,
-                                      level_selector.level_name, "Level: "))
-    items.append(ValueBrowserMenuItem(game_factory.remove_player, game_factory.add_player,
-                                      lambda: game_factory.n_players, "Number of players: "))
-
-    def preferences_menu_runner():
-        active_player_preferences = game_factory.active_player_preferences()
-        menu_items = player_preferences_menu_items(active_player_preferences)
-        menu_factory.menu(menu_items).run()
-
-    items.append(ValueBrowserMenuItem(game_factory.activate_previous_player,
-                                      game_factory.activate_next_player,
-                                      game_factory.active_player_name,
-                                      "Edit preferences: ", preferences_menu_runner))
-
-    def game_runner():
-        game_factory.game().run()
-
-    items.append(ButtonMenuItem(game_runner, "start game"))
-    return items

@@ -93,34 +93,38 @@ class MenuInput:
         self.set_text_callback(self.get_text_callback() + character)
 
 
-class MenuFactory:
+class MenuListFactory:
     def __init__(self, menu_renderer, menu_input, clock):
         self.menu_renderer = menu_renderer
         self.menu_input = menu_input
         self.clock = clock
 
-    def menu(self, items):
-        return Menu(self.menu_renderer, self.menu_input, items, self.clock)
+    def menu(self, menu_item_collection):
+        return MenuList(self.menu_renderer, self.menu_input, menu_item_collection, self.clock)
 
 
-class Menu:
-    def __init__(self, menu_renderer, menu_input, items, clock):
+class MenuList:
+    def __init__(self, menu_renderer, menu_input, item_collection, clock):
         self.menu_renderer = menu_renderer
         self.menu_input = menu_input
-        self.items = items
+        self.item_collection = item_collection
         self.selected_item = 0
         self.clock = clock
         self._should_quit = False
+        self._items = []
 
-    def run(self):
-        while True:
-            self._prepare_menu_input()
-            self.menu_input.handle_inputs()
-            if self._should_quit:
-                return None
+    def run_tick(self):
+        self._update_item_list()
+        self._prepare_menu_input()
+        self.menu_input.handle_inputs()
+        self.menu_renderer.render(self)
+        self.clock.tick()
 
-            self.menu_renderer.render(self)
-            self.clock.tick()
+    def should_quit(self):
+        return self._should_quit
+
+    def _update_item_list(self):
+        self.items = self.item_collection.get_item_list()
 
     def _prepare_menu_input(self):
         self.menu_input.clear_bindings()
@@ -146,7 +150,7 @@ class Menu:
         self.selected_item = item_index
 
 
-class MenuRenderer:
+class MenuListRenderer:
     def __init__(self, screen, background_color, item_spacing, item_renderer):
         self.screen = screen
         self.background_color = background_color
@@ -155,14 +159,14 @@ class MenuRenderer:
         self.screen.surface.fill(background_color)
         self.screen.update()
 
-    def render(self, menu):
+    def render(self, menu_list):
         self.screen.surface.fill(self.background_color)
-        for i in range(len(menu.items)):
-            item_center = self._item_center(i, len(menu.items))
+        for i in range(len(menu_list.items)):
+            item_center = self._item_center(i, len(menu_list.items))
             is_active = False
-            if i == menu.selected_item:
+            if i == menu_list.selected_item:
                 is_active = True
-            self.item_renderer.render(self.screen.surface, menu.items[i],
+            self.item_renderer.render(self.screen.surface, menu_list.items[i],
                                       item_center, is_active)
         self.screen.update()
 

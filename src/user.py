@@ -22,7 +22,7 @@ class UserFactory:
 
     def name_valid(self):
         """Checks if the current name is unique.
-        
+
         Returns:
             True if the user's name is unique in `user_dao`.
             False otherwise.
@@ -45,4 +45,24 @@ class UserFactory:
     def set_name(self, name):
         """Sets the currently modified user's name"""
         self._user.name = name
+
+class UserSelector:
+    def __init__(self, user_dao):
+        self._user_dao = user_dao
+        self._selected = self._user_dao.get_first()
+        if self._selected is None:
+            raise ValueError("No users found in `user_dao`")
+
+    def next(self):
+        next_selected = self._user_dao.get_next(self._selected)
+        if next_selected is not None:
+            self._selected = next_selected
+
+    def previous(self):
+        next_selected = self._user_dao.get_previous(self._selected)
+        if next_selected is not None:
+            self._selected = next_selected
+
+    def get_current(self):
+        return self._selected
 
