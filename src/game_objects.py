@@ -240,6 +240,9 @@ class Plane(GameObject):
             other.owner.process_reward(self.score_generator(
                 damage_taken, destroyed), self.owner)
 
+            if destroyed:
+                other.owner.add_kill(self.owner)
+
     def _damage(self, amount):
         if not self.alive():
             return (0, False)

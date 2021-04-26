@@ -1,7 +1,4 @@
 from user import User
-class DatabaseException(Exception):
-    pass
-
 class UserDao:
     def __init__(self, connection):
         self._connection = connection
