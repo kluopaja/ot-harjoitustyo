@@ -49,7 +49,7 @@ class Player:
     def update(self, delta_time):
         self._spawn_timer.update(delta_time)
         if self._plane == None:
-            self.notification.until_spawn(self._spawn_timer.time_left)
+            self.notification.until_spawn(self._spawn_timer.time_left())
             if self._spawn_timer.expired():
                 self.notification.press_key_to_start()
                 self._player_input.bind_shoot(self._start_new_flight)

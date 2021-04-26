@@ -3,18 +3,24 @@ import logging
 
 
 class Timer:
-    def __init__(self, length):
-        self.time_left = length
-        self.length = length
+    def __init__(self, length=float('inf')):
+        self._current_time = 0
+        self._length = length
 
     def start(self):
-        self.time_left = self.length
+        self._current_time = 0
 
     def update(self, delta_time):
-        self.time_left -= delta_time
+        self._current_time += delta_time
+
+    def current_time(self):
+        return self._current_time
+
+    def time_left(self):
+        return self._length - self._current_time
 
     def expired(self):
-        return self.time_left <= 0
+        return self._current_time >= self._length
 
 
 def busy_wait(until):
