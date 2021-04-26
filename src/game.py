@@ -122,18 +122,35 @@ class Game:
         self.game_state = game_state
         self.game_renderer = game_renderer
         self.clock = clock
+        self._paused = False
 
     def run(self):
+        self._paused = False
+        self.game_input.bind_pause(self._toggle_pause)
         self.clock.reset()
         while True:
-            self.game_input.handle_inputs()
+            if self._paused:
+                self.game_input.handle_pause_inputs()
+            else:
+                self.game_input.handle_inputs()
+
             if self.game_input.should_quit:
                 break
 
-            self.game_state.run_tick(self.clock.delta_time)
-            self.game_renderer.render(self.game_state.game_objects)
+            if self._paused:
+                self.game_renderer.render_pause(self.game_state.game_objects)
+            else:
+                self.game_state.run_tick(self.clock.delta_time)
+                self.game_renderer.render(self.game_state.game_objects)
+
             self.clock.tick()
             logging.debug(f'busy frac: {self.clock.busy_fraction()}')
+
+    def _toggle_pause(self):
+        if self._paused:
+            self._paused = False
+        else:
+            self._paused = True
 
 
 def rect_horizontal_split(rect):
@@ -212,10 +229,11 @@ def rect_splitter(split_depth, rect, start_dimension='vertical'):
 
 
 class GameRenderer:
-    def __init__(self, screen, game_views, game_background):
+    def __init__(self, screen, game_views, game_background, pause_overlay):
         self._screen = screen
         self.game_views = game_views
         self.game_background = game_background
+        self.pause_overlay = pause_overlay
 
         self._screen.surface.fill(self.game_background.fill_color)
         self._previous_dirty_rects = []
@@ -229,6 +247,15 @@ class GameRenderer:
         self.game_view_areas = rect_splitter(n_splits, whole_area)
 
     def render(self, game_objects):
+        self._update_screen(self._render_game_objects(game_objects))
+
+    def render_pause(self, game_objects):
+        dirty_rects = self._render_game_objects(game_objects)
+        self._screen.surface.blur(15)
+        self.pause_overlay.render(self._screen.surface)
+        self._update_screen(None)
+
+    def _render_game_objects(self, game_objects):
         self._screen.surface.fill(self.game_background.fill_color)
         dirty_rects = []
         for game_view, area in zip(self.game_views, self.game_view_areas):
@@ -237,10 +264,13 @@ class GameRenderer:
                 subsurface, game_objects, self.game_background)
             dirty_rects.extend(self._subrects_to_absolute(
                 dirty_subrects, area.topleft))
+        return dirty_rects
 
+    def _update_screen(self, dirty_rects):
         self._screen.update(self._previous_dirty_rects)
         self._screen.update(dirty_rects)
         self._previous_dirty_rects = dirty_rects
+
 
     def _subrects_to_absolute(self, subrects, offset):
         result = []
@@ -251,6 +281,16 @@ class GameRenderer:
             result.append(copy)
 
         return result
+
+class PauseOverlay:
+    def __init__(self, text, font_color):
+        self.text = text
+        self.font_color = font_color
+
+    def render(self, surface):
+        text_center = Vector2(surface.get_rect().center)
+        return [surface.centered_text(self.text, text_center,
+                                      self.font_color)]
 
 
 class GameBackground:

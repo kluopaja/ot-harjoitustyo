@@ -22,6 +22,11 @@ class DrawingSurface:
 
         return self.surface.blit(source, dest)
 
+    def blur(self, radius):
+        size = self.surface.get_size()
+        tmp = pygame.transform.smoothscale(self.surface, (size[0]//radius, size[1]//radius))
+        self.blit(pygame.transform.scale(tmp, self.surface.get_size()))
+
     def draw_line(self, begin, end, color, width=1):
         """Draws a line to `self.surface`
 

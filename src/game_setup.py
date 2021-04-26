@@ -1,11 +1,11 @@
 from game import Player, GameState, Game, GameNotification, GameBackground
-from game import GameRenderer, GameView
+from game import GameRenderer, GameView, PauseOverlay
 from timing import Timer, Clock, busy_wait
 from graphics import ImageGraphic, PolylineGraphic
 from shapes import Polyline, Rectangle
 from screen import Screen
 from game_objects import PlaneFactory, Ground
-from inputs import GameInput, PlayerInput
+from inputs import GameKeys, GameInput, PlayerInput
 import pygame
 from pygame import Vector2
 from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
@@ -56,7 +56,9 @@ class GameFactory:
 
     def game(self):
         level_config = self.level_config_selector.get_selected()
-        game_input = GameInput(self.event_handler)
+        game_keys = GameKeys(quit_game = pygame.K_ESCAPE,
+                             pause_game = pygame.key.key_code("p"))
+        game_input = GameInput(self.event_handler, game_keys)
         player_inputs = self.player_input_loader.get_player_inputs(game_input)
 
         game_notifications = []
@@ -88,7 +90,8 @@ class GameFactory:
         background = GameBackground(cloud_graphic, n_clouds=10,
                                     repeat_area=Vector2(3000, 2000),
                                     fill_color=(180, 213, 224))
-        renderer = GameRenderer(self.screen, game_views, background)
+        pause_overlay = PauseOverlay("PAUSE", (107, 88, 110))
+        renderer = GameRenderer(self.screen, game_views, background, pause_overlay)
 
         game = Game(game_input, game_state, renderer, Clock(60, busy_wait))
         return game
