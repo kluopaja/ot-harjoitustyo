@@ -24,7 +24,7 @@ project_root = Path(__file__).parent.parent
 event_handler = EventHandler()
 
 user_dao = UserDao(get_database_connection())
-user_dao.create(User("default player"))
+user_dao.create(User("default user"))
 
 game_factory = GameFactory(project_root / "assets", user_dao, event_handler, screen)
 

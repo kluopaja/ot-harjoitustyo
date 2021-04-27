@@ -6,7 +6,7 @@ class MainMenu:
         self.menu_factory = menu_factory
         self.item_collection = MenuItemCollection()
         self.item_collection.add_item(
-            ButtonMenuItem(add_user_menu.run, "Add player")
+            ButtonMenuItem(add_user_menu.run, "Add user")
         )
         self.item_collection.add_item(
             ButtonMenuItem(new_game_menu.run, "New game")
