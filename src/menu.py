@@ -1,6 +1,7 @@
 from pygame import Vector2
 from menu_item import ButtonMenuItem
 import pygame
+import string
 
 
 class MenuKeys:
@@ -72,6 +73,8 @@ class MenuInput:
         self.set_text_callback(self.get_text_callback()[0:-1])
 
     def _add_text(self, character):
+        if character in string.whitespace:
+            return
         if (self.set_text_callback is None) or (self.get_text_callback is None):
             return
         self.set_text_callback(self.get_text_callback() + character)

@@ -35,10 +35,14 @@ class TestMenuInput(unittest.TestCase):
         self.menu_input.bind_accept(self.accept)
 
         self.text = ""
-        def set_text(new_text):
-            self.text = new_text
 
-        self.menu_input.bind_text(lambda: self.text, set_text)
+        self.menu_input.bind_text(self._get_text, self._set_text)
+
+    def _get_text(self):
+        return self.text
+
+    def _set_text(self, new_text):
+        self.text = new_text
 
     def test_quit_key_calls_quit_function(self):
         self.event_handler.get_events.return_value = [
@@ -120,7 +124,7 @@ class TestMenuInput(unittest.TestCase):
     def test_erase_key_doesnt_modify_empty_text(self):
         self.text = ""
         self.event_handler.get_events.return_value = [
-            MockEvent(pygame.K_BACKSPACE, "")
+            MockEvent(pygame.K_BACKSPACE, ""),
         ]
         self.menu_input.handle_inputs()
         assert self.text == ""
@@ -139,3 +143,16 @@ class TestMenuInput(unittest.TestCase):
         ]
         self.menu_input.handle_inputs()
         self.increase.assert_not_called()
+
+    def test_whitespaces_do_not_modify_text(self):
+        # clear enter from the keys
+        self.menu_input.clear_bindings()
+        self.menu_input.bind_text(self._get_text, self._set_text)
+        self.event_handler.get_events.return_value = [
+            MockEvent(pygame.K_SPACE, " "),
+            MockEvent(pygame.K_RETURN, "\n"),
+        ]
+        self.menu_input.handle_inputs()
+        # check that the enter key was cleared from the accept function
+        self.accept.assert_not_called()
+        assert self.text == ""
