@@ -16,7 +16,10 @@ The following commands should be run at the project root.
 1. Set up Poetry environment:
 ```poetry install```
 
-2. Start game:
+2. Initialize the database:
+```poetry run invoke init-database```
+
+3. Start game:
 ```poetry run invoke start```
 
 ## Running tests
@@ -33,14 +36,27 @@ Pylint can be run with;
 
 Navigation in the menu is done with arrow keys, esc and enter.
 
-The player config menu can be accessed by selecting the player at `Edit preferences` menu item and pressing enter.
-Currently the player config menu only supports changing the players name.
 
-Text input is inserted simply typing something when the
-menu item is selected.
+### Add user menu
+New users can be added in the `Add user` menu by typing the player
+name to the `Name` field and selecting`Create user`.
+
+
+### New game menu
+The game can be configured by navigating to a menu item and selecting
+the values with left and right keys.
+
+The players should have different names to make the game results
+more interpretable.
 
 The number of supported players depends on the number of player keymaps defined
 and on the map support. Currently these support 4 players.
+
+### Game
+
+The timer to end the game hasn't been implemented yet so the players
+have to press `Esc` to finish the game.
+
 The player's score is shown in the top left corner of the game view.
 
 Keys for player 1:
@@ -79,10 +95,12 @@ turn down: l
 shoot: u
 ```
 
-
 They keymaps can be configured by modifying the `assets/keys.json` file.
 Please note that in single player mode the keymappings for player 1 will
 be used.
+
+### Results
+The results view will be shown automatically after the game has finished.
 
 
 ### Levels
