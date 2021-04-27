@@ -13,9 +13,13 @@ class TestPlayer(unittest.TestCase):
         self.player_input_mock = Mock()
         self.game_notification_mock = Mock()
         self.spawn_timer_mock = Mock()
+        self.user_recorder_mock = Mock()
+        self.user_mock = Mock()
 
         self.player = Player(self.plane_factory_mock, self.player_input_mock,
-                             self.game_notification_mock, self.spawn_timer_mock)
+                             self.game_notification_mock,
+                             self.user_recorder_mock, self.user_mock,
+                             self.spawn_timer_mock)
 
     def test_view_location_without_plane(self):
         self.plane_factory_mock.start_position = Vector2(1, 2)
