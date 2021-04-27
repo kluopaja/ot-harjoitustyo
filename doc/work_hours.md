@@ -18,5 +18,9 @@ Date | Hours | What did I do
 17.4 | 5     | Add level selection, better multiplayer support and other improvements
 18.4 | 4     | Add config file for players' keys and other improvements.
 20.4 | 6     | Add submenu for player configuration, refactor menu, add player names, do weekly requirements
+24.4 | 4     | Refactoring and adding tests
+25.5 | 6     | Storing user information to database, refactoring and changing menu structure
+26.5 | 6     | Add pause, start implementing the game statistics part
+27.5 | 6     | Implement showing the results after the game has finished, finishk weekly project requirements, add tests
 ---- | ----- | ---
-Total| 58
+Total 80
