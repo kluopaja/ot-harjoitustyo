@@ -1,5 +1,7 @@
-class PlayerStats:
-    def __init__(self, timer):
+
+class UserRecorder:
+    def __init__(self, user, timer):
+        self.user = user
         self._timer = timer
         self.scores = []
         self._score_sum = 0

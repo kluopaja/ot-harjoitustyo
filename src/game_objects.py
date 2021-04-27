@@ -89,6 +89,7 @@ class Gun:
 
     def shoot(self, location, velocity, front, owner):
         if self._timer.expired():
+            owner.add_shot_fired()
             self._timer.start()
             bullet_location = location + self._spawn_offset * front
             bullet_velocity = velocity + self._speed * front

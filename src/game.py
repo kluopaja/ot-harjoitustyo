@@ -30,9 +30,9 @@ class GameNotification:
 
 class Player:
     def __init__(self, plane_factory, player_input, game_notification,
-                 player_stats, user, spawn_timer):
+                 user_recorder, user, spawn_timer):
         self.notification = game_notification
-        self.stats = player_stats
+        self.user_recorder = user_recorder
         self.user = user
 
         self._plane_factory = plane_factory
@@ -49,7 +49,7 @@ class Player:
 
     def update(self, delta_time):
         self._spawn_timer.update(delta_time)
-        self.stats.update(delta_time)
+        self.user_recorder.update(delta_time)
         if self._plane == None:
             self.notification.until_spawn(self._spawn_timer.time_left())
             if self._spawn_timer.expired():
@@ -58,7 +58,7 @@ class Player:
             return
 
         if not self._plane.alive():
-            self.stats.add_death()
+            self.user_recorder.add_death()
             self._plane = None
             self._spawn_timer.start()
 
@@ -77,13 +77,16 @@ class Player:
         if issuer is self:
             return
 
-        self.stats.add_score(score)
+        self.user_recorder.add_score(score)
 
     def add_kill(self, target_owner):
         if target_owner is self:
             return
 
-        self.stats.add_kill()
+        self.user_recorder.add_kill()
+
+    def add_shot_fired(self):
+        self.user_recorder.add_shot()
 
 
 class GameState:
@@ -154,6 +157,15 @@ class Game:
 
             self.clock.tick()
             logging.debug(f'busy frac: {self.clock.busy_fraction()}')
+
+    def get_user_recorders(self):
+        """Returns the information about partiticipants' game performance
+
+        Returns:
+            A list of UserRecorder objects."""
+
+        return [player.user_recorder for player in self.game_state.players]
+
 
     def _toggle_pause(self):
         if self._paused:
@@ -394,7 +406,7 @@ class GameView:
         text_topleft = Vector2(surface.get_rect().topleft)
         dirty_rects = []
         dirty_rects.append(
-            surface.topleft_text(str(self.player.stats.total_score()), text_topleft,
+            surface.topleft_text(str(self.player.user_recorder.total_score()), text_topleft,
                                  self.font_color))
         return dirty_rects
 

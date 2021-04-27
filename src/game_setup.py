@@ -11,7 +11,7 @@ from pygame import Vector2
 from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
 from level_config import LevelConfigSelector
 from user import UserSelector
-from game_stats import PlayerStats
+from game_stats import UserRecorder
 import json
 
 
@@ -81,7 +81,7 @@ class GameFactory:
             user = self.user_selectors[i].get_current()
             players.append(Player(plane_factories[i], player_inputs[i],
                                   game_notifications[i],
-                                  PlayerStats(Timer()), user, Timer(0.5)))
+                                  UserRecorder(user, Timer()), user, Timer(0.5)))
             game_views.append(GameView(players[-1], (30, 72, 102)))
 
         game_state = GameState(level_config.game_objects(), players)
