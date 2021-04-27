@@ -11,14 +11,20 @@ class DrawingSurface:
     def subsurface(self, area):
         return DrawingSurface(self.surface.subsurface(area))
 
+    #TODO remove none?
     def blit(self, source, dest=None):
-        """Draws `source` to `self.surface`. Optionally at pygame.Rect `dest`
+        """Draws `source` to `self.surface`.
+
+        Args:
+            `source` a pygame surface
+            `dest`: A tuple of two coordinates or None
+                The top left corner of the `source`
 
         Returns:
             A pygame.Rect corresponding to the changed area.
         """
         if dest is None:
-            return self.surface.blit(source, self.surface.get_rect())
+            return self.surface.blit(source, (0, 0))
 
         return self.surface.blit(source, dest)
 
@@ -40,6 +46,22 @@ class DrawingSurface:
             A pygame.Rect corresponding to the changed area.
         """
         return pygame.draw.line(self.surface, color, begin, end, width)
+
+    def draw_image(self, image, position):
+        """Draws image from a numpy array.
+
+        Args:
+            `image` a numpy array of shape (?, ?, 4) (ARGB)
+            `position` Vector2
+                The position of the top left corner.
+
+        Returns:
+            A pygame.Rect corresponding to the changed area.
+        """
+        surface = pygame.surfarray.make_surface(image[:, :, 1:]).convert_alpha()
+        # TODO will locking break something if I don't unlock?
+        pygame.surfarray.pixels_alpha(surface)[:, :] = image[:, :, 0]
+        return self.blit(surface, position)
 
     def fill(self, color):
         """Fills `self.surface` with `color`
