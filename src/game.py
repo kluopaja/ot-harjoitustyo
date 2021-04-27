@@ -173,6 +173,18 @@ class Game:
         else:
             self._paused = True
 
+class GameOrganizer:
+    """Class for running a game and handling the statistics"""
+    def __init__(self, results_viewer):
+        self._results_viewer = results_viewer
+
+    def organize(self, game):
+        game.run()
+
+        user_recorders = game.get_user_recorders()
+
+        self._results_viewer.run(user_recorders)
+
 
 def rect_horizontal_split(rect):
     """Splits `rect` along the horizontal axis`

@@ -18,9 +18,10 @@ class MainMenu:
             menu.run_tick()
 
 class NewGameMenu:
-    def __init__(self, game_factory, menu_factory):
+    def __init__(self, game_factory, menu_factory, game_organizer):
         self.game_factory = game_factory
         self.menu_factory = menu_factory
+        self.game_organizer = game_organizer
         self.item_collection = MenuItemCollection()
         level_selector = game_factory.level_config_selector
         self.item_collection.add_item(
@@ -35,10 +36,9 @@ class NewGameMenu:
         self.player_selection_collection = MenuItemCollection()
         self.item_collection.add_collection(self.player_selection_collection)
 
-        def game_runner():
-            game_factory.game().run()
 
-        self.item_collection.add_item(ButtonMenuItem(game_runner, "Start game"))
+
+        self.item_collection.add_item(ButtonMenuItem(self._game_runner, "Start game"))
 
     def run(self):
         menu = self.menu_factory.menu(self.item_collection)
@@ -55,6 +55,12 @@ class NewGameMenu:
                                      lambda u=user_selector: u.get_current().name,
                                      f"Player {i+1}: ")
             )
+
+    def _game_runner(self):
+        game = self.game_factory.game()
+        self.game_organizer.organize(game)
+
+
 
 class AddUserMenu:
     def __init__(self, menu_factory, user_factory):
