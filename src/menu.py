@@ -32,9 +32,6 @@ class MenuInput:
     def bind_previous_item(self, func):
         self.keymaps[self.keys.prev_item] = func
 
-    def bind_quit(self, func):
-        self.keymaps[self.keys.quit] = func
-
     def bind_increase(self, func):
         self.keymaps[self.keys.increase] = func
 
@@ -47,19 +44,6 @@ class MenuInput:
     def bind_text(self, get_text, set_text):
         self.get_text_callback = get_text
         self.set_text_callback = set_text
-
-    def clear_item_bindings(self):
-        if self.keys.increase in self.keymaps:
-            del self.keymaps[self.keys.increase]
-
-        if self.keys.decrease in self.keymaps:
-            del self.keymaps[self.keys.decrease]
-
-        if self.keys.accept in self.keymaps:
-            del self.keymaps[self.keys.accept]
-
-        self.set_text_callback = None
-        self.get_text_callback = None
 
     def clear_bindings(self):
         self.keymaps.clear()
@@ -141,10 +125,10 @@ class MenuList:
         self._should_start_game = True
 
     def _activate_next_item(self):
-        self._activate_item((self.selected_item - 1) % len(self.items))
+        self._activate_item((self.selected_item + 1) % len(self.items))
 
     def _activate_previous_item(self):
-        self._activate_item((self.selected_item + 1) % len(self.items))
+        self._activate_item((self.selected_item - 1) % len(self.items))
 
     def _activate_item(self, item_index):
         self.selected_item = item_index
