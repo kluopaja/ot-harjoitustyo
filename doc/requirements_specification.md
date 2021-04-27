@@ -14,7 +14,7 @@ game will not have any AI and thus single-player mode will not be very useful.
 
 ## Basic functionality
 
-### Main menu
+### Menu
 
 - [x] The players can start the game
 - [x] The players can select a map
@@ -37,12 +37,12 @@ game will not have any AI and thus single-player mode will not be very useful.
 
 ### After game
 
-- [ ] The players can see their final scores
+- [x] The players can see their final scores *tehty*
 - [ ] Game statistics will be saved to a database
 
 ## Further development ideas
 
-### Main menu
+### Menu
 
 - [ ] Configuration of the planes
 
