@@ -139,7 +139,7 @@ class DrawingSurface:
         self._surface = surface
         self._screen = screen
         self._absolute_topleft = absolute_topleft
-        self.font = pygame.font.SysFont("monospace", 24)
+        self._font = pygame.font.SysFont("monospace", 24)
 
     def subsurface(self, area):
         rect_topleft = self._to_pixel_coordinates(area.topleft)
@@ -265,7 +265,7 @@ class DrawingSurface:
         """
         _position = self._to_pixel_coordinates(position)
         # TODO read about performance issues related to this!
-        text_surface = self.font.render(text, True, color)
+        text_surface = self._font.render(text, True, color)
         dest = text_surface.get_rect()
         dest.center = (_position[0], _position[1])
         dirty_rect = self._surface.blit(text_surface, dest.topleft)
@@ -276,7 +276,7 @@ class DrawingSurface:
         """
         _position = self._to_pixel_coordinates(position)
         # TODO read about performance issues related to this!
-        text_surface = self.font.render(text, True, color)
+        text_surface = self._font.render(text, True, color)
         dest = text_surface.get_rect()
         dest.midtop = (_position[0], _position[1])
         dirty_rect = self._surface.blit(text_surface, dest.topleft)
@@ -287,7 +287,7 @@ class DrawingSurface:
         """
         _position = self._to_pixel_coordinates(position)
         # TODO read about performance issues related to this!
-        text_surface = self.font.render(text, True, color)
+        text_surface = self._font.render(text, True, color)
         dest = text_surface.get_rect()
         dest.topleft = (_position[0], _position[1])
         dirty_rect = self._surface.blit(text_surface, dest.topleft)
