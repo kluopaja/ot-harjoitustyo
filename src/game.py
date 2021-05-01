@@ -190,11 +190,11 @@ def rect_horizontal_split(rect):
     """Splits `rect` along the horizontal axis`
 
     Arguments:
-        `rect`: a pygame Rect
+        `rect`: a FloatRect
 
     Returns:
-        (r1, r2) : a tuple of Rects
-            r1 is the upper Rect and r2 is the lower Rect"""
+        (r1, r2) : a tuple of FloatRects
+            r1 is the upper FloatRect and r2 is the lower FloatRect"""
 
     upper = rect.copy()
     upper.height /= 2
@@ -210,11 +210,11 @@ def rect_vertical_split(rect):
     """Splits `rect` along the vertical axis`
 
     Arguments:
-        `rect`: a pygame Rect
+        `rect`: a FloatRect
 
     Returns:
-        (r1, r2) : a tuple of Rects
-            r1 is the left Rect and r2 is the right Rect"""
+        (r1, r2) : a tuple of FloatRects
+            r1 is the left FloatRect and r2 is the right FloatRect"""
 
     left = rect.copy()
     left.width /= 2
@@ -234,12 +234,12 @@ def rect_splitter(split_depth, rect, start_dimension='vertical'):
     Arguments:
         `split_depth`: a non-negative integer
             The number of recursive splits
-        `rect`: a pygame Rect
+        `rect`: a FloatRect
         `start_dimension`: `vertical` or `horizontal`
             The direction of the first split
 
     Returns:
-        a list of Rects
+        a list of FloatRects
             The final results of the splits"""
 
     splitters = (rect_vertical_split, rect_horizontal_split)
@@ -268,8 +268,7 @@ class GameRenderer:
         self.game_background = game_background
         self.pause_overlay = pause_overlay
 
-        self._screen.surface.fill(self.game_background.fill_color)
-        self._previous_dirty_rects = []
+        self._screen.surface.fill(self.game_background.fill_color, update=True)
         self._screen.update()
 
         if len(game_views) == 0:
@@ -280,40 +279,20 @@ class GameRenderer:
         self.game_view_areas = rect_splitter(n_splits, whole_area)
 
     def render(self, game_objects):
-        self._update_screen(self._render_game_objects(game_objects))
+        self._render_game_objects(game_objects)
+        self._screen.update()
 
     def render_pause(self, game_objects):
-        dirty_rects = self._render_game_objects(game_objects)
+        self._render_game_objects(game_objects)
         self._screen.surface.blur(15)
         self.pause_overlay.render(self._screen.surface)
-        self._update_screen(None)
+        self._screen.update()
 
     def _render_game_objects(self, game_objects):
         self._screen.surface.fill(self.game_background.fill_color)
-        dirty_rects = []
         for game_view, area in zip(self.game_views, self.game_view_areas):
             subsurface = self._screen.surface.subsurface(area)
-            dirty_subrects = game_view.render(
-                subsurface, game_objects, self.game_background)
-            dirty_rects.extend(self._subrects_to_absolute(
-                dirty_subrects, area.topleft))
-        return dirty_rects
-
-    def _update_screen(self, dirty_rects):
-        self._screen.update(self._previous_dirty_rects)
-        self._screen.update(dirty_rects)
-        self._previous_dirty_rects = dirty_rects
-
-
-    def _subrects_to_absolute(self, subrects, offset):
-        result = []
-        for rect in subrects:
-            copy = Rect(rect)
-            copy.left += offset[0]
-            copy.top += offset[1]
-            result.append(copy)
-
-        return result
+            game_view.render(subsurface, game_objects, self.game_background)
 
 class PauseOverlay:
     def __init__(self, text, font_color):
@@ -322,8 +301,7 @@ class PauseOverlay:
 
     def render(self, surface):
         text_center = Vector2(surface.get_rect().center)
-        return [surface.centered_text(self.text, text_center,
-                                      self.font_color)]
+        surface.centered_text(self.text, text_center, self.font_color)
 
 
 class GameBackground:
@@ -366,15 +344,13 @@ class GameBackground:
 
         return mod_distance + target
 
-    def render(self, surface, offset):
-        center_offset = surface.get_rect().center + Vector2(offset)
-        dirty_rects = []
+    def render(self, camera):
+        center_offset = camera.location
         for location in self.cloud_locations:
             cloud_location = self._closest_congruent(
                 center_offset, location, self.repeat_area)
             self.cloud_graphic.location = cloud_location
-            dirty_rects.extend(self.cloud_graphic.draw(surface, offset))
-        return dirty_rects
+            self.cloud_graphic.draw(camera)
 
 
 def constant_view_locator(x, y):
@@ -384,48 +360,35 @@ def constant_view_locator(x, y):
 
 
 class GameView:
-    def __init__(self, player, font_color):
+    def __init__(self, player, camera, font_color):
         self.player = player
+        self.camera = camera
         self.font_color = font_color
 
     def render(self, surface, game_objects, game_background):
-        rendering_region = surface.get_rect()
-        rendering_region.center = self.player.view_location()
+        self.camera.location = self.player.view_location()
+        self.camera.set_drawing_surface(surface)
 
-        dirty_rects = []
-
-        dirty_rects.extend(
-            game_background.render(surface, offset=rendering_region.topleft))
+        game_background.render(self.camera)
 
         for game_object in game_objects:
-            dirty_rects.extend(
-                game_object.graphic.draw(surface, offset=rendering_region.topleft))
+            game_object.graphic.draw(self.camera)
 
-        dirty_rects.extend(self._render_notification(surface))
-        dirty_rects.extend(self._render_score(surface))
-        dirty_rects.extend(self._render_name(surface))
-        return dirty_rects
+        self._render_notification(surface)
+        self._render_score(surface)
+        self._render_name(surface)
 
     def _render_notification(self, surface):
         text_center = Vector2(surface.get_rect().center)
-        dirty_rects = []
-        dirty_rects.append(
-            surface.centered_text(self.player.notification.message, text_center,
-                                  self.font_color))
-        return dirty_rects
+        surface.centered_text(self.player.notification.message, text_center,
+                              self.font_color)
 
     def _render_score(self, surface):
         text_topleft = Vector2(surface.get_rect().topleft)
-        dirty_rects = []
-        dirty_rects.append(
-            surface.topleft_text(str(self.player.user_recorder.total_score()), text_topleft,
-                                 self.font_color))
-        return dirty_rects
+        surface.topleft_text(str(self.player.user_recorder.total_score()), text_topleft,
+                             self.font_color)
 
     def _render_name(self, surface):
         text_center = Vector2(surface.get_rect().midtop)
-        dirty_rects = []
-        dirty_rects.append(
-            surface.midtop_text(str(self.player.user.name), text_center,
-                                self.font_color))
-        return dirty_rects
+        surface.midtop_text(str(self.player.user.name), text_center,
+                            self.font_color)

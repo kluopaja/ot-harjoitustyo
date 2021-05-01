@@ -143,11 +143,9 @@ class MenuListRenderer:
         self.background_color = background_color
         self.item_renderer = item_renderer
         self.item_spacing = item_spacing
-        self.screen.surface.fill(background_color)
-        self.screen.update()
 
     def render(self, menu_list):
-        self.screen.surface.fill(self.background_color)
+        self.screen.surface.fill(self.background_color, update=True)
         for i in range(len(menu_list.items)):
             item_center = self._item_center(i, len(menu_list.items))
             is_active = False

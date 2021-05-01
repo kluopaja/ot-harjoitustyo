@@ -12,6 +12,7 @@ from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
 from level_config import LevelConfigSelector
 from user import UserSelector
 from game_stats import UserRecorder
+from drawing_surface import Camera
 import json
 
 
@@ -82,7 +83,7 @@ class GameFactory:
             players.append(Player(plane_factories[i], player_inputs[i],
                                   game_notifications[i],
                                   UserRecorder(user, Timer()), user, Timer(0.5)))
-            game_views.append(GameView(players[-1], (30, 72, 102)))
+            game_views.append(GameView(players[-1], Camera(1300), (30, 72, 102)))
 
         game_state = GameState(level_config.game_objects(), players)
 

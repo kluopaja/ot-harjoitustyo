@@ -30,7 +30,7 @@ game_factory = GameFactory(project_root / "assets", user_dao, event_handler, scr
 
 menu_item_renderer = MenuItemRenderer(font_color=(50, 69, 63))
 menu_list_renderer = MenuListRenderer(screen, background_color=(186, 204, 200),
-                             item_spacing=100, item_renderer=menu_item_renderer)
+                             item_spacing=0.1, item_renderer=menu_item_renderer)
 menu_keys = MenuKeys(pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP,
                      pygame.K_RIGHT, pygame.K_LEFT, pygame.K_RETURN, pygame.K_BACKSPACE)
 menu_input = MenuInput(event_handler, menu_keys)

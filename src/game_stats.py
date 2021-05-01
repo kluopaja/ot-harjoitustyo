@@ -92,7 +92,7 @@ class UserRecorderAnalyzer:
 # TODO these to a separate file
 def create_results_viewer(menu_input, screen):
     dataframe_renderer = DataFrameRenderer(
-        cell_size=(200, 30),
+        cell_size=(0.22, 0.05),
         font_color=(50, 69, 63),
         max_cell_text_length=10
     )
@@ -132,11 +132,11 @@ class ResultsRenderer:
         self.background_color = (186, 204, 200)
 
     def render(self, user_recorders):
-        self._screen.surface.fill(self.background_color)
+        self._screen.surface.fill(self.background_color, update=True)
 
         summary_table = self._analyzer.get_sorted_summary_table(user_recorders)
         self._dataframe_renderer.render(self._screen.surface, summary_table,
-                                        (200, 200))
+                                        (0, 0.1))
 
         bin_range = self._histogram_bin_range(user_recorders)
 
@@ -146,14 +146,14 @@ class ResultsRenderer:
             bin_range=bin_range, bins=10,
             title="Shot distribution", width=800, height=600
         )
-        self._screen.surface.draw_image(shot_histogram, (200, 600))
+        self._screen.surface.draw_image_from_array(shot_histogram, (0.05, 0.3), 0.6)
 
         kill_histogram = self._plotter.plot_histogram_to_image(
             verbose_table, x="kill_time", hue='name',
             bin_range=bin_range, bins=10,
             title="Kill distribution", width=800, height=600
         )
-        self._screen.surface.draw_image(kill_histogram, (900, 600))
+        self._screen.surface.draw_image_from_array(kill_histogram, (0.8, 0.3), 0.6)
 
         self._screen.update()
 
