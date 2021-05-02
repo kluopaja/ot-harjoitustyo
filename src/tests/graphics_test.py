@@ -8,18 +8,21 @@ from pygame import Rect, Vector2
 from graphics import Image, ImageGraphic, PolylineGraphic
 from shapes import Rectangle, Polyline
 
-from tests.screen_test import ScreenStub
-from tests.drawing_surface_test import DrawingSurfaceStub
 from screen import Screen
 
+from drawing_surface import Image, Camera
+
+from unittest.mock import Mock, ANY, create_autospec, call
 
 @pytest.fixture
-def surface_stub():
-    return DrawingSurfaceStub(10, 10)
+def camera_stub():
+    return create_autospec(Camera)
 
 
 @pytest.fixture
 def image():
+    pygame.init()
+    pygame.display.set_mode((0, 0), flags=pygame.HIDDEN, vsync=1)
     tests_path = Path(__file__).parent
     return Image(Path(tests_path / "assets/test_image_1.png"))
 
@@ -37,27 +40,11 @@ class TestPolylineGraphics:
     def test_constructor_sets_width_correctly(self, polyline_graphic):
         assert polyline_graphic.width == 2
 
-    def test_draw_no_offset(self, polyline_graphic, surface_stub):
-        polyline_graphic.draw(surface_stub)
-        assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(0, 0),
-                                                   'end': Vector2(1, 2),
-                                                   'width': 2}
-        assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(1, 2),
-                                                   'end': Vector2(5, 4),
-                                                   'width': 2}
-
-    def test_draw_with_offset(self, polyline_graphic, surface_stub):
-        polyline_graphic.draw(surface_stub, Vector2(5, 3))
-        assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                   'begin': -Vector2(5, 3),
-                                                   'end': Vector2(1, 2) - Vector2(5, 3),
-                                                   'width': 2}
-        assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(1, 2) - Vector2(5, 3),
-                                                   'end': Vector2(5, 4) - Vector2(5, 3),
-                                                   'width': 2}
+    def test_draw(self, polyline_graphic, camera_stub):
+        polyline_graphic.draw(camera_stub)
+        calls = [call(Vector2(0, 0), Vector2(1, 2), (1, 2, 3), 2),
+                 call(Vector2(1, 2), Vector2(5, 4), (1, 2, 3), 2)]
+        camera_stub.draw_line.assert_has_calls(calls, any_order=True)
 
     def test_location_sets_location_correctly(self, polyline_graphic):
         polyline_graphic.location = Vector2(1, 2)
@@ -67,31 +54,20 @@ class TestPolylineGraphics:
         polyline_graphic.rotation = 1.2
         assert polyline_graphic.rotation == 1.2
 
-    def test_location_and_draw(self, polyline_graphic, surface_stub):
+    def test_location_and_draw(self, polyline_graphic, camera_stub):
         polyline_graphic.location = Vector2(1, 2)
-        polyline_graphic.draw(surface_stub)
-        assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(1, 2),
-                                                   'end': Vector2(1, 2) + Vector2(1, 2),
-                                                   'width': 2}
+        polyline_graphic.draw(camera_stub)
+        calls = [call(Vector2(1, 2), Vector2(1, 2) + Vector2(1, 2), (1, 2, 3), 2),
+                 call(Vector2(1, 2) + Vector2(1, 2), Vector2(5, 4) + Vector2(1, 2),
+                      (1, 2, 3), 2)]
+        camera_stub.draw_line.assert_has_calls(calls, any_order=True)
 
-        assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(1, 2) + Vector2(1, 2),
-                                                   'end': Vector2(5, 4) + Vector2(1, 2),
-                                                   'width': 2}
-
-    def test_rotation_and_draw(self, polyline_graphic, surface_stub):
+    def test_rotation_and_draw(self, polyline_graphic, camera_stub):
         polyline_graphic.rotation = math.pi/2
-        polyline_graphic.draw(surface_stub)
-        assert surface_stub.draw_line_calls[0] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(0, 0),
-                                                   'end': Vector2(2, -1),
-                                                   'width': 2}
-
-        assert surface_stub.draw_line_calls[1] == {'color': (1, 2, 3),
-                                                   'begin': Vector2(2, -1),
-                                                   'end': Vector2(4, -5),
-                                                   'width': 2}
+        polyline_graphic.draw(camera_stub)
+        calls = [call(Vector2(0, 0), Vector2(2, -1), (1, 2, 3), 2),
+                 call(Vector2(2, -1), Vector2(4, -5), (1, 2, 3), 2)]
+        camera_stub.draw_line.assert_has_calls(calls, any_order=True)
 
 
 class TestImageGraphics:
@@ -106,127 +82,53 @@ class TestImageGraphics:
     def test_rotation_initialized_to_zero(self, image_graphic):
         assert image_graphic.rotation == 0.0
 
-    def test_image_resized_to_match_rectangle(self, image):
-        rectangle = Rectangle(Vector2(0, 0), Vector2(10, 0), Vector2(0, 10))
-        image_graphic = ImageGraphic(rectangle, image)
-        assert image.image.get_rect() == Rect(0, 0, 10, 10)
+    def test_from_image_path_resizes_image_to_match_aspect_ratio(self, camera_stub):
+        tests_path = Path(__file__).parent
+        image_graphic = ImageGraphic.from_image_path(
+            Path(tests_path / "assets/test_image_1.png"),
+            Vector2(0, 0), Vector2(10, 10)
+        )
+        image_graphic.draw(camera_stub)
+        camera_stub.draw_image.assert_called()
+        image = camera_stub.draw_image.call_args.args[0]
+        assert image.get_height_pixels() == image.get_width_pixels()
 
-    def test_from_image_path_with_offset(self, surface_stub):
+    def test_from_image_path_with_offset(self, camera_stub):
         tests_path = Path(__file__).parent
         image_graphic = ImageGraphic.from_image_path(
             Path(tests_path / "assets/test_image_1.png"),
             Vector2(1, 1), Vector2(3, 2))
 
-        image_graphic.draw(surface_stub)
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 3, 2)
-        assert surface_stub.surface.get_at((1, 0)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (255, 255, 255, 255)
-        assert surface_stub.surface.get_at((2, 0)) == (255, 255, 255, 255)
+        image_graphic.draw(camera_stub)
+        camera_stub.draw_image.assert_called_with(ANY, Vector2(1, 1), ANY, ANY)
 
-    def test_draw(self, image_graphic, surface_stub):
-        image_graphic.draw(surface_stub)
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 3, 2)
-        assert surface_stub.surface.get_at((1, 0)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (255, 255, 255, 255)
-        assert surface_stub.surface.get_at((2, 0)) == (255, 255, 255, 255)
-
-    def test_draw_positive_offset(self, image_graphic, surface_stub):
-        surface_stub.fill((1, 2, 3))
-        image_graphic.draw(surface_stub, Vector2(1, 0))
-        assert surface_stub.blit_calls[0]['dest'] == Rect(-1, 0, 3, 2)
-        assert surface_stub.surface.get_at((0, 0)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((1, 0)) == (255, 255, 255, 255)
-        assert surface_stub.surface.get_at((2, 0)) == (1, 2, 3, 255)
-
-    def test_draw_negative_offset(self, image_graphic, surface_stub):
-        surface_stub.fill((1, 2, 3))
-        image_graphic.draw(surface_stub, Vector2(-1, 0))
-        assert surface_stub.blit_calls[0]['dest'] == Rect(1, 0, 3, 2)
-        assert surface_stub.surface.get_at((0, 0)) == (1, 2, 3, 255)
-        assert surface_stub.surface.get_at((1, 0)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((2, 0)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((3, 0)) == (255, 255, 255, 255)
+    def test_draw(self, image_graphic, camera_stub):
+        image_graphic.draw(camera_stub)
+        camera_stub.draw_image.assert_called_with(ANY, Vector2(1.5, 1), 0, 2)
 
     def test_location_sets_location(self, image_graphic):
         image_graphic.location = Vector2(13, 37)
         assert image_graphic.location == Vector2(13, 37)
 
-    def test_location_moves_drawn_image(self, image_graphic, surface_stub):
+    def test_location_moves_drawn_image(self, image_graphic, camera_stub):
         image_graphic.location = Vector2(0, 1)
-        surface_stub.fill((1, 2, 3))
-        image_graphic.draw(surface_stub)
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 1, 3, 2)
-        assert surface_stub.surface.get_at((0, 0)) == (1, 2, 3, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((0, 2)) == (255, 255, 255, 255)
+        image_graphic.draw(camera_stub)
+        camera_stub.draw_image.assert_called_with(ANY, Vector2(1.5, 2), ANY, ANY)
 
-    def test_rotation_sets_location(self, image_graphic):
-        image_graphic.location = Vector2(13, 37)
-        assert image_graphic.location == Vector2(13, 37)
+    def test_rotation_sets_rotation(self, image_graphic):
+        image_graphic.rotation = 123
+        assert image_graphic.rotation == 123
 
-    def test_rotation_rotates_drawn_image(self, image_graphic, surface_stub):
-        surface_stub.fill((1, 2, 3))
+    def test_rotation_rotates_drawn_image(self, image_graphic, camera_stub):
         image_graphic.rotation = math.pi/2
-        image_graphic.draw(surface_stub)
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, -3, 2, 3)
-        assert surface_stub.surface.get_at((0, 0)) == (1, 2, 3, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (1, 2, 3, 255)
-        assert surface_stub.surface.get_at((0, 2)) == (1, 2, 3, 255)
+        image_graphic.draw(camera_stub)
+        camera_stub.draw_image.assert_called_with(ANY, ANY, math.pi/2, ANY)
 
-    def test_location_plus_rotation(self, image_graphic, surface_stub):
-        surface_stub.fill((1, 2, 3))
+    def test_location_plus_rotation(self, image_graphic, camera_stub):
+        print(image_graphic.location, image_graphic._rectangle.center())
         image_graphic.location = Vector2(0, 3)
+        print(image_graphic.location, image_graphic._rectangle.center())
         image_graphic.rotation = math.pi/2
-        image_graphic.draw(surface_stub)
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 2, 3)
-        assert surface_stub.surface.get_at((0, 0)) == (255, 255, 255, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((0, 2)) == (0, 0, 0, 255)
-
-
-class TestImage:
-    def test_constructor_loads_correctly_shaped_image(self, image):
-        assert image.image.get_rect() == Rect(0, 0, 3, 2)
-
-    def test_draw_only_draws_to_image_area(self, image, surface_stub):
-        image.draw(surface_stub)
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 3, 2)
-
-    def test_draw_only_draws_to_image_area(self, image, surface_stub):
-        image.draw(surface_stub, Vector2(1, 1))
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 3, 2)
-
-    def test_draw_correct_image(self, image, surface_stub):
-        image.draw(surface_stub, Vector2(1, 1))
-        assert surface_stub.surface.get_at((1, 0)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (255, 255, 255, 255)
-        assert surface_stub.surface.get_at((2, 0)) == (255, 255, 255, 255)
-
-    def test_rotate_and_draw(self, image, surface_stub):
-        image.rotate_to(math.pi/2)
-        image.draw(surface_stub, Vector2(1, 1))
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 2, 3)
-        assert surface_stub.surface.get_at((0, 0)) == (255, 255, 255, 255)
-        assert surface_stub.surface.get_at((0, 1)) == (0, 0, 0, 255)
-        assert surface_stub.surface.get_at((0, 2)) == (0, 0, 0, 255)
-
-    def test_resize_draws_correct_size(self, image, surface_stub):
-        image.resize(Vector2(6, 4))
-        image.draw(surface_stub, Vector2(3, 2))
-        assert surface_stub.blit_calls[0]['dest'] == Rect(0, 0, 6, 4)
-
-    def test_resize_with_zero_dimensions(self, image, surface_stub):
-        image.resize(Vector2(0, 0))
-        image.draw(surface_stub, Vector2(3, 2))
-        assert surface_stub.blit_calls[0]['dest'] == Rect(3, 2, 0, 0)
-
-    def test_resize_with_negative_dimension(self, image, surface_stub):
-        with pytest.raises(ValueError) as e:
-            image.resize(Vector2(-1, 0))
-
-        assert str(e.value) == "The resize dimensions cannot be negative"
-
-        with pytest.raises(ValueError) as e:
-            image.resize(Vector2(0, -1))
-
-        assert str(e.value) == "The resize dimensions cannot be negative"
+        print(image_graphic.location, image_graphic._rectangle.center())
+        image_graphic.draw(camera_stub)
+        camera_stub.draw_image.assert_called_with(ANY, Vector2(1, 1.5), math.pi/2, ANY)

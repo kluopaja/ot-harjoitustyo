@@ -395,12 +395,3 @@ class Image:
 
     def get_width_pixels(self):
         return self.image.get_width()
-
-    def resize(self, size):
-        if size[0] < 0 or size[1] < 0:
-            raise ValueError("The resize dimensions cannot be negative")
-
-        size_tuple = (int(size[0]), int(size[1]))
-        self.image = pygame.transform.scale(self.image, size_tuple)
-        self._image_not_rotated = pygame.transform.scale(
-            self._image_not_rotated, size_tuple)

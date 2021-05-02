@@ -74,7 +74,13 @@ class ImageGraphic(Graphic):
     def __init__(self, rectangle, image):
         """
 
-        `rectangle` and `image` should have the same aspect ratio!
+        Args:
+            `rectangle`: A Rectangle
+            `image`: An Image
+
+        NOTE: The drawing of the image is done by setting its height to
+        match that of the `rectangle`. Therefore `rectangle` and `image`
+        should have (approximately) the same aspect ratio!
         """
 
         rectangle_size = rectangle.size()
@@ -91,6 +97,8 @@ class ImageGraphic(Graphic):
     @classmethod
     def from_image_path(cls, image_path, center_offset, size):
         """Creates ImageGraphic from an image file.
+
+        Scales image to match the `size` aspect ratio.
 
         Arguments:
             `image_path`: pathlib.Path object
