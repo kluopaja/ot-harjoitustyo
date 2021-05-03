@@ -6,9 +6,12 @@ from pygame import Vector2
 class Screen:
     def __init__(self, width, height, font_size):
         self._height = height
+        font_pixels = int(self.get_height() * font_size)
+        self.font = pygame.font.SysFont("monospace", font_pixels)
+
         self.surface = DrawingSurface(
             pygame.display.set_mode((width, height), vsync=1),
-            self, Vector2(0), font_size)
+            self, Vector2(0))
         self._previous_dirty_rects = []
         self._current_dirty_rects = []
 
