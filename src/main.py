@@ -1,24 +1,24 @@
-import pygame
-from pygame import Vector2
-from timing import Clock, sleep_wait
-from menu import MenuListRenderer, MenuItemRenderer, MenuInput, MenuKeys, MenuListFactory
-from game_menus import NewGameMenu, AddUserMenu, MainMenu
-from game_setup import GameFactory
-from game import GameOrganizer
 import logging
-from screen import Screen
-from events import EventHandler
+import pygame
+from graphics.screen import Screen
 from pathlib import Path
-import sys
+from events import EventHandler
+from user_dao import UserDao
 from database_connection import get_database_connection
 from user import User, UserFactory
-from user_dao import UserDao
-from plotter import Plotter
-from game_stats import create_results_viewer
+from game.setup import GameFactory
+from game.game import Player
+from graphics.menu_rendering import MenuItemRenderer, MenuListRenderer
+from menu.input import MenuKeys, MenuInput
+from menu.menu_list import MenuListFactory
+from menu.menus import NewGameMenu, AddUserMenu, MainMenu
+from utils.timing import Clock, sleep_wait
+from game.game_stats import create_results_viewer
+from game.game import GameOrganizer
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 pygame.init()
-screen = Screen(1280, 720, 0.02)
+screen = Screen(1920, 1080, 0.02)
 project_root = Path(__file__).parent.parent
 
 event_handler = EventHandler()

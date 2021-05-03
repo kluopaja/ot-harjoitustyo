@@ -1,11 +1,11 @@
 from pathlib import Path
 from pygame import Vector2
 import json
-from shapes import Polyline
 import pygame
-from graphics import PolylineGraphic
-from game_objects import Ground
-from inputs import PlayerInput
+from graphics.graphics import PolylineGraphic
+from game.shapes import Polyline
+from game.game_objects import Ground
+from game.inputs import PlayerInput
 
 project_root = Path(__file__).parent.parent
 DATABASE_PATH = project_root / "data/database.sqlite"

@@ -1,7 +1,6 @@
 import pygame
-from drawing_surface import DrawingSurface
+from graphics.drawing_surface import DrawingSurface
 from pygame import Vector2
-
 
 class Screen:
     def __init__(self, width, height, font_size):

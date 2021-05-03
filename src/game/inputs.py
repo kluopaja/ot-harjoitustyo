@@ -1,6 +1,4 @@
 import pygame
-# TODO should be somehow combined with MenuInput
-
 
 class GameKeys:
     def __init__(self, quit_game, pause_game):

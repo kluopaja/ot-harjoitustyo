@@ -5,9 +5,10 @@ import pytest
 import pygame
 from pygame import Rect, Vector2
 
-from screen import Screen
+from graphics.screen import Screen
 
-from drawing_surface import Image, Camera
+from graphics.image import Image
+from graphics.camera import Camera
 
 from unittest.mock import Mock, ANY, create_autospec, call
 

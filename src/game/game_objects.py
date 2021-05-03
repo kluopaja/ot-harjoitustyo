@@ -2,10 +2,11 @@ import math
 import logging
 from constants import EPS
 from pygame import Vector2
-from graphics import ImageGraphic
-from shapes import Rectangle, Circle
-from physics import BasePhysics, BodyPhysics, WingPhysics, angle_between, PhysicsController
-from timing import Timer
+from graphics.graphics import ImageGraphic
+from game.shapes import Rectangle, Circle
+from game.physics import BasePhysics, BodyPhysics, WingPhysics, angle_between
+from game.physics import PhysicsController
+from utils.timing import Timer
 
 
 def score_generator(damage_score, destroying_score):

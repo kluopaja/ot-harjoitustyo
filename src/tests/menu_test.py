@@ -4,7 +4,7 @@ from unittest.mock import Mock
 
 import pygame
 
-from menu import MenuKeys, MenuInput
+from menu.input import MenuKeys, MenuInput
 
 
 class MockEvent:

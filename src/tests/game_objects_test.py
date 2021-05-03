@@ -2,12 +2,12 @@ from unittest.mock import Mock, ANY, create_autospec
 import unittest
 from pygame import Vector2
 
-from game_objects import Plane, Gun, Bullet, Ground
-from shapes import Shape
-from graphics import Graphic
-from physics import PhysicsController
-from game import Player
-from timing import Timer
+from game.game_objects import Plane, Gun, Bullet, Ground
+from game.shapes import Shape
+from graphics.graphics import Graphic
+from game.physics import PhysicsController
+from game.game import Player
+from utils.timing import Timer
 
 from math import pi
 

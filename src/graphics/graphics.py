@@ -3,8 +3,9 @@ import logging
 from pygame import Vector2
 import math
 from abc import ABC, abstractmethod
-from shapes import Rectangle
-from drawing_surface import Image, FloatRect
+from game.shapes import Rectangle
+from graphics.image import Image
+from utils.float_rect import FloatRect
 
 
 class Graphic(ABC):

@@ -1,17 +1,17 @@
 import pygame
-from game import Player, GameState, Game, GameNotification, GameBackground
-from game import GameRenderer, GameView, PauseOverlay
-from timing import Timer, Clock, busy_wait
-from graphics import ImageGraphic, PolylineGraphic
-from shapes import Polyline, Rectangle
-from screen import Screen
-from game_objects import PlaneFactory, Ground
-from inputs import GameKeys, GameInput, PlayerInput
 from pygame import Vector2
-from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
+from game.game import Player, GameState, Game, GameNotification
+from utils.timing import Timer, Clock, busy_wait
+from graphics.graphics import ImageGraphic, PolylineGraphic
+from game.shapes import Polyline, Rectangle
+from game.game_objects import PlaneFactory, Ground
+from game.inputs import GameKeys, GameInput, PlayerInput
+from game.game_stats import UserRecorder
+from graphics.game_rendering import GameRenderer, GameView, PauseOverlay, GameBackground
+from graphics.screen import Screen
+from graphics.camera import Camera
+from menu.menu_items import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
 from user import UserSelector
-from game_stats import UserRecorder
-from drawing_surface import Camera
 from config import LevelConfigSelector, PlayerInputsConfig, PlaneConfig
 import json
 

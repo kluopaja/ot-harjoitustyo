@@ -3,7 +3,7 @@ import math
 import pytest
 from pygame import Vector2
 
-from shapes import Circle, Line, Rectangle, Polyline
+from game.shapes import Circle, Line, Rectangle, Polyline
 from constants import EPS
 
 

@@ -5,12 +5,13 @@ import pytest
 import pygame
 from pygame import Rect, Vector2
 
-from graphics import Image, ImageGraphic, PolylineGraphic
-from shapes import Rectangle, Polyline
+from graphics.graphics import ImageGraphic, PolylineGraphic
+from graphics.image import Image
+from game.shapes import Rectangle, Polyline
 
-from screen import Screen
+from graphics.screen import Screen
 
-from drawing_surface import Image, Camera
+from graphics.camera import Camera
 
 from unittest.mock import Mock, ANY, create_autospec, call
 

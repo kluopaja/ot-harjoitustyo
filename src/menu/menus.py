@@ -1,6 +1,6 @@
 from user import UserFactory
-from menu_item import TextInputMenuItem, ButtonMenuItem, MenuItemCollection
-from menu_item import ValueBrowserMenuItem
+from menu.menu_items import TextInputMenuItem, ButtonMenuItem, MenuItemCollection
+from menu.menu_items import ValueBrowserMenuItem
 class MainMenu:
     def __init__(self, menu_factory, new_game_menu, add_user_menu):
         self.menu_factory = menu_factory
