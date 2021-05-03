@@ -18,7 +18,7 @@ from game_stats import create_results_viewer
 
 logging.basicConfig(level=logging.INFO)
 pygame.init()
-screen = Screen(2000, 1300)
+screen = Screen(1280, 720)
 project_root = Path(__file__).parent.parent
 
 event_handler = EventHandler()
