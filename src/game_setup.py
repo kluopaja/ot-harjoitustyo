@@ -1,3 +1,4 @@
+import pygame
 from game import Player, GameState, Game, GameNotification, GameBackground
 from game import GameRenderer, GameView, PauseOverlay
 from timing import Timer, Clock, busy_wait
@@ -6,39 +7,14 @@ from shapes import Polyline, Rectangle
 from screen import Screen
 from game_objects import PlaneFactory, Ground
 from inputs import GameKeys, GameInput, PlayerInput
-import pygame
 from pygame import Vector2
 from menu_item import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
-from level_config import LevelConfigSelector
 from user import UserSelector
 from game_stats import UserRecorder
 from drawing_surface import Camera
+from config import LevelConfigSelector, PlayerInputsConfig, PlaneConfig
 import json
 
-
-class PlayerInputLoader:
-    def __init__(self, keymaps_file_path):
-        self._data = json.load(open(keymaps_file_path, "r"))
-
-    def max_players(self):
-        return len(self._data["player_keys"])
-
-    def get_player_inputs(self, game_input):
-        """Generates a list of PlayerInput objects.
-
-        Arguments:
-            `game_input`: a GameInput object
-                The object to which the PlayerInputs will be attached to."""
-        player_inputs = []
-
-        def code(description):
-            return pygame.key.key_code(description)
-        for keys in self._data["player_keys"]:
-            player_inputs.append(PlayerInput(game_input, code(keys["accelerate"]),
-                                             code(keys["up"]), code(
-                                                 keys["down"]),
-                                             code(keys["shoot"])))
-        return player_inputs
 
 class GameFactory:
     def __init__(self, assets_path, user_dao, event_handler, screen, n_players=2):
@@ -51,8 +27,9 @@ class GameFactory:
         self.screen = screen
         self.level_config_selector = LevelConfigSelector(
             self.assets_path / "levels")
-        self.player_input_loader = PlayerInputLoader(
+        self.player_input_loader = PlayerInputsConfig(
             self.assets_path / "keys.json")
+        self.plane_config = PlaneConfig(self.assets_path / "plane.json")
         self.user_selectors = []
         self._update_players()
 
@@ -71,9 +48,7 @@ class GameFactory:
         for i in range(self.n_players):
             game_notifications.append(
                 GameNotification("press `shoot` to start flying", "seconds to go"))
-            plane_factories.append(
-                PlaneFactory(self.assets_path / "plane.png",
-                             self.assets_path / "bullet.png"))
+            plane_factories.append(PlaneFactory(self.plane_config))
             plane_factories[i].start_position = start_positions[i]
 
         players = []

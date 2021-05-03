@@ -15,41 +15,34 @@ def score_generator(damage_score, destroying_score):
 
 
 class PlaneFactory:
-    def __init__(self, file_path, bullet_file_path):
-        self.file_path = file_path
-        self.bullet_file_path = bullet_file_path
-        self.size = Vector2(80, 40)
-        self.acceleration = 4
-        self.rotation = 5
-        self.body_drag = 0.01
-        self.wing_size = 0.4
-        self.gravity = 5
-        self.health = 100
-        self.collision_damage = 100
+    def __init__(self, plane_config):
+        self._config = plane_config
         self.start_position = Vector2(0, 0)
         self.score_generator = score_generator(0, 100)
 
     def plane(self, player_input, owner):
-        image_graphic = ImageGraphic.from_image_path(self.file_path,
-                                                     Vector2(0, 0), self.size)
-        rectangle = self._plane_rectangle(self.size)
+        rectangle = self._plane_rectangle(self._config.size)
+        image_graphic = ImageGraphic.from_image_path(self._config.image_file_path,
+                                                     Vector2(0, 0), self._config.size)
 
         tmp = BasePhysics(Vector2(self.start_position),
                           Vector2(0, 0), Vector2(1, 0))
-        tmp = BodyPhysics(tmp, self.body_drag, lambda x: Vector2(0, 5))
-        tmp = WingPhysics(tmp, self.wing_size)
+        tmp = BodyPhysics(tmp, self._config.body_drag, self._gravity_callback)
+        tmp = WingPhysics(tmp, self._config.wing_size)
         plane_physics = PhysicsController(
-            tmp, self.acceleration, self.rotation)
+            tmp, self._config.acceleration, self._config.rotation)
 
-        bullet_factory = BulletFactory(self.bullet_file_path)
-        gun = Gun(bullet_factory, Timer(0.2), spawn_offset=60, speed=10)
+        gun = Gun.from_gun_config(self._config.gun_config)
 
-        plane = Plane(rectangle, image_graphic, plane_physics, gun, self.score_generator, owner,
-                      health=self.health, collision_damage=self.collision_damage)
+        plane = Plane(rectangle, image_graphic, plane_physics, gun, 
+                      self.score_generator, owner, health=self._config.health,
+                      collision_damage=self._config.collision_damage)
         player_input.bind_to_plane(plane)
-        print("new_plane")
 
         return plane
+
+    def _gravity_callback(self, position):
+        return Vector2(0, 1) * self._config.gravity
 
     def _plane_rectangle(self, size):
         return Rectangle(Vector2(-size[0]/2, -size[1]/2),
@@ -58,31 +51,36 @@ class PlaneFactory:
 
 
 class BulletFactory:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.size = Vector2(20, 20)
-        self.gravity = 5
-        self.body_grad = 0.001
-        self.health = 1
-        self.collision_damage = 100
-        self.timeout = 5
+    def __init__(self, bullet_config):
+        self._config = bullet_config
 
     def bullet(self, location, velocity, front, owner):
-        image_graphic = ImageGraphic.from_image_path(self.file_path,
-                                                     Vector2(0, 0), self.size)
-        circle = Circle(Vector2(0), self.size[0]/2)
+        image_graphic = ImageGraphic.from_image_path(self._config.image_file_path,
+                                                     Vector2(0, 0),
+                                                     Vector2(self._config.diameter))
+        circle = Circle(Vector2(0), self._config.diameter)
         tmp = BasePhysics(location, velocity, front)
-        physics = BodyPhysics(tmp, self.body_grad, lambda x: Vector2(0, 5))
-        return Bullet(circle, image_graphic, physics, owner, Timer(self.timeout),
-                      self.health, self.collision_damage)
+        physics = BodyPhysics(tmp, self._config.body_drag, self._gravity_callback)
+        return Bullet(circle, image_graphic, physics, owner,
+                      Timer(self._config.timeout), self._config.health,
+                      self._config.collision_damage)
+
+    def _gravity_callback(self, position):
+        return Vector2(0, 1) * self._config.gravity
 
 
 class Gun:
     def __init__(self, bullet_factory, timer, spawn_offset, speed):
         self._bullet_factory = bullet_factory
+        self._timer = timer
         self._spawn_offset = spawn_offset
         self._speed = speed
-        self._timer = timer
+
+    @classmethod
+    def from_gun_config(cls, gun_config):
+        bullet_factory = BulletFactory(gun_config.bullet_config)
+        return cls(bullet_factory, Timer(gun_config.bullet_spawn_time),
+                   gun_config.bullet_spawn_offset, gun_config.bullet_speed)
 
     def update(self, delta_time):
         self._timer.update(delta_time)
