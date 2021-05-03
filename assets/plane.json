@@ -1,0 +1,17 @@
+{
+	"image_file_path": "./plane.png",
+	"gun_config_path": "./gun.json",
+	"size": {
+		"width": 80,
+		"height": 40
+	},
+	"acceleration": 4,
+	"rotation": 5,
+	"body_drag": 0.01,
+	"wing_size": 0.4,
+	"gravity": 5,
+	"health": 100,
+	"collision_damage": 100,
+	"score_per_damage": 0,
+	"score_when_destroyed": 100
+}

@@ -1,0 +1,9 @@
+{
+	"image_file_path": "./bullet.png",
+	"diameter": 20,
+	"gravity": 5,
+	"body_drag": 0.001,
+	"health": 1,
+	"collision_damage": 100,
+	"timeout": 5
+}
