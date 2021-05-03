@@ -7,7 +7,7 @@ class Screen:
     def __init__(self, width, height):
         self.surface = DrawingSurface(
             pygame.display.set_mode((width, height), vsync=1), self, Vector2(0))
-        self._previous_dirty_rects = None
+        self._previous_dirty_rects = []
         self._current_dirty_rects = []
 
     def resize(self, width, height):
@@ -19,8 +19,7 @@ class Screen:
     def update(self):
         """Updates screen."""
 
-        pygame.display.update(self._previous_dirty_rects)
-        pygame.display.update(self._current_dirty_rects)
+        pygame.display.update(self._previous_dirty_rects + self._current_dirty_rects)
         self._previous_dirty_rects = self._current_dirty_rects
         self._current_dirty_rects = []
 
