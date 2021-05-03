@@ -126,7 +126,7 @@ class FloatRect:
 # but should work as long as we always create a new DrawingSurface
 # at each rendering
 class DrawingSurface:
-    def __init__(self, surface, screen, absolute_topleft):
+    def __init__(self, surface, screen, absolute_topleft, font_size):
         """Initializes a DrawingSurface.
 
         Args:
@@ -134,12 +134,16 @@ class DrawingSurface:
             `screen`: A Screen object
             `absolute_topleft`: Vector2
                 The absolute pixel coordinates of the top left corner
+            `font_size`: a positive number
+                The font size as a fraction of the `screen` height.
         """
 
         self._surface = surface
         self._screen = screen
         self._absolute_topleft = absolute_topleft
-        self._font = pygame.font.SysFont("monospace", 24)
+        self._font_size = font_size
+        font_pixels = int(self._screen.get_height() * self._font_size)
+        self._font = pygame.font.SysFont("monospace", font_pixels)
 
     def subsurface(self, area):
         rect_topleft = self._to_pixel_coordinates(area.topleft)
@@ -147,16 +151,13 @@ class DrawingSurface:
         _area = Rect(rect_topleft[0], rect_topleft[1], size[0], size[1])
         new_absolute_topleft = rect_topleft + self._absolute_topleft
         return DrawingSurface(self._surface.subsurface(_area), self._screen,
-                              new_absolute_topleft)
+                              new_absolute_topleft, self._font_size)
 
     def get_relative_width(self):
         """The width of the drawing surface relative to the height.
 
         """
         return self._surface.get_width() / self._surface.get_height()
-
-    def get_height_pixels():
-        return self._surface.get_height()
 
     def blur(self, radius):
         size = self._surface.get_size()

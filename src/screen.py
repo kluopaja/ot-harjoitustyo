@@ -4,9 +4,11 @@ from pygame import Vector2
 
 
 class Screen:
-    def __init__(self, width, height):
+    def __init__(self, width, height, font_size):
+        self._height = height
         self.surface = DrawingSurface(
-            pygame.display.set_mode((width, height), vsync=1), self, Vector2(0))
+            pygame.display.set_mode((width, height), vsync=1),
+            self, Vector2(0), font_size)
         self._previous_dirty_rects = []
         self._current_dirty_rects = []
 
@@ -28,4 +30,4 @@ class Screen:
         self._current_dirty_rects.append(rect)
 
     def get_height(self):
-        return self.surface.get_height_pixels()
+        return self._height
