@@ -13,3 +13,26 @@ Release for week 5: https://github.com/kluopaja/ot-harjoitustyo/releases/tag/vii
 * [Work hours](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/work_hours.md)
 
 
+## Installation
+
+The following commands should be run at the project root.
+
+1. Set up Poetry environment:
+```poetry install```
+
+2. Initialize the database:
+```poetry run invoke init-database```
+
+3. Start game:
+```poetry run invoke start```
+
+## Running tests
+
+Tests can be run with:
+```poetry run invoke test```
+
+Coverage report can be genreated with:
+```poetry run invoke coverage-report```
+
+Pylint can be run with;
+```poetry run invoke lint```
