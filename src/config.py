@@ -126,6 +126,7 @@ class PlaneConfig:
         self.collision_damage = data["collision_damage"]
         self.score_per_damage = data["score_per_damage"]
         self.score_when_destroyed = data["score_when_destroyed"]
+        self.cost = data["cost"]
 
 class GunConfig:
     """A class for reading and storing the properties of a gun."""

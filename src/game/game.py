@@ -59,6 +59,7 @@ class Player:
 
         if not self._plane.alive():
             self.user_recorder.add_death()
+            self.user_recorder.add_score(-self._plane_factory.get_plane_cost())
             self._plane = None
             self._spawn_timer.start()
 

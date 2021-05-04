@@ -42,6 +42,9 @@ class PlaneFactory:
 
         return plane
 
+    def get_plane_cost(self):
+        return self._config.cost
+
     def _gravity_callback(self, position):
         return Vector2(0, 1) * self._config.gravity
 

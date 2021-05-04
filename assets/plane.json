@@ -13,5 +13,6 @@
 	"health": 100,
 	"collision_damage": 100,
 	"score_per_damage": 0,
-	"score_when_destroyed": 100
+	"score_when_destroyed": 100,
+	"cost": 20
 }
