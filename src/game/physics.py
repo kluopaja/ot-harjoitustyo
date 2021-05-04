@@ -11,10 +11,9 @@ class BasePhysics:
         self.acceleration = Vector2(0)
 
     def update(self, delta_time):
+        self.location += delta_time * self.velocity
         self.velocity += delta_time * self.acceleration
         self.acceleration = Vector2(0)
-        # TODO add delta_time to this!
-        self.location += self.velocity
 
 
 class PhysicsDecorator:
@@ -157,6 +156,10 @@ class PhysicsController(PhysicsDecorator):
 
 def angle_between(start, end):
     '''Angle from `start` end `end`.
+
+        Assumes pygame coordinate system. (x grows to right, y down).
+
+        Positive angle is counterclockwise.
 
         Parameters:
             `start` and `end` should be pygame.Vector2
