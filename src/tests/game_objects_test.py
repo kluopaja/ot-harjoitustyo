@@ -2,7 +2,7 @@ from unittest.mock import Mock, ANY, create_autospec
 import unittest
 from pygame import Vector2
 
-from game.game_objects import Plane, Gun, Bullet, Ground
+from game.game_objects import Plane, Gun, Bullet, Ground, BulletFactory
 from game.shapes import Shape
 from graphics.graphics import Graphic
 from game.physics import PhysicsController
@@ -205,3 +205,37 @@ class TestGround(unittest.TestCase):
 
     def test_new_objects_contain_self(self):
         assert self.ground in self.ground.new_objects()
+
+class TestGun(unittest.TestCase):
+    def setUp(self):
+        self.bullet_factory = create_autospec(BulletFactory)
+        self.bullet_factory.bullet.return_value = Mock()
+        self.timer = create_autospec(Timer)
+        self.timer.expired.return_value = True
+        self.gun = Gun(self.bullet_factory, self.timer, 1, 10)
+        self.owner = create_autospec(Player)
+
+    def test_update_updates_timer(self):
+        self.gun.update(123)
+        self.timer.update.assert_called_with(123)
+
+    def test_shoot_returns_empty_list_if_timer_not_ready(self):
+        self.timer.expired.return_value = False
+        assert self.gun.shoot(Vector2(1, 2), Vector2(2, 3), Vector2(1, 0), None) == []
+
+    def test_shoot_updates_owner(self):
+        self.gun.shoot(Vector2(1, 2), Vector2(2, 3), Vector2(1, 0), self.owner)
+        self.owner.add_shot_fired.assert_called()
+
+    def test_shoot_return_new_bullet(self):
+        result = self.gun.shoot(Vector2(1, 2), Vector2(2, 3), Vector2(1, 0), self.owner)
+        assert len(result) == 1
+        assert result[0] == self.bullet_factory.bullet.return_value
+
+    def test_shoot_calls_bullet_factory_correctly(self):
+        self.gun.shoot(Vector2(1, 2), Vector2(2, 3), Vector2(1, 0), self.owner)
+        self.bullet_factory.bullet.assert_called_with(
+            Vector2(1, 2) + Vector2(1, 0),
+            Vector2(2, 3) + Vector2(1, 0) * 10,
+            Vector2(1, 0),
+            self.owner)
