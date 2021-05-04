@@ -13,12 +13,6 @@ class GameInput:
         self.should_quit = False
         self._pause_callback = lambda : None
 
-    def bind_keys(self, new_keymaps):
-        for keycode in new_keymaps:
-            if keycode in self.keymaps:
-                raise Exception('Key already bound to a function')
-            self.keymaps[keycode] = new_keymaps[keycode]
-
     def bind_key(self, keycode, func):
         self.keymaps[keycode] = func
 

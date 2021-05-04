@@ -58,7 +58,7 @@ def rect_splitter(split_depth, rect, start_dimension='vertical'):
     if start_dimension == 'vertical':
         pass
     elif start_dimension == 'horizontal':
-        splitters[0], split_dimesions[1] = splitters[1], splitters[0]
+        splitters = splitters[1], splitters[0]
     else:
         raise ValueError("Invalid `start_dimension`")
 
