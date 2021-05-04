@@ -11,6 +11,10 @@ This includes rendering code for game, menu and results.
 
 `src/utils` contains some small utility classes/functions.
 
+# Storage
+
+The user information is stored in an SQLite database.
+
 # Graphics
 
 The most important classes for graphics are `Screen` and `DrawingSurface`.
