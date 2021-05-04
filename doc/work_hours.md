@@ -22,5 +22,9 @@ Date | Hours | What did I do
 25.5 | 6     | Storing user information to database, refactoring and changing menu structure
 26.5 | 6     | Add pause, start implementing the game statistics part
 27.5 | 6     | Implement showing the results after the game has finished, finishk weekly project requirements, add tests
+1.5 | 6      | Think about improving the drawing, start implementing
+2.5 | 8      | Continue improving drawing, add more configuration files, fix tests
+3.5 | 5      | Optimize rendering speed, refactor module structure
+3.5 | 5      | Add tests, finish weekly project requirements
 ---- | ----- | ---
-Total 80
+Total 104
