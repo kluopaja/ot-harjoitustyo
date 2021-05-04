@@ -5,6 +5,8 @@ Repository for the University of Helsinki couse *Ohjelmistotekniikka*.
 A 2D shoot 'em up flying game inspired by Sopwith.
 
 Release for week 5: https://github.com/kluopaja/ot-harjoitustyo/releases/tag/viikko5
+Release for week 6: https://github.com/kluopaja/ot-harjoitustyo/releases/tag/viikko6
+
 
 ## Documentation
 * [Manual](https://github.com/kluopaja/ot-harjoitustyo/blob/master/doc/manual.md)
