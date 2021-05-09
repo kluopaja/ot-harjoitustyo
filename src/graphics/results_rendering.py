@@ -1,25 +1,33 @@
 from pygame import Vector2
 class ResultsRenderer:
-    def __init__(self, screen, dataframe_renderer, plotter,
-                 user_recorder_analyzer):
+    def __init__(self, screen, dataframe_renderer, plotter):
         self._screen = screen
         self._dataframe_renderer = dataframe_renderer
         self._plotter = plotter
-        self._analyzer = user_recorder_analyzer
         self.background_color = (186, 204, 200)
         self._aspect_ratio = 16/9
 
-    def render(self, user_recorders):
+    def render(self, summary_table, verbose_table, round_length):
+        """Renders the round results.
+
+        Arguments:
+            `summary_table`: A pandas dataframe
+                Summary of the round. Rendered as a table.
+            `verbose_table`: A pandas dataframe
+                More detailed desrciption of the round.
+                Should have columns: `name`, `shot_time` and `kill_time`.
+            `round_length`: a positive scalar
+                The length of the round in seconds
+        """
+
         self._screen.surface.fill(self.background_color, update=True)
         subsurface = self._get_aspect_ratio_subsurface()
 
-        summary_table = self._analyzer.get_sorted_summary_table(user_recorders)
         self._dataframe_renderer.render(subsurface, summary_table,
                                         (0, 0.1))
 
-        bin_range = self._histogram_bin_range(user_recorders)
+        bin_range = (0, round_length)
 
-        verbose_table = self._analyzer.get_verbose_table(user_recorders)
         shot_histogram = self._plotter.plot_histogram_to_image(
             verbose_table, x="shot_time", hue='name',
             bin_range=bin_range, bins=10,

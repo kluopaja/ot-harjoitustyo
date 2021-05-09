@@ -1,6 +1,7 @@
 from user import UserFactory
 from menu.menu_items import TextInputMenuItem, ButtonMenuItem, MenuItemCollection
 from menu.menu_items import ValueBrowserMenuItem
+# TODO rename menu_factory to menu_list_factory everywhere
 class MainMenu:
     def __init__(self, menu_factory, new_game_menu, add_user_menu):
         self.menu_factory = menu_factory

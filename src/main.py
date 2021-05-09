@@ -15,6 +15,7 @@ from menu.menus import NewGameMenu, AddUserMenu, MainMenu
 from utils.timing import Clock, sleep_wait
 from game.game_stats import create_results_viewer
 from game.game import GameOrganizer
+from stats_dao import StatsDao
 
 logging.basicConfig(level=logging.DEBUG)
 pygame.init()
@@ -39,7 +40,8 @@ menu_list_factory = MenuListFactory(menu_list_renderer, menu_input, Clock(20, sl
 
 results_viewer = create_results_viewer(menu_input, screen)
 
-game_organizer = GameOrganizer(results_viewer)
+stats_dao = StatsDao(get_database_connection())
+game_organizer = GameOrganizer(results_viewer, stats_dao)
 
 new_game_menu = NewGameMenu(game_factory, menu_list_factory, game_organizer)
 user_factory = UserFactory(user_dao)

@@ -9,6 +9,8 @@ import time
 import math
 import itertools
 
+from game.game_stats import RoundStats
+
 # TODO make this more general, also player name/score styles
 
 
@@ -190,12 +192,14 @@ class Game:
 
 class GameOrganizer:
     """Class for running a game and handling the statistics"""
-    def __init__(self, results_viewer):
+    def __init__(self, results_viewer, stats_dao):
         self._results_viewer = results_viewer
+        self._stats_dao = stats_dao
 
     def organize(self, game):
         game.run()
 
-        user_recorders = game.get_user_recorders()
+        round_stats = RoundStats(game.get_user_recorders())
+        self._stats_dao.save_round_stats(round_stats)
 
-        self._results_viewer.run(user_recorders)
+        self._results_viewer.run(round_stats)
