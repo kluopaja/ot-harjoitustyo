@@ -9,6 +9,9 @@ from game.inputs import PlayerInput
 
 project_root = Path(__file__).parent.parent
 DATABASE_PATH = project_root / "data/database.sqlite"
+ASSETS_PATH = project_root / "assets"
+
+
 
 class LevelConfig:
     """A class for storing the properties of a level."""

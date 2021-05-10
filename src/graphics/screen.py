@@ -4,6 +4,7 @@ from pygame import Vector2
 
 class Screen:
     def __init__(self, width, height, font_size):
+        pygame.init()
         self._height = height
         font_pixels = int(self.get_height() * font_size)
         self.font = pygame.font.SysFont("monospace", font_pixels)
