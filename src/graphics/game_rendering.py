@@ -3,11 +3,13 @@ import math
 from pygame import Vector2
 from utils.rect_splitter import rect_splitter
 class GameRenderer:
-    def __init__(self, screen, game_views, game_background, pause_overlay):
+    def __init__(self, screen, game_views, game_background,
+                 pause_overlay, round_info):
         self._screen = screen
         self.game_views = game_views
         self.game_background = game_background
         self.pause_overlay = pause_overlay
+        self._round_info = round_info
 
         self._screen.surface.fill(self.game_background.fill_color, update=True)
         self._screen.update()
@@ -16,24 +18,45 @@ class GameRenderer:
             raise ValueError("At least 1 GameView needed")
 
         n_splits = math.ceil(math.log2(len(game_views)))
-        whole_area = screen.surface.get_rect()
-        self.game_view_areas = rect_splitter(n_splits, whole_area)
 
-    def render(self, game_objects):
-        self._render_game_objects(game_objects)
+        info_bar_height = self._screen.surface.get_font_height()
+
+        self._info_bar_area = screen.surface.get_rect()
+        self._info_bar_area.height = info_bar_height
+
+        game_area = screen.surface.get_rect()
+        game_area.height -= info_bar_height
+        game_area.top += info_bar_height
+
+        self.game_view_areas = rect_splitter(n_splits, game_area)
+
+    def render(self, game_state):
+        self._render_common(game_state)
         self._screen.update()
 
-    def render_pause(self, game_objects):
-        self._render_game_objects(game_objects)
+    def render_pause(self, game_state):
+        self._render_common(game_state)
         self._screen.surface.blur(15)
         self.pause_overlay.render(self._screen.surface)
         self._screen.update()
 
-    def _render_game_objects(self, game_objects):
+    def _render_common(self, game_state):
+
+        # The whole game surface needs to be cleared here
+        # as the whole game surface might not be covered with
+        # game views.
+        # NOTE: Currently also clears the InfoBar region which is not optimal.
         self._screen.surface.fill(self.game_background.fill_color)
+
         for game_view, area in zip(self.game_views, self.game_view_areas):
             subsurface = self._screen.surface.subsurface(area)
-            game_view.render(subsurface, game_objects, self.game_background)
+            game_view.render(subsurface, game_state.game_objects,
+                             self.game_background)
+
+        info_surface = self._screen.surface.subsurface(self._info_bar_area)
+        self._round_info.render(info_surface,
+                                game_state.level_name,
+                                game_state.timer.time_left())
 
 class PauseOverlay:
     def __init__(self, text, font_color):
@@ -44,6 +67,28 @@ class PauseOverlay:
         text_center = Vector2(surface.get_rect().center)
         surface.centered_text(self.text, text_center, self.font_color)
 
+class InfoBar:
+    """A class for rendering information common to all players."""
+    def __init__(self, level_text, time_left_text, font_color, background_color):
+        self.level_text = level_text
+        self.time_left_text = time_left_text
+        self.font_color = font_color
+        self.background_color = background_color
+
+    def render(self, surface, level_name, time_left):
+        surface.fill(self.background_color)
+        self._render_level_name(surface, level_name)
+        self._render_time_left(surface, time_left)
+
+    def _render_level_name(self, surface, level_name):
+        topleft = Vector2(surface.get_rect().topleft)
+        text = self.level_text + level_name
+        surface.topleft_text(text, topleft, self.font_color)
+
+    def _render_time_left(self, surface, time_left):
+        midtop = Vector2(surface.get_rect().midtop)
+        text = self.time_left_text + f"{time_left:4.0f}"
+        surface.midtop_text(text, midtop, self.font_color)
 
 class GameBackground:
     def __init__(self, cloud_graphic, n_clouds, repeat_area, fill_color=(174, 186, 232)):

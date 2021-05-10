@@ -148,6 +148,12 @@ class DrawingSurface:
 
         return Vector2(self.get_relative_width(), 1)
 
+    def get_font_height(self):
+        """Returns the font height in relative DrawingSurface coordinates.
+
+        NOTE: Use this as spacing between consecutive lines."""
+        return self._screen.font.get_linesize() / self._surface.get_size()[1]
+
     def centered_text(self, text, position, color):
         """Draws `text` centered at `position`
         """

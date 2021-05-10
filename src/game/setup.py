@@ -7,7 +7,7 @@ from game.shapes import Polyline, Rectangle
 from game.game_objects import PlaneFactory, Ground
 from game.inputs import GameKeys, GameInput, PlayerInput
 from game.game_stats import UserRecorder
-from graphics.game_rendering import GameRenderer, GameView, PauseOverlay, GameBackground
+from graphics.game_rendering import GameRenderer, GameView, PauseOverlay, GameBackground, InfoBar
 from graphics.screen import Screen
 from graphics.camera import Camera
 from menu.menu_items import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
@@ -60,7 +60,8 @@ class GameFactory:
                                   UserRecorder(user, Timer()), user, Timer(0.5)))
             game_views.append(GameView(players[-1], Camera(1300), (30, 72, 102)))
 
-        game_state = GameState(level_config.game_objects(), players)
+        game_state = GameState(level_config.game_objects(), players,
+                               level_config.name(), Timer(5))
 
         cloud_graphic = ImageGraphic.from_image_path(self.assets_path / "cloud.png",
                                                      Vector2(0, 0), Vector2(119, 81))
@@ -68,7 +69,10 @@ class GameFactory:
                                     repeat_area=Vector2(3000, 2000),
                                     fill_color=(180, 213, 224))
         pause_overlay = PauseOverlay("PAUSE", (107, 88, 110))
-        renderer = GameRenderer(self.screen, game_views, background, pause_overlay)
+        round_info = InfoBar("Level: ", "Time left: ", (107, 88, 110),
+                             (235, 232, 221))
+        renderer = GameRenderer(self.screen, game_views, background,
+                                pause_overlay, round_info)
 
         game = Game(game_input, game_state, renderer, Clock(60, busy_wait))
         return game

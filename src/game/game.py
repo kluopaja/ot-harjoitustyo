@@ -93,11 +93,14 @@ class Player:
 
 
 class GameState:
-    def __init__(self, game_objects, players):
+    def __init__(self, game_objects, players, level_name, timer):
         self.game_objects = game_objects
         self.players = players
+        self.level_name = level_name
+        self.timer = timer
 
     def run_tick(self, delta_time):
+        self.timer.update(delta_time)
         self._update_players(delta_time)
         # update the game object list _before_ game object update so that
         # the newly created bullets will be moved with the plane (otherwise
@@ -155,10 +158,10 @@ class Game:
                 break
 
             if self._paused:
-                self.game_renderer.render_pause(self.game_state.game_objects)
+                self.game_renderer.render_pause(self.game_state)
             else:
                 self.game_state.run_tick(self.clock.delta_time)
-                self.game_renderer.render(self.game_state.game_objects)
+                self.game_renderer.render(self.game_state)
 
             self.clock.tick()
             self._log()
