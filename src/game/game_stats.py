@@ -3,7 +3,8 @@ from pygame import Vector2
 
 from graphics.plotter import Plotter
 from utils.timing import Clock, sleep_wait
-from graphics.results_rendering import DataFrameRenderer, ResultsRenderer
+from graphics.stats_rendering import DataFrameRenderer, ResultsRenderer
+from graphics.stats_rendering import HighScoreRenderer
 
 class UserRecorder:
     def __init__(self, user, timer):
@@ -78,9 +79,9 @@ class RoundStats:
         return stats_list
 
     def get_summary_table(self):
-        """Constructs a dataframe from a list of UserRoundStats objects.
+        """Constructs a dataframe containing the summary results.
 
-        The dataframe will be sorted on descending score."""
+        The dataframe will be sorted descending by the score."""
         user_rounds = sorted(self.get_user_rounds(), key=lambda x: -x.score)
         columns = {'name': [], 'score': [],
                    'shots_fired': [], 'kills': [], 'deaths': []}
@@ -132,7 +133,6 @@ class RoundStats:
         df = pd.DataFrame(columns)
         return df
 
-
 def create_results_viewer(menu_input, screen):
     dataframe_renderer = DataFrameRenderer(
         cell_size=(0.22, 0.05),
@@ -145,25 +145,98 @@ def create_results_viewer(menu_input, screen):
 
     return ResultsViewer(menu_input, results_renderer, Clock(2, sleep_wait))
 
-class ResultsViewer:
-    def __init__(self, menu_input, results_renderer, clock):
+class StatsViewer:
+    def __init__(self, menu_input, clock):
         self._menu_input = menu_input
-        self._renderer = results_renderer
         self._clock = clock
 
-    def run(self, round_stats):
+    
+    def _run(self, render_function):
         self._menu_input.clear_bindings()
         self._menu_input.bind_quit(self._quit)
         self._should_quit = False
-
-        summary_table = round_stats.get_summary_table()
-        verbose_table = round_stats.get_verbose_table()
-        round_length = round_stats.get_round_length()
         while not self._should_quit:
             self._menu_input.handle_inputs()
-            self._renderer.render(summary_table, verbose_table, round_length)
+            render_function()
             self._clock.tick()
 
     def _quit(self):
         self._should_quit = True
 
+class ResultsViewer(StatsViewer):
+    """A class for showing the results view after the game round"""
+    def __init__(self, menu_input, results_renderer, clock):
+        super().__init__(menu_input, clock)
+        self._renderer = results_renderer
+
+    def run(self, round_stats):
+        summary_table = round_stats.get_summary_table()
+        verbose_table = round_stats.get_verbose_table()
+        def render():
+            self._renderer.render(summary_table, verbose_table, round_length)
+
+        round_length = round_stats.get_round_length()
+        self._run(
+            lambda : self._renderer.render(summary_table, verbose_table,
+                                           round_length)
+        )
+
+
+class UserStats:
+    """A class for storing the user's statistics collected over many rounds"""
+    def __init__(self, user, score, shots, kills, deaths, rounds):
+        self.user = user
+        self.score = score
+        self.shots = shots
+        self.kills = kills
+        self.deaths = deaths
+        self.rounds = rounds
+
+class TotalStats:
+    """A class for storing the statistics collected over many rounds"""
+    def __init__(self, user_stats_list):
+        self._user_stats_list = sorted(user_stats_list, key=lambda x: -x.score)
+
+    def get_summary_table(self):
+        """Constructs a dataframe containing the key statistics.
+
+        The dataframe will be sorted on descending total score."""
+        columns = {'name': [], 'total score': [],
+                   'rounds': [], 'kills': [], 'deaths': []}
+        for user_stats in self._user_stats_list:
+            columns['name'].append(user_stats.user.name)
+            columns['total score'].append(user_stats.score)
+            columns['rounds'].append(user_stats.rounds)
+            columns['kills'].append(user_stats.kills)
+            columns['deaths'].append(user_stats.deaths)
+
+        df = pd.DataFrame(columns)
+        df['k/d'] = df['kills'] / df['deaths']
+        return df
+
+def create_high_score_viewer(stats_dao, n_top_players, menu_input, screen):
+    dataframe_renderer = DataFrameRenderer(
+        cell_size=(0.22, 0.05),
+        font_color=(50, 69, 63),
+        max_cell_text_length=10
+    )
+
+    high_score_renderer = HighScoreRenderer(screen, dataframe_renderer)
+
+    return HighScoreViewer(
+        stats_dao, n_top_players, menu_input, high_score_renderer,
+        Clock(2, sleep_wait))
+
+class HighScoreViewer(StatsViewer):
+    """A class for viewing high scores"""
+    def __init__(self, stats_dao, n_top_players, menu_input, high_score_renderer, clock):
+        super().__init__(menu_input, clock)
+        self._stats_dao = stats_dao
+        self._n_top_players = n_top_players
+        self._renderer = high_score_renderer
+
+    def run(self):
+        """Queries high scores from the database and shows them"""
+        total_stats = self._stats_dao.get_top_scorers(self._n_top_players)
+        summary_table = total_stats.get_summary_table()
+        self._run(lambda : self._renderer.render(summary_table))

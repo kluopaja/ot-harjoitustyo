@@ -3,7 +3,7 @@ from menu.menu_items import TextInputMenuItem, ButtonMenuItem, MenuItemCollectio
 from menu.menu_items import ValueBrowserMenuItem
 # TODO rename menu_factory to menu_list_factory everywhere
 class MainMenu:
-    def __init__(self, menu_factory, new_game_menu, add_user_menu):
+    def __init__(self, menu_factory, new_game_menu, add_user_menu, high_score_view):
         self.menu_factory = menu_factory
         self.item_collection = MenuItemCollection()
         self.item_collection.add_item(
@@ -11,6 +11,9 @@ class MainMenu:
         )
         self.item_collection.add_item(
             ButtonMenuItem(new_game_menu.run, "New game")
+        )
+        self.item_collection.add_item(
+            ButtonMenuItem(high_score_view.run, "View high score")
         )
 
     def run(self):

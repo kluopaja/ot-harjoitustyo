@@ -13,7 +13,7 @@ from menu.input import MenuKeys, MenuInput
 from menu.menu_list import MenuListFactory
 from menu.menus import NewGameMenu, AddUserMenu, MainMenu
 from utils.timing import Clock, sleep_wait
-from game.game_stats import create_results_viewer
+from game.game_stats import create_results_viewer, create_high_score_viewer
 from game.game import GameOrganizer
 from stats_dao import StatsDao
 
@@ -46,5 +46,6 @@ game_organizer = GameOrganizer(results_viewer, stats_dao)
 new_game_menu = NewGameMenu(game_factory, menu_list_factory, game_organizer)
 user_factory = UserFactory(user_dao)
 add_user_menu = AddUserMenu(menu_list_factory, user_factory)
-main_menu = MainMenu(menu_list_factory, new_game_menu, add_user_menu)
+high_score_viewer = create_high_score_viewer(stats_dao, 5,  menu_input, screen)
+main_menu = MainMenu(menu_list_factory, new_game_menu, add_user_menu, high_score_viewer)
 main_menu.run()

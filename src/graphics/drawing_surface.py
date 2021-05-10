@@ -29,6 +29,17 @@ class DrawingSurface:
         return DrawingSurface(self._surface.subsurface(_area), self._screen,
                               new_absolute_topleft)
 
+    def aspect_ratio_subsurface(self, aspect_ratio):
+        """Returns the maximal subsurface with width/height = `aspect_ratio`."""
+        area = self.get_rect()
+        width = area.width
+        if width > aspect_ratio:
+            area.width = aspect_ratio
+        else:
+            area.height = width / aspect_ratio
+        area.center = Vector2(width / 2, 0.5)
+        return self.subsurface(area)
+
     def get_relative_width(self):
         """The width of the drawing surface relative to the height.
 

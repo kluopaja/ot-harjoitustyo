@@ -200,6 +200,6 @@ class GameOrganizer:
         game.run()
 
         round_stats = RoundStats(game.get_user_recorders())
-        self._stats_dao.save_round_stats(round_stats)
+        self._stats_dao.save_user_rounds(round_stats.get_user_rounds())
 
         self._results_viewer.run(round_stats)

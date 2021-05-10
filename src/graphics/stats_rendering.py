@@ -21,10 +21,9 @@ class ResultsRenderer:
         """
 
         self._screen.surface.fill(self.background_color, update=True)
-        subsurface = self._get_aspect_ratio_subsurface()
+        subsurface = self._screen.surface.aspect_ratio_subsurface(self._aspect_ratio)
 
-        self._dataframe_renderer.render(subsurface, summary_table,
-                                        (0, 0.1))
+        self._dataframe_renderer.render(subsurface, summary_table, (0, 0.1))
 
         bin_range = (0, round_length)
 
@@ -44,26 +43,27 @@ class ResultsRenderer:
 
         self._screen.update()
 
-    def _histogram_bin_range(self, user_recorders):
-        if len(user_recorders) == 0:
-            return (0, 1)
-        return (0, user_recorders[0].record_end_time())
+class HighScoreRenderer:
+    """Class for the high score view"""
+    def __init__(self, screen, dataframe_renderer):
+        self._screen = screen
+        self._dataframe_renderer = dataframe_renderer
+        self.background_color = (186, 204, 200)
+        self._aspect_ratio = 16/9
 
-    def _get_aspect_ratio_subsurface(self):
-        """Creates a subsurface with suitable aspect ratio.
+    def render(self, high_score_table):
+        """Renders the high score table.
 
-        Creates the maximum drawing surface fitting in `self._screen`
-        that has aspect ratio `self._aspect_ratio`.
+        Arguments:
+            `high_score_table`: A pandas dataframe
+                High scores, Rendered as a table.
         """
-        area = self._screen.surface.get_rect()
-        width = area.width
-        if width > self._aspect_ratio:
-            area.width = self._aspect_ratio
-        else:
-            area.height = width / self._aspect_ratio
-        area.center = Vector2(width / 2, 0.5)
-        return self._screen.surface.subsurface(area)
+        self._screen.surface.fill(self.background_color, update=True)
+        subsurface = self._screen.surface.aspect_ratio_subsurface(self._aspect_ratio)
 
+        self._dataframe_renderer.render(subsurface, high_score_table, (0, 0.1))
+
+        self._screen.update()
 
 class DataFrameRenderer:
     def __init__(self, cell_size, font_color, max_cell_text_length):
