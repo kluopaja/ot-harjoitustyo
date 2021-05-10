@@ -109,6 +109,9 @@ class GameState:
         self._update_game_objects(delta_time)
         self._handle_collisions()
 
+    def game_over(self):
+        return self.timer.expired()
+
     def _update_players(self, delta_time):
         for player in self.players:
             player.update(delta_time)
@@ -162,6 +165,9 @@ class Game:
             else:
                 self.game_state.run_tick(self.clock.delta_time)
                 self.game_renderer.render(self.game_state)
+
+            if self.game_state.game_over():
+                break
 
             self.clock.tick()
             self._log()

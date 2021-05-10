@@ -87,7 +87,7 @@ class InfoBar:
 
     def _render_time_left(self, surface, time_left):
         midtop = Vector2(surface.get_rect().midtop)
-        text = self.time_left_text + f"{time_left:4.0f}"
+        text = self.time_left_text + f"{max(0, time_left):4.0f}"
         surface.midtop_text(text, midtop, self.font_color)
 
 class GameBackground:
