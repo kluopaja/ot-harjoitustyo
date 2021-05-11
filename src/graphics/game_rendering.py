@@ -2,6 +2,7 @@ import random
 import math
 from pygame import Vector2
 from utils.rect_splitter import rect_splitter
+from graphics.graphics import ImageGraphic
 class GameRenderer:
     def __init__(self, screen, game_views, game_background,
                  pause_overlay, round_info):
@@ -36,7 +37,6 @@ class GameRenderer:
 
     def render_pause(self, game_state):
         self._render_common(game_state)
-        self._screen.surface.blur(15)
         self.pause_overlay.render(self._screen.surface)
         self._screen.update()
 
@@ -59,13 +59,15 @@ class GameRenderer:
                                 game_state.timer.time_left())
 
 class PauseOverlay:
-    def __init__(self, text, font_color):
+    def __init__(self, text, font_color, blur_radius):
         self.text = text
         self.font_color = font_color
+        self._blur_radius = blur_radius
 
     def render(self, surface):
         text_center = Vector2(surface.get_rect().center)
         surface.centered_text(self.text, text_center, self.font_color)
+        surface.blur(self._blur_radius)
 
 class InfoBar:
     """A class for rendering information common to all players."""
@@ -91,7 +93,7 @@ class InfoBar:
         surface.midtop_text(text, midtop, self.font_color)
 
 class GameBackground:
-    def __init__(self, cloud_graphic, n_clouds, repeat_area, fill_color=(174, 186, 232)):
+    def __init__(self, cloud_graphic, n_clouds, repeat_area, fill_color):
         """Initializes GameBackground object.
 
         Arguments:
@@ -107,6 +109,23 @@ class GameBackground:
         self.repeat_area = repeat_area
         self.fill_color = fill_color
         self.cloud_locations = self._generate_cloud_locations()
+
+    @classmethod
+    def from_config(cls, background_config):
+        """Construct a GameBackground from a config file.
+
+        Arguments:
+            `background_config` a BackgroundConfig object
+        """
+
+        background_graphic = ImageGraphic.from_image_path(
+            background_config.image_file_path,
+            Vector2(0, 0), Vector2(background_config.image_size))
+
+        return cls(
+            background_graphic, background_config.n_images,
+            background_config.repeat_area, background_config.fill_color
+        )
 
     def _generate_cloud_locations(self):
         random.seed(1337)

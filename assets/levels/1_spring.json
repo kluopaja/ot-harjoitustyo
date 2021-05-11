@@ -1,5 +1,6 @@
 {
 	"name" : "spring",
+	"background_config_path": "../background.json",
 	"starting_locations" : [
 			[-800, -500],
 			[-200, -500],

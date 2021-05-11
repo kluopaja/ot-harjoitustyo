@@ -2,7 +2,7 @@ import pygame
 from user_dao import UserDao
 from game.setup import GameFactory
 from graphics.menu_rendering import MenuItemRenderer, MenuListRenderer
-from menu.input import MenuKeys, MenuInput
+from menu.input import MenuInput
 from menu.menu_list import MenuListFactory
 from game.game_stats import create_results_viewer, create_high_score_viewer
 from stats_dao import StatsDao
@@ -11,18 +11,17 @@ from menu.menus import NewGameMenu, AddUserMenu, MainMenu
 from user import UserFactory, User
 from utils.timing import Clock, sleep_wait
 
-def create_main_menu(screen, event_handler, assets_path, database_connection):
+def create_main_menu(screen, event_handler, assets_path, config, database_connection):
     user_dao = UserDao(database_connection)
     user_dao.create(User("default user"))
 
-    game_factory = GameFactory(assets_path, user_dao, event_handler, screen)
+    game_factory = GameFactory(config, user_dao, event_handler, screen)
 
-    menu_item_renderer = MenuItemRenderer(font_color=(50, 69, 63))
-    menu_list_renderer = MenuListRenderer(screen, background_color=(186, 204, 200),
-                                 item_spacing=0.1, item_renderer=menu_item_renderer)
-    menu_keys = MenuKeys(pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP,
-                         pygame.K_RIGHT, pygame.K_LEFT, pygame.K_RETURN, pygame.K_BACKSPACE)
-    menu_input = MenuInput(event_handler, menu_keys)
+    menu_item_renderer = MenuItemRenderer(font_color=config.menu_font_color)
+    menu_list_renderer = MenuListRenderer(
+        screen, background_color=config.menu_background_color,
+        item_spacing=config.menu_item_spacing, item_renderer=menu_item_renderer)
+    menu_input = MenuInput(event_handler, config.menu_input_config)
 
     menu_list_factory = MenuListFactory(menu_list_renderer, menu_input, Clock(20, sleep_wait))
 

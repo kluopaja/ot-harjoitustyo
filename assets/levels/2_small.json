@@ -1,5 +1,6 @@
 {
 	"name" : "small",
+	"background_config_path": "../background.json",
 	"starting_locations" : [
 			[-600, -900],
 			[-200, -900],

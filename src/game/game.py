@@ -24,7 +24,7 @@ class GameNotification:
         self.message = self.press_key_to_start_msg
 
     def until_spawn(self, seconds_left):
-        self.message = f"{seconds_left:.1f} " + self.until_spawn_msg
+        self.message = f"{seconds_left:.1f}" + self.until_spawn_msg
 
     def clear(self):
         self.message = ""

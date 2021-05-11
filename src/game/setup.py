@@ -5,40 +5,30 @@ from utils.timing import Timer, Clock, busy_wait
 from graphics.graphics import ImageGraphic, PolylineGraphic
 from game.shapes import Polyline, Rectangle
 from game.game_objects import PlaneFactory, Ground
-from game.inputs import GameKeys, GameInput, PlayerInput
+from game.inputs import GameInput, PlayerInput
 from game.game_stats import UserRecorder
 from graphics.game_rendering import GameRenderer, GameView, PauseOverlay, GameBackground, InfoBar
 from graphics.screen import Screen
 from graphics.camera import Camera
 from menu.menu_items import ValueBrowserMenuItem, ButtonMenuItem, TextInputMenuItem
 from user import UserSelector
-from config import LevelConfigSelector, PlayerInputsConfig, PlaneConfig
 import json
 
 
 class GameFactory:
-    def __init__(self, assets_path, user_dao, event_handler, screen, n_players=2):
+    def __init__(self, config, user_dao, event_handler, screen, n_players=2):
+        self._config = config
+        self.level_config_selector = self._config.level_config_selector
         self.n_players = n_players
-        self.assets_path = assets_path
         self.user_dao = user_dao
-        if event_handler is None:
-            event_handler = EventHandler()
         self.event_handler = event_handler
         self.screen = screen
-        self.level_config_selector = LevelConfigSelector(
-            self.assets_path / "levels")
-        self.player_input_loader = PlayerInputsConfig(
-            self.assets_path / "keys.json")
-        self.plane_config = PlaneConfig(self.assets_path / "plane.json")
         self.user_selectors = []
         self._update_players()
 
     def game(self):
         level_config = self.level_config_selector.get_selected()
-        game_keys = GameKeys(quit_game = pygame.K_ESCAPE,
-                             pause_game = pygame.key.key_code("p"))
-        game_input = GameInput(self.event_handler, game_keys)
-        player_inputs = self.player_input_loader.get_player_inputs(game_input)
+        game_input = GameInput(self.event_handler, self._config.game_input_config)
 
         game_notifications = []
         plane_factories = []
@@ -47,34 +37,43 @@ class GameFactory:
 
         for i in range(self.n_players):
             game_notifications.append(
-                GameNotification("press `shoot` to start flying", "seconds to go"))
-            plane_factories.append(PlaneFactory(self.plane_config))
+                GameNotification(self._config.press_key_to_start_message,
+                                 self._config.until_spawn_message))
+            plane_factories.append(PlaneFactory(self._config.plane_config))
             plane_factories[i].start_position = start_positions[i]
 
         players = []
         game_views = []
         for i in range(self.n_players):
+            player_input_config = self._config.player_input_configs[i]
+            player_input = PlayerInput(game_input, player_input_config)
             user = self.user_selectors[i].get_current()
-            players.append(Player(plane_factories[i], player_inputs[i],
+            spawn_timer = Timer(self._config.player_spawn_time)
+            players.append(Player(plane_factories[i], player_input,
                                   game_notifications[i],
-                                  UserRecorder(user, Timer()), user, Timer(0.5)))
-            game_views.append(GameView(players[-1], Camera(1300), (30, 72, 102)))
+                                  UserRecorder(user, Timer()), user, spawn_timer))
+            camera = Camera(self._config.game_camera_height)
+            font_color = self._config.game_view_font_color
+            game_views.append(GameView(players[-1], camera, font_color))
 
+        game_length = self._config.game_length
         game_state = GameState(level_config.game_objects(), players,
-                               level_config.name(), Timer(5))
+                               level_config.name(), Timer(game_length))
 
-        cloud_graphic = ImageGraphic.from_image_path(self.assets_path / "cloud.png",
-                                                     Vector2(0, 0), Vector2(119, 81))
-        background = GameBackground(cloud_graphic, n_clouds=10,
-                                    repeat_area=Vector2(3000, 2000),
-                                    fill_color=(180, 213, 224))
-        pause_overlay = PauseOverlay("PAUSE", (107, 88, 110))
-        round_info = InfoBar("Level: ", "Time left: ", (107, 88, 110),
-                             (235, 232, 221))
+        background = GameBackground.from_config(self._config.background_config)
+
+        pause_overlay = PauseOverlay(self._config.pause_message,
+                                     self._config.pause_font_color,
+                                     self._config.pause_blur_radius)
+        round_info = InfoBar(self._config.info_bar_level_message,
+                             self._config.info_bar_time_left_message,
+                             self._config.info_bar_font_color,
+                             self._config.info_bar_background_color)
         renderer = GameRenderer(self.screen, game_views, background,
                                 pause_overlay, round_info)
 
-        game = Game(game_input, game_state, renderer, Clock(60, busy_wait))
+        game_clock = Clock(self._config.game_fps, busy_wait)
+        game = Game(game_input, game_state, renderer, game_clock)
         return game
 
     def add_player(self):
@@ -105,4 +104,4 @@ class GameFactory:
         self.n_players = min(
             self.n_players, self.level_config_selector.max_players())
         self.n_players = min(
-            self.n_players, self.player_input_loader.max_players())
+            self.n_players, len(self._config.player_input_configs))
