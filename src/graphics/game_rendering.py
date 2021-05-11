@@ -25,11 +25,11 @@ class GameRenderer:
         self._info_bar_area = screen.surface.get_rect()
         self._info_bar_area.height = info_bar_height
 
-        game_area = screen.surface.get_rect()
-        game_area.height -= info_bar_height
-        game_area.top += info_bar_height
+        self._game_area = screen.surface.get_rect()
+        self._game_area.height -= info_bar_height
+        self._game_area.top += info_bar_height
 
-        self.game_view_areas = rect_splitter(n_splits, game_area)
+        self.game_view_areas = rect_splitter(n_splits, self._game_area)
 
     def render(self, game_state):
         self._render_common(game_state)
@@ -37,7 +37,8 @@ class GameRenderer:
 
     def render_pause(self, game_state):
         self._render_common(game_state)
-        self.pause_overlay.render(self._screen.surface)
+        game_area_subsurface = self._screen.surface.subsurface(self._game_area)
+        self.pause_overlay.render(game_area_subsurface)
         self._screen.update()
 
     def _render_common(self, game_state):
@@ -66,8 +67,8 @@ class PauseOverlay:
 
     def render(self, surface):
         text_center = Vector2(surface.get_rect().center)
-        surface.centered_text(self.text, text_center, self.font_color)
         surface.blur(self._blur_radius)
+        surface.centered_text(self.text, text_center, self.font_color)
 
 class InfoBar:
     """A class for rendering information common to all players."""
