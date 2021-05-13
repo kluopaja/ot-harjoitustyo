@@ -5,7 +5,7 @@ from unittest.mock import Mock, create_autospec
 
 from utils.timing import Timer
 
-from game.game_stats import UserRecorder, UserRecorderAnalyzer
+from game.game_stats import UserRecorder, RoundStats
 
 class TestUserRecorder(unittest.TestCase):
     def setUp(self):
@@ -47,7 +47,7 @@ class TestUserRecorder(unittest.TestCase):
         self.recorder.add_score(15)
         assert self.recorder.total_score() == 25
 
-class TestUserRecorderAnalyzer(unittest.TestCase):
+class TestRoundStats(unittest.TestCase):
     def setUp(self):
         self.timer = create_autospec(Timer)
         self.timer.current_time.return_value = 1
@@ -70,10 +70,10 @@ class TestUserRecorderAnalyzer(unittest.TestCase):
         self.recorder_2.add_kill()
         self.recorder_2.add_death()
 
-        self.analyzer = UserRecorderAnalyzer()
+        self.round_stats = RoundStats([self.recorder_1, self.recorder_2])
 
-    def test_get_sorted_summary_table(self):
-        result = self.analyzer.get_sorted_summary_table([self.recorder_1, self.recorder_2])
+    def test_getsummary_table(self):
+        result = self.round_stats.get_summary_table()
         assert list(result['name'].values) == ['a', 'b']
         assert list(result['score'].values) == [100, 50]
         assert list(result['shots_fired'].values) == [1, 1]

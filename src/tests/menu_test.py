@@ -4,8 +4,9 @@ from unittest.mock import Mock
 
 import pygame
 
-from menu.input import MenuKeys, MenuInput
+from menu.input import MenuInput
 
+from config import MenuInputConfig
 
 class MockEvent:
     def __init__(self, key, unicode, event_type = pygame.KEYDOWN):
@@ -15,7 +16,7 @@ class MockEvent:
 
 class TestMenuInput(unittest.TestCase):
     def setUp(self):
-        menu_keys = MenuKeys(pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP,
+        menu_keys = MenuInputConfig(pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP,
                              pygame.K_RIGHT, pygame.K_LEFT, pygame.K_RETURN,
                              pygame.K_BACKSPACE)
 

@@ -4,6 +4,7 @@ import unittest
 from pygame import Vector2
 
 from game.game import GameState, Player
+from utils.timing import Timer
 
 class TestPlayer(unittest.TestCase):
     def setUp(self):
@@ -58,7 +59,8 @@ class TestGameState:
     @pytest.fixture
     def game_state(self):
         return GameState([self.game_object_mock(), self.game_object_mock()],
-                         [self.player_mock(), self.player_mock()])
+                         [self.player_mock(), self.player_mock()],
+                         "level1", Timer(10))
 
     def test_run_tick_updates_newly_created_objects(self, game_state):
         newly_created = Mock()

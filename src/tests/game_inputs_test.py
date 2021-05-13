@@ -3,7 +3,8 @@ import unittest
 
 import pygame
 
-from game.inputs import GameKeys, GameInput
+from game.inputs import GameInput
+from config import GameInputConfig
 
 from events import EventHandler
 
@@ -17,7 +18,7 @@ class TestGameInput(unittest.TestCase):
         self.event_handler = create_autospec(EventHandler)
         self.event_handler.get_pressed.return_value = [0] * 1000
         self.event_handler.get_events.return_value = []
-        self.game_keys = GameKeys(pygame.K_q, pygame.K_p)
+        self.game_keys = GameInputConfig(pygame.K_q, pygame.K_p)
         self.game_input = GameInput(self.event_handler, self.game_keys)
         self.pause = Mock()
         self.game_input.bind_pause(self.pause)

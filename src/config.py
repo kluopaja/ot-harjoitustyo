@@ -26,8 +26,8 @@ class Config:
 
             keys_config_path = file_dir / data["keys_config_path"]
             self.player_input_configs = player_input_configs_loader(keys_config_path)
-            self.game_input_config = GameInputConfig(keys_config_path)
-            self.menu_input_config = MenuInputConfig(keys_config_path)
+            self.game_input_config = GameInputConfig.from_file(keys_config_path)
+            self.menu_input_config = MenuInputConfig.from_file(keys_config_path)
 
             self.window_width = data["window_width"]
             self.window_height = data["window_height"]
@@ -158,17 +158,30 @@ def pygame_key_code(description):
             f"'{description}' into a pygame keycode")
 
 class MenuInputConfig:
-    def __init__(self, keymaps_file_path):
+    def __init__(self, quit, next_item, prev_item, increase, decrease, accept,
+                 erase):
+        self.quit = quit
+        self.next_item = next_item
+        self.prev_item = prev_item
+        self.increase = increase
+        self.decrease = decrease
+        self.accept = accept
+        self.erase = erase
+
+    @classmethod
+    def from_file(cls, keymaps_file_path):
         data = json.load(open(keymaps_file_path, "r"))
         keys = data["menu_keys"]
 
-        self.quit = pygame_key_code(keys["quit"])
-        self.next_item = pygame_key_code(keys["next_item"])
-        self.prev_item = pygame_key_code(keys["previous_item"])
-        self.increase = pygame_key_code(keys["increase"])
-        self.decrease = pygame_key_code(keys["decrease"])
-        self.accept = pygame_key_code(keys["accept"])
-        self.erase = pygame_key_code(keys["erase"])
+        return cls(
+            pygame_key_code(keys["quit"]),
+            pygame_key_code(keys["next_item"]),
+            pygame_key_code(keys["previous_item"]),
+            pygame_key_code(keys["increase"]),
+            pygame_key_code(keys["decrease"]),
+            pygame_key_code(keys["accept"]),
+            pygame_key_code(keys["erase"]))
+
 
 class PlayerInputConfig:
     """A class for storing the keys for a single player.
@@ -183,11 +196,15 @@ class PlayerInputConfig:
 
 class GameInputConfig:
     """A class for storing game keys common to all players"""
-    def __init__(self, keymaps_file_path):
-        print(keymaps_file_path)
+    def __init__(self, quit, pause):
+        self.quit = quit
+        self.pause = pause
+
+    @classmethod
+    def from_file(cls, keymaps_file_path):
         data = json.load(open(keymaps_file_path, "r"))
-        self.quit = pygame_key_code(data["game_keys"]["quit"])
-        self.pause = pygame_key_code(data["game_keys"]["pause"])
+        return cls(pygame_key_code(data["game_keys"]["quit"]),
+                   pygame_key_code(data["game_keys"]["pause"]))
 
 
 def player_input_configs_loader(keymaps_file_path):
