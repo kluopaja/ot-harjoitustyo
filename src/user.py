@@ -1,3 +1,5 @@
+import logging
+import sys
 class User:
     """A class representing a game user.
 
@@ -47,22 +49,75 @@ class UserFactory:
         self._user.name = name
 
 class UserSelector:
+    """A class for browsing through and selecting Users from database.
+
+    NOTE: If the database doesn't contain any User data, then
+    the class will work as if there was a single default user
+    in the database."""
     def __init__(self, user_dao):
+        """Initializes UserSelector.
+
+        Arguments:
+            `user_dao`: a UserDao object
+        """
         self._user_dao = user_dao
-        self._selected = self._user_dao.get_first()
-        if self._selected is None:
-            raise ValueError("No users found in `user_dao`")
+        self._selected = None
+        self._init_selected()
+
+    def _init_selected(self):
+        if self._selected is not None:
+            return
+
+        try:
+            self._selected = self._user_dao.get_first()
+        except Exception:
+            self._error()
+
+    def _error(self):
+        logging.critical("Failed accessing the database. "
+                         "Try reinitializing the database")
+        sys.exit()
 
     def next(self):
-        next_selected = self._user_dao.get_next(self._selected)
+        """Select the next User in lexicographical order.
+
+        Does nothing if no next User exists in the database."""
+        self._init_selected()
+        if self._selected is None:
+            return
+
+        try:
+            next_selected = self._user_dao.get_next(self._selected)
+        except Exception:
+            self._error()
+
         if next_selected is not None:
             self._selected = next_selected
 
     def previous(self):
-        next_selected = self._user_dao.get_previous(self._selected)
+        """Select the previous User in lexicographical order.
+
+        Does nothing if no previous User exists in the database."""
+        self._init_selected()
+        if self._selected is None:
+            return
+        try:
+            next_selected = self._user_dao.get_previous(self._selected)
+        except Exception:
+            self._error()
         if next_selected is not None:
             self._selected = next_selected
 
     def get_current(self):
-        return self._selected
+        """Returns the selected User.
 
+        Returns:
+            User object
+
+            NOTE: If the database doesn't contain any Users, then
+            returns a default user with User.id == None!
+        """
+        self._init_selected()
+        if self._selected is None:
+            return User("default user")
+        return self._selected
