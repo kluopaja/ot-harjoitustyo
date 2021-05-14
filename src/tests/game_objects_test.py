@@ -3,6 +3,7 @@ import unittest
 from pygame import Vector2
 
 from game.game_objects import Plane, Gun, Bullet, Ground, BulletFactory
+from game.game_objects import score_generator
 from game.shapes import Shape
 from graphics.graphics import Graphic
 from game.physics import PhysicsController
@@ -10,6 +11,10 @@ from game.game import Player
 from utils.timing import Timer
 
 from math import pi
+
+def test_score_generator():
+    generator = score_generator(10, 100)
+    assert generator(1, True) == 110
 
 class TestPlane(unittest.TestCase):
     def setUp(self):

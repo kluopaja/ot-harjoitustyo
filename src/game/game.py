@@ -11,9 +11,6 @@ import itertools
 
 from game.game_stats import RoundStats
 
-# TODO make this more general, also player name/score styles
-
-
 class GameNotification:
     def __init__(self, press_key_to_start_msg, until_spawn_msg):
         self.message = ""
