@@ -27,14 +27,13 @@ class NewGameMenu:
         self.menu_factory = menu_factory
         self.game_organizer = game_organizer
         self.item_collection = MenuItemCollection()
-        level_selector = game_factory.level_config_selector
         self.item_collection.add_item(
             ValueBrowserMenuItem(game_factory.previous_level, game_factory.next_level,
-                                 level_selector.level_name, "Level: ")
+                                 game_factory.get_level_name, "Level: ")
         )
         self.item_collection.add_item(
             ValueBrowserMenuItem(game_factory.remove_player, game_factory.add_player,
-                                 lambda: game_factory.n_players, "Number of players: ")
+                                 game_factory.get_n_players, "Number of players: ")
         )
 
         self.player_selection_collection = MenuItemCollection()

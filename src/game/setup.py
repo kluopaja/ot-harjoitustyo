@@ -18,24 +18,24 @@ import json
 class GameFactory:
     def __init__(self, config, user_dao, event_handler, screen, n_players=2):
         self._config = config
-        self.level_config_selector = self._config.level_config_selector
-        self.n_players = n_players
-        self.user_dao = user_dao
-        self.event_handler = event_handler
-        self.screen = screen
+        self._level_config_selector = self._config.level_config_selector
+        self._n_players = n_players
+        self._user_dao = user_dao
+        self._event_handler = event_handler
+        self._screen = screen
         self.user_selectors = []
         self._update_players()
 
     def game(self):
-        level_config = self.level_config_selector.get_selected()
-        game_input = GameInput(self.event_handler, self._config.game_input_config)
+        level_config = self._level_config_selector.get_selected()
+        game_input = GameInput(self._event_handler, self._config.game_input_config)
 
         game_notifications = []
         plane_factories = []
 
         start_positions = level_config.starting_locations()
 
-        for i in range(self.n_players):
+        for i in range(self._n_players):
             game_notifications.append(
                 GameNotification(self._config.press_key_to_start_message,
                                  self._config.until_spawn_message))
@@ -44,7 +44,7 @@ class GameFactory:
 
         players = []
         game_views = []
-        for i in range(self.n_players):
+        for i in range(self._n_players):
             player_input_config = self._config.player_input_configs[i]
             player_input = PlayerInput(game_input, player_input_config)
             user = self.user_selectors[i].get_current()
@@ -69,7 +69,7 @@ class GameFactory:
                              self._config.info_bar_time_left_message,
                              self._config.info_bar_font_color,
                              self._config.info_bar_background_color)
-        renderer = GameRenderer(self.screen, game_views, background,
+        renderer = GameRenderer(self._screen, game_views, background,
                                 pause_overlay, round_info)
 
         game_clock = Clock(self._config.game_fps, busy_wait)
@@ -77,31 +77,37 @@ class GameFactory:
         return game
 
     def add_player(self):
-        self.n_players += 1
+        self._n_players += 1
         self._update_players()
 
     def remove_player(self):
-        self.n_players -= 1
+        self._n_players -= 1
         self._update_players()
 
+    def get_n_players(self):
+        return self._n_players
+
     def next_level(self):
-        self.level_config_selector.next_level()
+        self._level_config_selector.next_level()
         self._update_players()
 
     def previous_level(self):
-        self.level_config_selector.previous_level()
+        self._level_config_selector.previous_level()
         self._update_players()
+
+    def get_level_name(self):
+        return self._level_config_selector.level_name()
 
     def _update_players(self):
         self._clamp_n_players()
-        for i in range(len(self.user_selectors), self.n_players):
-            self.user_selectors.append(UserSelector(self.user_dao))
+        for i in range(len(self.user_selectors), self._n_players):
+            self.user_selectors.append(UserSelector(self._user_dao))
 
-        self.user_selectors = self.user_selectors[0:self.n_players]
+        self.user_selectors = self.user_selectors[0:self._n_players]
 
     def _clamp_n_players(self):
-        self.n_players = max(1, self.n_players)
-        self.n_players = min(
-            self.n_players, self.level_config_selector.max_players())
-        self.n_players = min(
-            self.n_players, len(self._config.player_input_configs))
+        self._n_players = max(1, self._n_players)
+        self._n_players = min(
+            self._n_players, self._level_config_selector.max_players())
+        self._n_players = min(
+            self._n_players, len(self._config.player_input_configs))
