@@ -1,20 +1,37 @@
 from unittest.mock import Mock, ANY, create_autospec
 import unittest
+from pathlib import Path
+
 from pygame import Vector2
 
 from game.game_objects import Plane, Gun, Bullet, Ground, BulletFactory
-from game.game_objects import score_generator
+from game.game_objects import score_generator, PlaneFactory
 from game.shapes import Shape
 from graphics.graphics import Graphic
 from game.physics import PhysicsController
 from game.game import Player
 from utils.timing import Timer
 
+from config import PlaneConfig
+
 from math import pi
 
 def test_score_generator():
     generator = score_generator(10, 100)
     assert generator(1, True) == 110
+
+class TestPlaneFactory(unittest.TestCase):
+    def setUp(self):
+        config_path = Path(__file__).parent / "./assets/plane.json"
+        self.factory = PlaneFactory(PlaneConfig(config_path))
+
+    def test_plane_cost(self):
+        assert self.factory.get_plane_cost() == 20
+
+    def test_plane_owner_set_correctly(self):
+        owner = create_autospec(Player)
+        plane = self.factory.plane(Mock(), owner)
+        assert plane.owner is owner
 
 class TestPlane(unittest.TestCase):
     def setUp(self):
