@@ -1,0 +1,13 @@
+{
+	"image_file_path": "./cloud.png",
+	"image_size": {
+		"width": 119,
+		"height": 81
+	},
+	"n_images": 10,
+	"repeat_area": {
+		"width": 3000,
+		"height": 2000
+	},
+	"fill_color": [180, 213, 224]
+}

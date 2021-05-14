@@ -1,0 +1,6 @@
+{
+	"bullet_config_path": "./bullet.json",
+	"bullet_spawn_time": 0.2,
+	"bullet_spawn_offset": 60,
+	"bullet_speed": 1000
+}

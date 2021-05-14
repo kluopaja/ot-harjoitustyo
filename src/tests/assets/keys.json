@@ -1,0 +1,41 @@
+{
+	"game_keys": {
+		"quit": "escape",
+		"pause": "p",
+		"player_keys" : [
+			{
+				"accelerate" : "w",
+				"up" : "a",
+				"down" : "d",
+				"shoot" : "q"
+			},
+			{
+				"accelerate" : "up",
+				"up" : "left",
+				"down" : "right",
+				"shoot" : "right shift"
+			},
+			{
+				"accelerate" : "t",
+				"up" : "f",
+				"down" : "h",
+				"shoot" : "r"
+			},
+			{
+				"accelerate" : "i",
+				"up" : "j",
+				"down" : "l",
+				"shoot" : "u"
+			}
+		]
+	},
+	"menu_keys": {
+		"quit": "escape",
+		"next_item": "down",
+		"previous_item": "up",
+		"increase": "right",
+		"decrease": "left",
+		"accept": "return",
+		"erase": "backspace"
+	}
+}

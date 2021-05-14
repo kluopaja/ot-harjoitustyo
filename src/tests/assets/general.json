@@ -1,0 +1,33 @@
+{
+	"database_path": "../data/database.sqlite",
+	"level_dir": "./levels",
+	"plane_config_path": "./plane.json",
+	"keys_config_path": "./keys.json",
+	"background_config_path": "./background.json",
+
+	"window_width": 1920,
+	"window_height": 1080,
+	"font_size": 0.02,
+	"menu_font_color": [50, 69, 63],
+	"menu_background_color": [186, 204, 200],
+	"menu_item_spacing": 0.1,
+
+	"camera_height": 1300,
+	"press_key_to_start_message": "press `shoot` to start flying",
+	"until_spawn_message": " seconds to go",
+
+	"game_view_font_color": [30, 72, 102],
+	"player_spawn_time": 0.5,
+	"game_length": 3,
+
+	"pause_message": "PAUSED",
+	"pause_font_color": [107, 88, 110],
+	"pause_blur_radius": 15,
+
+	"info_bar_level_message": "Level: ",
+	"info_bar_time_left_message": "Time left: ",
+	"info_bar_font_color" : [107, 88, 110],
+	"info_bar_background_color": [235, 232, 221],
+
+	"game_fps": 60
+}
