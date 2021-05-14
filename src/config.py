@@ -56,10 +56,24 @@ class Config:
             self.pause_blur_radius = data["pause_blur_radius"]
 
             self.game_fps = data["game_fps"]
+
         except Exception as ex:
             logging.critical(traceback.format_exc())
             logging.critical("Failed parsing configuration files")
             sys.exit()
+
+        self._validate_config()
+
+    def _validate_config(self):
+        if self.window_width < 100 or self.window_height < 100:
+            logging.critical("The window height and width should both be at least 100")
+            sys.exit()
+
+        if self.font_size > 0.5:
+            logging.critical("The maximum font size is 0.5")
+            sys.exit()
+
+
 
 class LevelConfig:
     """A class for storing the properties of a level."""
