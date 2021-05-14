@@ -1,3 +1,5 @@
+import logging
+import sys
 from config import ASSETS_PATH, Config
 from graphics.screen import Screen
 from events import EventHandler
@@ -6,6 +8,13 @@ from menu.setup import create_main_menu
 
 def main():
     config = Config(ASSETS_PATH / "general.json")
+    if config.window_width < 100 or config.window_height < 100:
+        logging.critical("The window height and width should both be at least 100")
+        sys.exit()
+
+    if config.font_size > 0.5:
+        logging.critical("The maximum font size is 0.5")
+
     screen = Screen(config.window_width, config.window_height, config.font_size)
     event_handler = EventHandler()
     database_connection = get_database_connection()

@@ -26,6 +26,8 @@ class DrawingSurface:
         size = self._to_pixel_coordinates(area.size)
         _area = Rect(rect_topleft[0], rect_topleft[1], size[0], size[1])
         new_absolute_topleft = rect_topleft + self._absolute_topleft
+        if size[0] <= 0 or size[1] <= 0:
+            raise ValueError("Cannot make a subsurface with pixel area 0")
         return DrawingSurface(self._surface.subsurface(_area), self._screen,
                               new_absolute_topleft)
 

@@ -19,24 +19,30 @@ class PlaneFactory:
     def __init__(self, plane_config):
         self._config = plane_config
         self.start_position = Vector2(0, 0)
-        self.score_generator = score_generator(0, 100)
 
     def plane(self, player_input, owner):
         rectangle = self._plane_rectangle(self._config.size)
         image_graphic = ImageGraphic.from_image_path(self._config.image_file_path,
                                                      Vector2(0, 0), self._config.size)
+        gravity = self._config.gravity
+
+        def gravity_callback(position):
+            return Vector2(0, 1) * gravity
 
         tmp = BasePhysics(Vector2(self.start_position),
                           Vector2(0, 0), Vector2(1, 0))
-        tmp = BodyPhysics(tmp, self._config.body_drag, self._gravity_callback)
+        tmp = BodyPhysics(tmp, self._config.body_drag, gravity_callback)
         tmp = WingPhysics(tmp, self._config.wing_size)
         plane_physics = PhysicsController(
             tmp, self._config.acceleration, self._config.rotation)
 
-        gun = Gun.from_gun_config(self._config.gun_config)
+        gun = Gun.from_config(self._config.gun_config)
 
+
+        _score_generator = score_generator(self._config.score_per_damage,
+                                           self._config.score_when_destroyed)
         plane = Plane(rectangle, image_graphic, plane_physics, gun, 
-                      self.score_generator, owner, health=self._config.health,
+                      _score_generator, owner, health=self._config.health,
                       collision_damage=self._config.collision_damage)
         player_input.bind_to_plane(plane)
 
@@ -44,9 +50,6 @@ class PlaneFactory:
 
     def get_plane_cost(self):
         return self._config.cost
-
-    def _gravity_callback(self, position):
-        return Vector2(0, 1) * self._config.gravity
 
     def _plane_rectangle(self, size):
         return Rectangle(Vector2(-size[0]/2, -size[1]/2),
@@ -81,7 +84,7 @@ class Gun:
         self._speed = speed
 
     @classmethod
-    def from_gun_config(cls, gun_config):
+    def from_config(cls, gun_config):
         bullet_factory = BulletFactory(gun_config.bullet_config)
         return cls(bullet_factory, Timer(gun_config.bullet_spawn_time),
                    gun_config.bullet_spawn_offset, gun_config.bullet_speed)
