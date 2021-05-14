@@ -1,3 +1,5 @@
+from database_connection import DatabaseError
+import logging
 from user import User
 class UserDao:
     def __init__(self, connection):
@@ -6,41 +8,55 @@ class UserDao:
 
     def get_by_name(self, name):
         """Returns the user with name `name` or None if no such user exists."""
-        self._cursor.execute("SELECT * from Users WHERE name=?", (name,))
-        result = self._cursor.fetchone()
-        return self._row_to_user(result)
+        try:
+            self._cursor.execute("SELECT * from Users WHERE name=?", (name,))
+            result = self._cursor.fetchone()
+            return self._row_to_user(result)
+        except Exception:
+            raise DatabaseErrror
+
 
     def get_first(self):
-        """Returns the user with the lexicographically smallest name."""
-        self._cursor.execute("SELECT * from Users ORDER BY name LIMIT 1")
-        result = self._cursor.fetchone()
-        return self._row_to_user(result)
+        """Returns the user with the lexicographically smallest name.
+
+        Returns:
+            User or None if no suitable User was found """
+        try:
+            self._cursor.execute("SELECT * from Users ORDER BY name LIMIT 1")
+            result = self._cursor.fetchone()
+            if result is None:
+                return None
+
+            return self._row_to_user(result)
+        except Exception:
+            raise DatabaseError
 
     def get_next(self, user):
         """Returns the user after `user` in lexicographical order by name"""
-        self._cursor.execute(
-            "SELECT * from Users WHERE name > ? ORDER BY name LIMIT 1",
-            (user.name,)
-        )
-        result = self._cursor.fetchone()
-        return self._row_to_user(result)
+        try:
+            self._cursor.execute(
+                "SELECT * from Users WHERE name > ? ORDER BY name LIMIT 1",
+                (user.name,)
+            )
+            result = self._cursor.fetchone()
+            return self._row_to_user(result)
+        except Exception:
+            raise DatabaseError
 
     def get_previous(self, user):
         """Returns the user after `user` in lexicographical order by name"""
-        self._cursor.execute(
-            "SELECT * from Users WHERE name < ? ORDER BY name DESC LIMIT 1",
-            (user.name,)
-        )
-        result = self._cursor.fetchone()
-        return self._row_to_user(result)
+        try:
+            self._cursor.execute(
+                "SELECT * from Users WHERE name < ? ORDER BY name DESC LIMIT 1",
+                (user.name,)
+            )
+            result = self._cursor.fetchone()
+            return self._row_to_user(result)
+        except Exception:
+            raise DatabaseError
 
     def create(self, user):
-        """Saves user `user` to the database.
-
-        Returns:
-            True if the saving was successful.
-            False otherwise
-        """
+        """Saves user `user` to the database."""
 
         if user.id is not None:
             raise ValueError("`user.id` should be None")
@@ -52,29 +68,7 @@ class UserDao:
             )
             self._connection.commit()
         except Exception:
-            return False
-
-        return True
-
-    def update(self, user):
-        """Updates user `user` in the database.
-
-        Returns:
-            True if the update was successful.
-            False otherwise.
-        """
-        if user.id is None:
-            raise ValueError("`user.id` should not be None")
-
-        try:
-            self._cursor.execute(
-                "UPDATE Users SET name=? WHERE id=?",
-                (user.name, user.id)
-            )
-        except Exception:
-            return False
-
-        return True
+            raise DatabaseError
 
     def _row_to_user(self, row):
         if row is None:
