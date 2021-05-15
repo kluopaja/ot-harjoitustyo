@@ -64,15 +64,14 @@ class BulletFactory:
                                                      Vector2(0, 0),
                                                      Vector2(self._config.diameter))
         circle = Circle(Vector2(0), self._config.diameter)
+        gravity = self._config.gravity
+        def gravity_callback(position):
+            return Vector2(0, 1) * gravity
         tmp = BasePhysics(location, velocity, front)
-        physics = BodyPhysics(tmp, self._config.body_drag, self._gravity_callback)
+        physics = BodyPhysics(tmp, self._config.body_drag, gravity_callback)
         return Bullet(circle, image_graphic, physics, owner,
                       Timer(self._config.timeout), self._config.health,
                       self._config.collision_damage)
-
-    def _gravity_callback(self, position):
-        return Vector2(0, 1) * self._config.gravity
-
 
 class Gun:
     def __init__(self, bullet_factory, timer, spawn_offset, speed):
