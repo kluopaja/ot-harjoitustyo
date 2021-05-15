@@ -52,7 +52,7 @@ class Plotter:
 
             self.figure.canvas.draw()
 
-            image = np.fromstring(self.figure.canvas.tostring_argb(), dtype=np.uint8, sep='')
+            image = np.frombuffer(self.figure.canvas.tostring_argb(), dtype=np.uint8)
             image = image.reshape(height, width, 4)
             image = np.swapaxes(image, 0, 1)
             self.figure.clf()
