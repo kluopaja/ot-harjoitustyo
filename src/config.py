@@ -2,6 +2,9 @@ import logging
 import sys
 import traceback
 from pathlib import Path
+import os
+# hide the pygame start message
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 from pygame import Vector2
 import json
 import pygame
