@@ -4,15 +4,16 @@ import traceback
 from pathlib import Path
 import os
 import json
+# hide the pygame start message
+# has to be placed before any of the pygame the imports!
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+from pygame import Vector2
+import pygame
+
 from graphics.graphics import PolylineGraphic
 from game.shapes import Polyline
 from game.game_objects import Ground
 
-# hide the pygame start message
-# has to be placed before the imports!
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-from pygame import Vector2
-import pygame
 
 project_root = Path(__file__).parent.parent
 CONFIG_PATH = project_root / "assets/config.json"
