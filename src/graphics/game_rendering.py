@@ -179,7 +179,7 @@ class GameView:
 
     def _render_notification(self, surface):
         text_center = Vector2(surface.get_rect().center)
-        surface.centered_text(self.player.notification.message, text_center,
+        surface.centered_text(self.player.notification.get_message(), text_center,
                               self.font_color)
 
     def _render_score(self, surface):

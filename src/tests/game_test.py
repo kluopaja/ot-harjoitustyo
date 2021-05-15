@@ -18,20 +18,20 @@ class TestGameNotification(unittest.TestCase):
         self.game_notification = GameNotification("press key", " until spawn")
 
     def test_constructor_leaves_message_clear(self):
-        assert self.game_notification.message == ""
+        assert self.game_notification.get_message() == ""
 
     def test_press_key_to_start(self):
         self.game_notification.press_key_to_start()
-        assert self.game_notification.message == "press key"
+        assert self.game_notification.get_message() == "press key"
 
     def test_until_spawn(self):
         self.game_notification.until_spawn(1.4444)
-        assert self.game_notification.message == "1.4 until spawn"
+        assert self.game_notification.get_message() == "1.4 until spawn"
 
     def test_clear(self):
         self.game_notification.press_key_to_start()
         self.game_notification.clear()
-        assert self.game_notification.message == ""
+        assert self.game_notification.get_message() == ""
 
 class TestPlayer(unittest.TestCase):
     def setUp(self):
@@ -41,7 +41,7 @@ class TestPlayer(unittest.TestCase):
         self.plane_factory_mock.plane.side_effect = lambda x, y: self.plane_mock
         self.plane_factory_mock.get_plane_cost.return_value = 123
         self.player_input_mock = Mock()
-        self.game_notification_mock = GameNotification("press key", " until spawn")
+        self.game_notification = GameNotification("press key", " until spawn")
         self.spawn_timer_mock = Mock()
         self.spawn_timer_mock.time_left.return_value = 10
         self.user_recorder_mock = Mock()
@@ -49,7 +49,7 @@ class TestPlayer(unittest.TestCase):
         self.user_mock = Mock()
 
         self.player = Player(self.plane_factory_mock, self.player_input_mock,
-                             self.game_notification_mock,
+                             self.game_notification,
                              self.user_recorder_mock, self.user_mock,
                              self.spawn_timer_mock)
 
@@ -88,18 +88,18 @@ class TestPlayer(unittest.TestCase):
 
     def test_notification_when_no_plane_and_timer_not_expired(self):
         self.player.update(1)
-        assert self.game_notification_mock.message == "10.0 until spawn"
+        assert self.game_notification.get_message() == "10.0 until spawn"
 
     def test_notification_after_timer_expired(self):
         self.spawn_timer_mock.expired.return_value = True
         self.player.update(1)
-        assert self.game_notification_mock.message == "press key"
+        assert self.game_notification.get_message() == "press key"
 
     def test_notification_stays_clear_when_plane_exists(self):
         self._create_plane_by_shoot_key_with_timer_expired()
         self.player.update(1)
         self.player.update(1)
-        assert self.game_notification_mock.message == ""
+        assert self.game_notification.get_message() == ""
 
     def test_dead_plane_starts_spawn_timer(self):
         self._create_plane_by_shoot_key_with_timer_expired()

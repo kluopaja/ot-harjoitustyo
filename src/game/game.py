@@ -8,19 +8,40 @@ from game.game_stats import RoundStats
 from database_connection import DatabaseError
 
 class GameNotification:
+    """Class storing and modifying messages shown to players."""
+
     def __init__(self, press_key_to_start_msg, until_spawn_msg):
-        self.message = ""
-        self.press_key_to_start_msg = press_key_to_start_msg
-        self.until_spawn_msg = until_spawn_msg
+        """Initializes GameNotification.
+
+        Arguments:
+            `press_key_to_start_msg`: A string
+                The message shown to user when the plane is ready
+                to spawn when the user presses some key.
+
+            `until_spawn_msg`: A string
+                The message shown to the user after the spawn timer
+                (in seconds). Will be attached directly to the
+                time left without an extra whitespace.
+            """
+        self._message = ""
+        self._press_key_to_start_msg = press_key_to_start_msg
+        self._until_spawn_msg = until_spawn_msg
 
     def press_key_to_start(self):
-        self.message = self.press_key_to_start_msg
+        """Set the message to the instructions to start the game"""
+        self._message = self._press_key_to_start_msg
 
     def until_spawn(self, seconds_left):
-        self.message = f"{seconds_left:.1f}" + self.until_spawn_msg
+        """Set the message to the remaining time until spawn"""
+        self._message = f"{seconds_left:.1f}" + self._until_spawn_msg
 
     def clear(self):
-        self.message = ""
+        """Don't show any message to the player"""
+        self._message = ""
+
+    def get_message(self):
+        """Get the message that should be shown to the player"""
+        return self._message
 
 
 class Player:
