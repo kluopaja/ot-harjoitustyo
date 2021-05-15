@@ -1,5 +1,4 @@
 from database_connection import DatabaseError
-import logging
 from user import User
 class UserDao:
     def __init__(self, connection):
@@ -13,7 +12,7 @@ class UserDao:
             result = self._cursor.fetchone()
             return self._row_to_user(result)
         except Exception:
-            raise DatabaseErrror
+            raise DatabaseError
 
 
     def get_first(self):

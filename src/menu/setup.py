@@ -1,14 +1,13 @@
-import pygame
 from user_dao import UserDao
 from game.setup import GameFactory
+from game.game_stats import create_results_viewer, create_high_score_viewer
+from game.game import GameOrganizer
 from graphics.menu_rendering import MenuItemRenderer, MenuListRenderer
 from menu.input import MenuInput
 from menu.menu_list import MenuListFactory
-from game.game_stats import create_results_viewer, create_high_score_viewer
-from stats_dao import StatsDao
-from game.game import GameOrganizer
 from menu.menus import NewGameMenu, AddUserMenu, MainMenu
-from user import UserFactory, User
+from stats_dao import StatsDao
+from user import UserFactory
 from utils.timing import Clock, sleep_wait
 
 def create_main_menu(screen, event_handler, config, database_connection):

@@ -1,15 +1,13 @@
 import math
-import logging
-from constants import EPS
 from pygame import Vector2
 from graphics.graphics import ImageGraphic
 from game.shapes import Rectangle, Circle
-from game.physics import BasePhysics, BodyPhysics, WingPhysics, angle_between
+from game.physics import BasePhysics, BodyPhysics, WingPhysics
 from game.physics import PhysicsController
 from utils.timing import Timer
 
 
-def score_generator(damage_score, destroying_score):
+def damage_score_generator(damage_score, destroying_score):
     def _inner(damage, destroyed):
         return damage * damage_score + destroyed * destroying_score
     return _inner
@@ -39,9 +37,9 @@ class PlaneFactory:
         gun = Gun.from_config(self._config.gun_config)
 
 
-        _score_generator = score_generator(self._config.score_per_damage,
-                                           self._config.score_when_destroyed)
-        plane = Plane(rectangle, image_graphic, plane_physics, gun, 
+        _score_generator = damage_score_generator(self._config.score_per_damage,
+                                                  self._config.score_when_destroyed)
+        plane = Plane(rectangle, image_graphic, plane_physics, gun,
                       _score_generator, owner, health=self._config.health,
                       collision_damage=self._config.collision_damage)
         player_input.bind_to_plane(plane)
@@ -99,7 +97,8 @@ class Gun:
             bullet_location = location + self._spawn_offset * front
             bullet_velocity = velocity + self._speed * front
             bullet_front = Vector2(front)
-            return [self._bullet_factory.bullet(bullet_location, bullet_velocity, bullet_front, owner)]
+            return [self._bullet_factory.bullet(
+                bullet_location, bullet_velocity, bullet_front, owner)]
         return []
 
 
@@ -174,8 +173,8 @@ class Plane(GameObject):
 
     """
 
-    def __init__(self, shape, graphic, plane_physics, gun, score_generator, owner, health=100,
-                 collision_damage=100):
+    def __init__(self, shape, graphic, plane_physics, gun, score_generator,
+                 owner, health, collision_damage):
         """Initializes Plane
 
 

@@ -1,8 +1,6 @@
 class FloatRect:
     """Similar class to pygame.Rect except also with floats"""
 
-    # TODO use Vector2?
-
     def __init__(self, x, y, width, height):
         self._x = x
         self._y = y

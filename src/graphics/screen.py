@@ -1,6 +1,6 @@
+from pygame import Vector2
 import pygame
 from graphics.drawing_surface import DrawingSurface
-from pygame import Vector2
 
 class Screen:
     def __init__(self, width, height, font_size):
@@ -17,7 +17,7 @@ class Screen:
 
     def resize(self, width, height):
         self.surface = DrawingSurface(
-            pygame.display.set_mode((width, height), vsync=1), Vector2(0))
+            pygame.display.set_mode((width, height), vsync=1), self, Vector2(0))
         self._previous_dirty_rects = None
         self._current_dirty_rects = []
 

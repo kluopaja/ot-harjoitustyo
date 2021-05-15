@@ -1,8 +1,9 @@
 import logging
-logging.getLogger('matplotlib').setLevel(logging.WARNING)
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+
+logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
 class Plotter:
     def __init__(self):

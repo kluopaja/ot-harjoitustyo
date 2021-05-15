@@ -1,4 +1,3 @@
-import sys
 from database_connection import get_database_connection
 from config import DEFAULT_DATABASE_PATH
 

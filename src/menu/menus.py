@@ -1,10 +1,8 @@
-from user import UserFactory
 from menu.menu_items import TextInputMenuItem, ButtonMenuItem, MenuItemCollection
 from menu.menu_items import ValueBrowserMenuItem
-# TODO rename menu_factory to menu_list_factory everywhere
 class MainMenu:
-    def __init__(self, menu_factory, new_game_menu, add_user_menu, high_score_view):
-        self.menu_factory = menu_factory
+    def __init__(self, menu_list_factory, new_game_menu, add_user_menu, high_score_view):
+        self.menu_list_factory = menu_list_factory
         self.item_collection = MenuItemCollection()
         self.item_collection.add_item(
             ButtonMenuItem(add_user_menu.run, "Add user")
@@ -17,14 +15,14 @@ class MainMenu:
         )
 
     def run(self):
-        menu = self.menu_factory.menu(self.item_collection)
+        menu = self.menu_list_factory.menu(self.item_collection)
         while not menu.should_quit():
             menu.run_tick()
 
 class NewGameMenu:
-    def __init__(self, game_factory, menu_factory, game_organizer):
+    def __init__(self, game_factory, menu_list_factory, game_organizer):
         self.game_factory = game_factory
-        self.menu_factory = menu_factory
+        self.menu_list_factory = menu_list_factory
         self.game_organizer = game_organizer
         self.item_collection = MenuItemCollection()
         self.item_collection.add_item(
@@ -44,7 +42,7 @@ class NewGameMenu:
         self.item_collection.add_item(ButtonMenuItem(self._game_runner, "Start game"))
 
     def run(self):
-        menu = self.menu_factory.menu(self.item_collection)
+        menu = self.menu_list_factory.menu(self.item_collection)
         while not menu.should_quit():
             self._update_player_selection_collection()
             menu.run_tick()
@@ -66,8 +64,8 @@ class NewGameMenu:
 
 
 class AddUserMenu:
-    def __init__(self, menu_factory, user_factory):
-        self.menu_factory = menu_factory
+    def __init__(self, menu_list_factory, user_factory):
+        self.menu_list_factory = menu_list_factory
         self.user_factory = user_factory
         self.item_collection = MenuItemCollection()
         self.item_collection.add_item(
@@ -76,11 +74,12 @@ class AddUserMenu:
         )
         self._create_user_button = ButtonMenuItem(lambda : None, "")
         self.item_collection.add_item(self._create_user_button)
+        self._should_quit = False
 
     def run(self):
         self._should_quit = False
         self.user_factory.reset()
-        menu = self.menu_factory.menu(self.item_collection)
+        menu = self.menu_list_factory.menu(self.item_collection)
         while (not self._should_quit) and (not menu.should_quit()):
             self._update_create_button()
             menu.run_tick()

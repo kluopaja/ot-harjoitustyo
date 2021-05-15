@@ -1,5 +1,5 @@
-import pygame
 import math
+import pygame
 from pygame import Rect, Vector2
 from utils.float_rect import FloatRect
 

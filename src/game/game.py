@@ -1,14 +1,8 @@
 import sys
-import random
-from pygame import Rect
-from pygame import Vector2
 import logging
-import graphics
-from pathlib import Path
-import pygame
-import time
-import math
 import itertools
+
+from pygame import Vector2
 
 from game.game_stats import RoundStats
 from database_connection import DatabaseError
@@ -51,7 +45,7 @@ class Player:
     def update(self, delta_time):
         self._spawn_timer.update(delta_time)
         self.user_recorder.update(delta_time)
-        if self._plane == None:
+        if self._plane is None:
             self.notification.until_spawn(self._spawn_timer.time_left())
             if self._spawn_timer.expired():
                 self.notification.press_key_to_start()
@@ -70,7 +64,7 @@ class Player:
         return tmp
 
     def view_location(self):
-        if self._plane == None:
+        if self._plane is None:
             return Vector2(self._plane_factory.start_position)
 
         return Vector2(self._plane.graphic.location)
@@ -120,10 +114,10 @@ class GameState:
             game_object.update(delta_time)
 
     def _handle_collisions(self):
-        for x, y in itertools.combinations(self.game_objects, 2):
-            if x.shape.intersects(y.shape):
-                x.collide(y)
-                y.collide(x)
+        for object_1, object_2 in itertools.combinations(self.game_objects, 2):
+            if object_1.shape.intersects(object_2.shape):
+                object_1.collide(object_2)
+                object_2.collide(object_1)
 
     def _update_game_object_list(self):
         new_game_objects = []
@@ -149,7 +143,7 @@ class Game:
         self._paused = False
         self.game_input.bind_pause(self._toggle_pause)
         self.clock.reset()
-        self.busy_frac_history = []
+        self._busy_frac_history = []
         while True:
             if self._paused:
                 self.game_input.handle_pause_inputs()
@@ -172,13 +166,13 @@ class Game:
             self._log()
 
     def _log(self):
-        self.busy_frac_history.append(self.clock.busy_fraction())
+        self._busy_frac_history.append(self.clock.busy_fraction())
         logging.debug(
             f"busy frac: {self.clock.busy_fraction():5.3f}, "
-            f"average(10): {self._mean(self.busy_frac_history):6.3f}"
+            f"average(10): {self._mean(self._busy_frac_history):6.3f}"
         )
-        if len(self.busy_frac_history) >= 10:
-            self.busy_frac_history = self.busy_frac_history[1:]
+        if len(self._busy_frac_history) >= 10:
+            self._busy_frac_history = self._busy_frac_history[1:]
 
     def _mean(self, v):
         return sum(v)/len(v)

@@ -1,5 +1,3 @@
-import logging
-import sys
 from config import CONFIG_PATH, Config
 from graphics.screen import Screen
 from events import EventHandler

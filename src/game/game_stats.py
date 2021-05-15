@@ -1,10 +1,9 @@
 import logging
 import sys
 import pandas as pd
-from pygame import Vector2
 
-from graphics.plotter import Plotter
 from utils.timing import Clock, sleep_wait
+from graphics.plotter import Plotter
 from graphics.stats_rendering import DataFrameRenderer, ResultsRenderer
 from graphics.stats_rendering import HighScoreRenderer
 
@@ -153,7 +152,7 @@ class StatsViewer:
     def __init__(self, menu_input, clock):
         self._menu_input = menu_input
         self._clock = clock
-
+        self._should_quit = False
 
     def _run(self, render_function):
         self._menu_input.clear_bindings()
@@ -176,9 +175,6 @@ class ResultsViewer(StatsViewer):
     def run(self, round_stats):
         summary_table = round_stats.get_summary_table()
         verbose_table = round_stats.get_verbose_table()
-        def render():
-            self._renderer.render(summary_table, verbose_table, round_length)
-
         round_length = round_stats.get_round_length()
         self._run(
             lambda : self._renderer.render(summary_table, verbose_table,

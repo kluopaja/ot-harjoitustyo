@@ -1,6 +1,3 @@
-import pygame
-import logging
-from pygame import Vector2
 import math
 from abc import ABC, abstractmethod
 from game.shapes import Rectangle
@@ -10,7 +7,7 @@ from utils.float_rect import FloatRect
 
 class Graphic(ABC):
     @abstractmethod
-    def draw(self, surface, offset=(0, 0)):
+    def draw(self, camera):
         pass
 
     @property
@@ -48,7 +45,6 @@ class PolylineGraphic(Graphic):
                 The target of drawing
 
         """
-        # TODO draw only visible if necessary
         for line in self._polyline.lines:
             camera.draw_line(line.begin, line.end, self.color, self.width)
 
@@ -144,4 +140,3 @@ class ImageGraphic(Graphic):
     @rotation.setter
     def rotation(self, value):
         self._rectangle.rotation = value
-

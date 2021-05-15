@@ -1,9 +1,3 @@
-from pygame import Vector2
-from menu.menu_items import ButtonMenuItem
-import pygame
-import string
-
-
 class MenuListFactory:
     def __init__(self, menu_renderer, menu_input, clock):
         self.menu_renderer = menu_renderer
@@ -22,7 +16,7 @@ class MenuList:
         self.selected_item = 0
         self.clock = clock
         self._should_quit = False
-        self._items = []
+        self.items = []
 
     def run_tick(self):
         self._update_item_list()
@@ -47,9 +41,6 @@ class MenuList:
 
     def _quit(self):
         self._should_quit = True
-
-    def _start_game(self):
-        self._should_start_game = True
 
     def _activate_next_item(self):
         self._activate_item((self.selected_item + 1) % len(self.items))

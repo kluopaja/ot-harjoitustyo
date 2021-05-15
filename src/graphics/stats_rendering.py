@@ -1,4 +1,3 @@
-from pygame import Vector2
 class ResultsRenderer:
     def __init__(self, screen, dataframe_renderer, plotter):
         self._screen = screen

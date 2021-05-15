@@ -1,7 +1,6 @@
-import logging
-from constants import EPS
-from pygame import Vector2
 from abc import ABC, abstractmethod
+from pygame import Vector2
+from constants import EPS
 
 
 class Shape(ABC):
@@ -70,10 +69,10 @@ class Circle(Shape):
         return distance < self.radius + circle.radius + EPS
 
     def __repr__(self):
-        return f"Circle(center = {self.center}, radius = {self.radius}, location = {self.location}, rotation = {self.rotation})"
+        return (f"Circle(center = {self.center}, radius = {self.radius}, "
+               f"location = {self.location}, rotation = {self.rotation})")
 
 
-# TODO would translate and rotate be enough for these?
 class Line(Shape):
     def __init__(self, begin, end):
         if (begin-end).magnitude() < EPS:
@@ -149,7 +148,8 @@ class Line(Shape):
         return True
 
     def __repr__(self):
-        return f"Line(begin = {self.begin}, end = {self.end}, location = {self.location}, rotation = {self.rotation})"
+        return (f"Line(begin = {self.begin}, end = {self.end}, "
+               f"location = {self.location}, rotation = {self.rotation})")
 
 
 class Rectangle(Shape):
@@ -164,8 +164,6 @@ class Rectangle(Shape):
 
         bottomright = bottomleft + topright - topleft
 
-        # TODO careful with the refernces in the list!
-        # Use Vector2 to copy the arguments
         self._left = Line(Vector2(topleft), Vector2(bottomleft))
         bottom = Line(Vector2(bottomleft), Vector2(bottomright))
         right = Line(Vector2(bottomright), Vector2(topright))
@@ -206,7 +204,7 @@ class Rectangle(Shape):
         if isinstance(shape, Line):
             return self._intersects_line(shape)
         if isinstance(shape, Rectangle):
-            return self._intersects_rect(shape)
+            return self._intersects_rectangle(shape)
         return shape.intersects(self)
 
     def _intersects_circle(self, circle):
@@ -226,13 +224,14 @@ class Rectangle(Shape):
         if self._contains(line.begin) or self._contains(line.end):
             return True
 
-        return any([side.intersects(line) for side in self.sides])
+        return any(side.intersects(line) for side in self.sides)
 
-    def _intersects_rect(self, rect):
-        if any([rect._contains(side.begin) for side in self.sides]):
+    def _intersects_rectangle(self, rectangle):
+        if any(rectangle._contains(side.begin) for side in self.sides):
             return True
-        if any([self._contains(side.begin) for side in rect.sides]):
+        if any(self._contains(side.begin) for side in rectangle.sides):
             return True
+        return False
 
     def center(self):
         """Returns the coordinates of the center point of the rectangle"""
@@ -283,7 +282,7 @@ class Polyline(Shape):
         self._rotation = value
 
     def intersects(self, shape):
-        return any([line.intersects(shape) for line in self.lines])
+        return any(line.intersects(shape) for line in self.lines)
 
     def __repr__(self):
         line_strings = [f"[{x.begin}, {x.end}]" for x in self.lines]

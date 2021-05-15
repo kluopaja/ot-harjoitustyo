@@ -9,13 +9,9 @@ class MenuItem:
     def bind(self, menu_input):
         pass
 
-    # TODO remove?
-    def release(self, menu_input):
-        pass
-
-
 class ValueBrowserMenuItem(MenuItem):
-    def __init__(self, decrease_function, increase_function, value_function, description, accept_function=lambda: None):
+    def __init__(self, decrease_function, increase_function, value_function,
+                 description, accept_function=lambda: None):
         self.decrease_function = decrease_function
         self.increase_function = increase_function
         self.value_function = value_function

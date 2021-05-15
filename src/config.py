@@ -3,15 +3,16 @@ import sys
 import traceback
 from pathlib import Path
 import os
-# hide the pygame start message
-os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-from pygame import Vector2
 import json
-import pygame
 from graphics.graphics import PolylineGraphic
 from game.shapes import Polyline
 from game.game_objects import Ground
-from game.inputs import PlayerInput
+
+# hide the pygame start message
+# has to be placed before the imports!
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+from pygame import Vector2
+import pygame
 
 project_root = Path(__file__).parent.parent
 CONFIG_PATH = project_root / "assets/config.json"
@@ -62,7 +63,7 @@ class Config:
 
             self.game_fps = data["game_fps"]
 
-        except Exception as ex:
+        except Exception:
             logging.critical(traceback.format_exc())
             logging.critical("Failed parsing configuration files")
             sys.exit()
@@ -177,9 +178,9 @@ def pygame_key_code(description):
             f"'{description}' into a pygame keycode")
 
 class MenuInputConfig:
-    def __init__(self, quit, next_item, prev_item, increase, decrease, accept,
+    def __init__(self, quit_key, next_item, prev_item, increase, decrease, accept,
                  erase):
-        self.quit = quit
+        self.quit = quit_key
         self.next_item = next_item
         self.prev_item = prev_item
         self.increase = increase
@@ -215,8 +216,8 @@ class PlayerInputConfig:
 
 class GameInputConfig:
     """A class for storing game keys common to all players"""
-    def __init__(self, quit, pause):
-        self.quit = quit
+    def __init__(self, quit_key, pause):
+        self.quit = quit_key
         self.pause = pause
 
     @classmethod

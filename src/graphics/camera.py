@@ -48,4 +48,3 @@ class Camera:
 
     def _to_drawing_surface_coords(self, world_coords):
         return (world_coords - self.location) / self._view_height + self._surface_center
-

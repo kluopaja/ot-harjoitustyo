@@ -5,7 +5,7 @@ from pathlib import Path
 from pygame import Vector2
 
 from game.game_objects import Plane, Gun, Bullet, Ground, BulletFactory
-from game.game_objects import score_generator, PlaneFactory
+from game.game_objects import damage_score_generator, PlaneFactory
 from game.shapes import Shape
 from graphics.graphics import Graphic
 from game.physics import PhysicsController
@@ -16,8 +16,8 @@ from config import PlaneConfig
 
 from math import pi
 
-def test_score_generator():
-    generator = score_generator(10, 100)
+def test_damage_score_generator():
+    generator = damage_score_generator(10, 100)
     assert generator(1, True) == 110
 
 class TestPlaneFactory(unittest.TestCase):

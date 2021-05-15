@@ -158,13 +158,6 @@ class GameBackground:
             self.cloud_graphic.location = cloud_location
             self.cloud_graphic.draw(camera)
 
-
-def constant_view_locator(x, y):
-    def _inner():
-        return (x, y)
-    return _inner
-
-
 class GameView:
     def __init__(self, player, camera, font_color):
         self.player = player
