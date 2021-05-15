@@ -3,14 +3,14 @@ import pygame
 
 class GameInput:
     def __init__(self, event_handler, game_input_config):
-        self.event_handler = event_handler
+        self._event_handler = event_handler
         self._config = game_input_config
-        self.keymaps = {}
-        self.should_quit = False
+        self._keymaps = {}
         self._pause_callback = lambda : None
+        self.should_quit = False
 
     def bind_key(self, keycode, func):
-        self.keymaps[keycode] = func
+        self._keymaps[keycode] = func
 
     def bind_pause(self, func):
         self._pause_callback = func
@@ -31,11 +31,11 @@ class GameInput:
         self.should_quit = False
         callbacks = self._handle_pause_and_quit()
 
-        pressed = self.event_handler.get_pressed()
+        pressed = self._event_handler.get_pressed()
 
-        for keycode in self.keymaps:
+        for keycode in self._keymaps:
             if pressed[keycode]:
-                callbacks.append(self.keymaps[keycode])
+                callbacks.append(self._keymaps[keycode])
 
         for f in callbacks:
             f()
@@ -50,7 +50,7 @@ class GameInput:
 
     def _handle_pause_and_quit(self):
         callbacks = []
-        for event in self.event_handler.get_events():
+        for event in self._event_handler.get_events():
             if event.type == pygame.KEYDOWN:
                 if event.key == self._config.quit:
                     self.should_quit = True
@@ -61,29 +61,29 @@ class GameInput:
 
 class PlayerInput:
     def __init__(self, game_input, player_input_config):
-        self.game_input = game_input
+        self._game_input = game_input
         self._config = player_input_config
 
     def bind_up(self, func):
-        self.game_input.bind_key(self._config.accelerate, func)
+        self._game_input.bind_key(self._config.accelerate, func)
 
     def clear_up(self):
         self.bind_up(lambda: None)
 
     def bind_left(self, func):
-        self.game_input.bind_key(self._config.up, func)
+        self._game_input.bind_key(self._config.up, func)
 
     def clear_left(self):
         self.bind_left(lambda: None)
 
     def bind_right(self, func):
-        self.game_input.bind_key(self._config.down, func)
+        self._game_input.bind_key(self._config.down, func)
 
     def clear_right(self):
         self.bind_right(lambda: None)
 
     def bind_shoot(self, func):
-        self.game_input.bind_key(self._config.shoot, func)
+        self._game_input.bind_key(self._config.shoot, func)
 
     def clear_shoot(self):
         self.bind_shoot(lambda: None)
