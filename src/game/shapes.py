@@ -4,6 +4,25 @@ from constants import EPS
 
 
 class Shape(ABC):
+    """A base class for Shape classes.
+
+    The final location/rotation of the Shape corresponds to the
+    location/rotation as if the Shape was first rotated to
+    `rotation` and then translated by the vector from origo to `location`.
+
+    NOTE: The `location` doesn't always correspond to the intuitive location
+    of the shape. For example, we might have a Shape which is a circle drawn
+    around point (1, 1). The location of this might still be (0
+    and changing the location to (2, 2) our circle would be around (3, 3).
+
+    Attributes:
+        `location`: A pygame.Vector2
+            The location of the Shape
+        `rotation`: Radians
+            Positive rotation mean counter-clockwise
+            (in coordinates where x grows right and y grows down)
+
+    """
     @property
     @abstractmethod
     def location(self):
@@ -26,17 +45,45 @@ class Shape(ABC):
 
     @abstractmethod
     def intersects(self, shape):
+        """Returns True if `self` intersects `shape`, False otherwise."""
         pass
 
 
 class Circle(Shape):
+    """A class representing a Circle.
+
+    Attributes:
+        `center`: A pygame.Vector2 (read only)
+            The center of the circle
+        `radius`: A non_negative float (read only)
+            The radius of the circle
+        """
     def __init__(self, center, radius):
+        """Initializes Circle
+
+        NOTE: `self.location` will be initialized to Vector2(0, 0)
+        and `self.rotation` will be initialized to 0!
+
+        Arguments:
+            `center`: A pygame.Vector2
+                The center of the circle
+            `radius`: A non_negative float
+                The radius of the circle
+        """
         if radius < 0:
             raise ValueError("The radius should be nonnegative")
-        self.center = center
-        self.radius = radius
+        self._center = center
+        self._radius = radius
         self._location = Vector2(0, 0)
         self._rotation = 0.0
+
+    @property
+    def center(self):
+        return self._center
+
+    @property
+    def radius(self):
+        return self._radius
 
     @property
     def location(self):
@@ -44,7 +91,7 @@ class Circle(Shape):
 
     @location.setter
     def location(self, value):
-        self.center += value - self._location
+        self._center += value - self._location
         self._location = value
 
     @property
@@ -55,33 +102,64 @@ class Circle(Shape):
     def rotation(self, value):
         tmp = self._location
         self.location = Vector2(0, 0)
-        self.center.rotate_ip_rad(-(value - self._rotation))
+        self._center.rotate_ip_rad(-(value - self._rotation))
         self.location = tmp
         self._rotation = value
 
     def intersects(self, shape):
+        """See the base class"""
         if isinstance(shape, Circle):
             return self._intersects_circle(shape)
         return shape.intersects(self)
 
     def _intersects_circle(self, circle):
-        distance = (circle.center - self.center).magnitude()
-        return distance < self.radius + circle.radius + EPS
+        distance = (circle._center - self._center).magnitude()
+        return distance < self._radius + circle._radius + EPS
 
     def __repr__(self):
-        return (f"Circle(center = {self.center}, radius = {self.radius}, "
+        return (f"Circle(center = {self._center}, radius = {self._radius}, "
                f"location = {self.location}, rotation = {self.rotation})")
 
 
 class Line(Shape):
+    """A class representing a Line.
+
+    Attributes:
+        `begin`: A pygame.Vector2 (read only)
+            The start point of the line
+        `end`: A pygame.Vector2 (read only)
+            The end point of the line
+    """
     def __init__(self, begin, end):
+        """Initializes Line
+
+        NOTE: `self.location` will be initialized to Vector2(0, 0)
+        and `self.rotation` will be initialized to 0!
+
+
+        Arguments:
+            `begin`: A pygame.Vector2
+                The start point of the line
+            `end`: A pygame.Vector2
+                The end point of the line
+
+            NOTE: The lenght of the line should be positive.
+        """
         if (begin-end).magnitude() < EPS:
             raise ValueError("The Line must have a positive length")
 
-        self.begin = begin
-        self.end = end
+        self._begin = begin
+        self._end = end
         self._location = Vector2(0, 0)
         self._rotation = 0.0
+
+    @property
+    def begin(self):
+        return self._begin
+
+    @property
+    def end(self):
+        return self._end
 
     @property
     def location(self):
@@ -89,8 +167,8 @@ class Line(Shape):
 
     @location.setter
     def location(self, value):
-        self.begin += value - self._location
-        self.end += value - self._location
+        self._begin += value - self._location
+        self._end += value - self._location
         self._location = value
 
     @property
@@ -102,27 +180,36 @@ class Line(Shape):
         tmp = self.location
         self.location = Vector2(0, 0)
         d_rotation = value - self._rotation
-        self.begin.rotate_ip_rad(-d_rotation)
-        self.end.rotate_ip_rad(-d_rotation)
+        self._begin.rotate_ip_rad(-d_rotation)
+        self._end.rotate_ip_rad(-d_rotation)
         self.location = tmp
         self._rotation = value
 
     def projection_param(self, point):
-        '''Projects `point` to `self` and returns the parameter of the result.
-        '''
-        v = self.end - self.begin
-        p = point - self.begin
+        """Projects `point` to `self` and returns the parameter of the result.
+
+        Arguments:
+            `point`: A pygame.Vector2
+        """
+        v = self._end - self._begin
+        p = point - self._begin
         return v.dot(p) / v.dot(v)
 
     def distance_to(self, point):
+        """Returns the distance of `point` to `self`.
+
+        Arguments:
+            `point`: A pygame.Vector2
+        """
         pos = self.projection_param(point)
-        v = self.end - self.begin
-        p = point - self.begin
+        v = self._end - self._begin
+        p = point - self._begin
         if 0.0 <= pos <= 1.0:
             return (p - pos * v).magnitude()
         return min(p.magnitude(), (p - v).magnitude())
 
     def intersects(self, shape):
+        """See the base class"""
         if isinstance(shape, Circle):
             return self._intersects_circle(shape)
         if isinstance(shape, Line):
@@ -133,27 +220,50 @@ class Line(Shape):
         return self.distance_to(circle.center) < circle.radius + EPS
 
     def _intersects_line(self, line):
-        v = self.end - self.begin
-        p1 = line.begin - self.begin
-        p2 = line.end - self.begin
+        v = self._end - self._begin
+        p1 = line._begin - self._begin
+        p2 = line._end - self._begin
         if v.cross(p1) * v.cross(p2) > EPS:
             return False
 
-        v = line.end - line.begin
-        p1 = self.begin - line.begin
-        p2 = self.end - line.begin
+        v = line._end - line._begin
+        p1 = self._begin - line._begin
+        p2 = self._end - line._begin
         if v.cross(p1) * v.cross(p2) > EPS:
             return False
 
         return True
 
     def __repr__(self):
-        return (f"Line(begin = {self.begin}, end = {self.end}, "
+        return (f"Line(begin = {self._begin}, end = {self._end}, "
                f"location = {self.location}, rotation = {self.rotation})")
 
 
 class Rectangle(Shape):
+    """A class representing a rectangle.
+
+    Attributes:
+        `sides`: A list of Line objects
+            The sides of the Rectangle.
+
+            NOTE: Should NOT be modified!
+    """
+
     def __init__(self, topleft, topright, bottomleft):
+        """Initializes a Rectangle.
+
+        Arguments:
+            `topleft`: A pygame.Vector2
+                The position of the topleft corner of the Rectangle
+            `topright`: A pygame.Vector2
+                The position of the topright corner of the Rectangle
+            `bottomleft`: A pygame.Vector2
+                The position of the bottomleft corner of the Rectangle
+
+            NOTE: The arguments should form a rectangle.
+
+            NOTE: The rectangle should have positive area.
+        """
         top_vector = topright - topleft
         left_vector = bottomleft - topleft
         if abs(top_vector.cross(left_vector)) < EPS:
@@ -199,6 +309,7 @@ class Rectangle(Shape):
         self._rotation = value
 
     def intersects(self, shape):
+        """See the base class"""
         if isinstance(shape, Circle):
             return self._intersects_circle(shape)
         if isinstance(shape, Line):
@@ -234,11 +345,19 @@ class Rectangle(Shape):
         return False
 
     def center(self):
-        """Returns the coordinates of the center point of the rectangle"""
-        return (self.sides[0].begin + self.sides[2].begin)/2
+        """Returns the coordinates of the center point of the rectangle.
+
+        Returns:
+            pygame.Vector2
+        """
+        return Vector2(self.sides[0].begin + self.sides[2].begin)/2
 
     def size(self):
-        """Returns width and height of the rectangle"""
+        """Returns width and height of the rectangle.
+
+        Returns:
+            pygame.Vector2
+        """
         width = (self.sides[3].end - self.sides[3].begin).magnitude()
         height = (self.sides[0].end - self.sides[0].begin).magnitude()
         return Vector2(width, height)
@@ -249,7 +368,17 @@ bottomleft = {self.sides[0].end}, location = {self.location}, rotation = {self.r
 
 
 class Polyline(Shape):
+    """A class representing a collection of Line objects.
+
+    Attributes:
+        `lines`: A list of Line objects
+    """
     def __init__(self, lines):
+        """Initializes a Polyline.
+
+        Attributes:
+            `lines`: A list of Line objects
+        """
         self.lines = lines
         self._location = Vector2(0, 0)
         self._rotation = 0.0
@@ -282,6 +411,7 @@ class Polyline(Shape):
         self._rotation = value
 
     def intersects(self, shape):
+        """See the base class"""
         return any(line.intersects(shape) for line in self.lines)
 
     def __repr__(self):
