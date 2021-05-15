@@ -87,7 +87,7 @@ class PlaneFactory:
         plane = Plane(rectangle, image_graphic, plane_physics, gun,
                       _score_generator, owner, health=self._config.health,
                       collision_damage=self._config.collision_damage)
-        player_input.bind_to_plane(plane)
+        player_input.bind_plane(plane)
 
         return plane
 

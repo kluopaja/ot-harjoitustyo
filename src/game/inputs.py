@@ -1,8 +1,15 @@
 import pygame
 
-
 class GameInput:
+    """A class for handling inputs in the Game."""
     def __init__(self, event_handler, game_input_config):
+        """Initializes GameInput.
+
+        Arguments:
+            `event_handler`: A EventHandler
+                Event handler used to fetch raw input events.
+            `game_input_config`: A GameInputConfig
+        """
         self._event_handler = event_handler
         self._config = game_input_config
         self._keymaps = {}
@@ -10,9 +17,26 @@ class GameInput:
         self.should_quit = False
 
     def bind_key(self, keycode, func):
+        """Binds `func` to `keycode`.
+
+        `func` will be called once if `keycode` is pressed when
+        `handle_inputs` is called`.
+
+        Arguments:
+            `keycode`: A pygame key identifier code.
+            `func`: A function
+        """
         self._keymaps[keycode] = func
 
     def bind_pause(self, func):
+        """Binds `func` to the pause key specified in GameInputConfig.
+
+        The `func` will be called exactly as many times as the pause key
+        was pressed.
+
+        Arguments:
+            `func`: A function
+        """
         self._pause_callback = func
 
     def handle_inputs(self):
@@ -60,36 +84,44 @@ class GameInput:
 
 
 class PlayerInput:
+    """A class for adapting a GameInput to be used to control Planes"""
     def __init__(self, game_input, player_input_config):
+        """Initializes a PlayerInput.
+
+        NOTE: Only a reference to `player_input_config` is stored!
+
+        Arguments:
+            `game_input`: A GameInput
+                The object handling the inputs at lower level.
+            `player_input_config`: A PlayerInputConfig
+                The config file specifying the keymaps.
+        """
         self._game_input = game_input
         self._config = player_input_config
 
-    def bind_up(self, func):
+    def bind_accelerate(self, func):
+        """Binds the function `func` to the key meant to accelerate the Plane"""
         self._game_input.bind_key(self._config.accelerate, func)
 
-    def clear_up(self):
-        self.bind_up(lambda: None)
-
-    def bind_left(self, func):
+    def bind_up(self, func):
+        """Binds the function `func` to the key meant to turn the Plane up"""
         self._game_input.bind_key(self._config.up, func)
 
-    def clear_left(self):
-        self.bind_left(lambda: None)
-
-    def bind_right(self, func):
+    def bind_down(self, func):
+        """Binds the function `func` to the key meant to turn the Plane down"""
         self._game_input.bind_key(self._config.down, func)
 
-    def clear_right(self):
-        self.bind_right(lambda: None)
-
     def bind_shoot(self, func):
+        """Binds the function `func` to the key mean to shoot a bullet"""
         self._game_input.bind_key(self._config.shoot, func)
 
     def clear_shoot(self):
+        """Clears the binding to the shoot key"""
         self.bind_shoot(lambda: None)
 
-    def bind_to_plane(self, plane):
-        self.bind_up(plane.accelerate)
-        self.bind_left(plane.up)
-        self.bind_right(plane.down)
+    def bind_plane(self, plane):
+        """Binds all controls of Plane `plane` to `self`"""
+        self.bind_accelerate(plane.accelerate)
+        self.bind_up(plane.up)
+        self.bind_down(plane.down)
         self.bind_shoot(plane.shoot)
