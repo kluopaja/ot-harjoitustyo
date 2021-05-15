@@ -57,7 +57,7 @@ class GameRenderer:
         info_surface = self._screen.surface.subsurface(self._info_bar_area)
         self._round_info.render(info_surface,
                                 game_state.level_name,
-                                game_state.timer.time_left())
+                                game_state.time_left())
 
 class PauseOverlay:
     def __init__(self, text, font_color, blur_radius):

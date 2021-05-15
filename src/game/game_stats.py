@@ -10,7 +10,33 @@ from graphics.stats_rendering import HighScoreRenderer
 from database_connection import DatabaseError
 
 class UserRecorder:
+    """A class for recording the statistics of a User associated with a Player.
+
+    NOTE: Currently is is possible for a single user to control many
+    Players in a Game. Possibly this class will be renamed to PlayerRecorder
+    in the future.
+
+    Attributes:
+        `user`: A User
+            The user with who the statistics should be associated.
+        `scores`: A list of tuples `(score, time)`
+            The `score` is the score got at time `time`
+        `shots_fired`: A list of floats
+            The times at which the associated Player shot a bullet
+        `kills`: A list of floats
+            The times at which the associated Player killed another Player.
+        `deaths`: A list of float
+            The times at which the associated Player died.
+        """
     def __init__(self, user, timer):
+        """Initializes a UserRecorder.
+
+        Arguments:
+            `user`: A User
+                The user with who the statistics should be associated.
+            `timer`: A Timer
+                The Timer for adding the time information for some events.
+        """
         self.user = user
         self._timer = timer
         self.scores = []
@@ -20,6 +46,7 @@ class UserRecorder:
         self.deaths = []
 
     def total_score(self):
+        """Returns the total recorded score"""
         return self._score_sum
 
     def add_score(self, value):
@@ -36,15 +63,49 @@ class UserRecorder:
         self.deaths.append(self._timer.current_time())
 
     def record_end_time(self):
+        """Returns the last time the UserRecorder was active."""
         return self._timer.current_time()
 
     def update(self, delta_time):
+        """Updates the UserRecorder timer."""
         self._timer.update(delta_time)
 
 
 class UserRound:
-    """A class for storing some key user round statistics"""
+    """A class for storing some key user round statistics.
+
+    NOTE: Currently is is possible for a single user to control many
+    Players in a Game. In this case, there can be many UserRound
+    classes associated with the same User in a single round. This class
+    will possibly be renamed to PlayerRound in the future.
+
+    Attributes:
+        `user`: A User
+            The User with who the statistics are associated with.
+        `score`: A float
+        `shots`: An integer
+            The number of shots the User fired.
+        `kills`:
+            The number of times the Player killed another Player.
+        `deaths`:
+            The number of time the Player died.
+    """
+
     def __init__(self, user, score, shots, kills, deaths):
+        """Initializes a UserRound.
+
+        Arguments:
+        `user`: A User
+            The User with who the statistics are associated with.
+        `score`: A float
+        `shots`: An integer
+            The number of shots the User fired.
+        `kills`:
+            The number of times the Player killed another Player.
+        `deaths`:
+            The number of time the Player died.
+        """
+
         self.user = user
         self.score = score
         self.shots = shots
@@ -53,7 +114,7 @@ class UserRound:
 
     @classmethod
     def from_user_recorder(cls, user_recorder):
-        """Construct UserRoundStats object from a UserRecorder object."""
+        """Construct UserRound object from a UserRecorder object."""
         return cls(
             user = user_recorder.user,
             score = user_recorder.total_score(),
@@ -63,15 +124,20 @@ class UserRound:
         )
 
 class RoundStats:
-    """Class for storing statistics for a single round"""
+    """Class for storing statistics for a single Game"""
     def __init__(self, user_recorders):
+        """Initializes a RoundStats object.
+
+        Arguments:
+            `user_recorders`: A list of UserRecorder objects.
+                The UserRecorders of the Game
+        """
         if len(user_recorders) == 0:
             raise ValueError("At least one UserRecorder must be provided")
         self._recorders = user_recorders
 
     def get_round_length(self):
         """Returns the round length in seconds"""
-
         return self._recorders[0].record_end_time()
 
     def get_user_rounds(self):
@@ -82,9 +148,15 @@ class RoundStats:
         return stats_list
 
     def get_summary_table(self):
-        """Constructs a dataframe containing the summary results.
+        """Constructs a pandas dataframe containing the summary results.
 
-        The dataframe will be sorted descending by the score."""
+        The dataframe will be sorted descending by the score.
+
+        Returns:
+            A pandas DataFrame with columns:
+                'name', 'score', 'shots_fired', 'kills', 'deaths', 'k/d',
+                'shots/kills'
+                sorted descending by the column 'score'"""
         user_rounds = sorted(self.get_user_rounds(), key=lambda x: -x.score)
         columns = {'name': [], 'score': [],
                    'shots_fired': [], 'kills': [], 'deaths': []}
@@ -101,6 +173,16 @@ class RoundStats:
         return df
 
     def get_verbose_table(self):
+        """Construct a pandas dataframe containing more detailed results.
+
+        Returns:
+            A pandas DataFrame with columns:
+                'name', 'score_time', 'score_value', 'shot_time',
+                'kill_time', 'death_time'
+
+                Every column will have a value in 'name' but otherwise
+                the cells might be empty.
+        """
         columns = {'name': [], 'score_time': [], 'score_value': [],
                    'shot_time': [], 'kill_time': [], 'death_time': []}
 
@@ -137,6 +219,14 @@ class RoundStats:
         return df
 
 def create_results_viewer(menu_input, screen):
+    """A factory function for ResultsViewer.
+
+    Arguments:
+        `menu_input`: A MenuInput
+            The inputs of the ResultsViewer
+        `screen`: A Screen
+            The Screen to which the ResultsViewer will be rendered to
+    """
     dataframe_renderer = DataFrameRenderer(
         cell_size=(0.22, 0.05),
         font_color=(50, 69, 63),
@@ -149,12 +239,28 @@ def create_results_viewer(menu_input, screen):
     return ResultsViewer(menu_input, results_renderer, Clock(2, sleep_wait))
 
 class StatsViewer:
+    """The base class for views showing statistics."""
     def __init__(self, menu_input, clock):
+        """Initializes a StatsViewer.
+
+        Arguments:
+            `menu_input`: A MenuInput class
+            `clock`: A Clock class
+                The Clock used to set the refreshing rate for the viewer.
+        """
         self._menu_input = menu_input
         self._clock = clock
         self._should_quit = False
 
     def _run(self, render_function):
+        """A wrapper class for a `render_function`.
+
+        Handles quit inputs and calls `render_function` according to
+        self._clock.
+
+        Should be called from the derived classes.
+        """
+
         self._menu_input.clear_bindings()
         self._menu_input.bind_quit(self._quit)
         self._should_quit = False
@@ -169,10 +275,26 @@ class StatsViewer:
 class ResultsViewer(StatsViewer):
     """A class for showing the results view after the game round"""
     def __init__(self, menu_input, results_renderer, clock):
+        """Initializes a ResultsViewer.
+
+        Arguments:
+            `menu_input`: A MenuInput
+                The inputs of the ResultsViewer
+            `results_renderer`: A ResultsRenderer
+                The class responsible for rendering the ResultsViewer
+            `clock`: A Clock
+                The Clock setting the refresh rate of `self.run()`
+        """
         super().__init__(menu_input, clock)
         self._renderer = results_renderer
 
     def run(self, round_stats):
+        """Opens the ResultsViewer for `round_stats`.
+
+        Arguments:
+            `round_stats`: A RoundStats
+                The round statistics to be viewed
+        """
         summary_table = round_stats.get_summary_table()
         verbose_table = round_stats.get_verbose_table()
         round_length = round_stats.get_round_length()
@@ -183,8 +305,33 @@ class ResultsViewer(StatsViewer):
 
 
 class UserStats:
-    """A class for storing the user's statistics collected over many rounds"""
+    """A class for storing the user's statistics collected over many rounds.
+
+    Attributes:
+        `user`: A User
+            The associated User
+        `score`: A float
+        `shots`: An integer
+            Shots fired by the User
+        `kills`: An integer
+        `deaths`: An integer
+        `rounds`: An integer
+            The number of times the User has taken part into a Game.
+    """
     def __init__(self, user, score, shots, kills, deaths, rounds):
+        """Initialies UserStats.
+
+        Arguments:
+            `user`: A User
+                The associated User
+            `score`: A float
+            `shots`: An integer
+                Shots fired by the User
+            `kills`: An integer
+            `deaths`: An integer
+            `rounds`: An integer
+                The number of times the User has taken part into a Game.
+        """
         self.user = user
         self.score = score
         self.shots = shots
@@ -195,12 +342,23 @@ class UserStats:
 class TotalStats:
     """A class for storing the statistics collected over many rounds"""
     def __init__(self, user_stats_list):
+        """Initializes TotalStats.
+
+        Arguments:
+            `user_stats_list`: A list of UserStats objects
+                The UserStats objects which to include in `self`.
+        """
         self._user_stats_list = sorted(user_stats_list, key=lambda x: -x.score)
 
     def get_summary_table(self):
         """Constructs a dataframe containing the key statistics.
 
-        The dataframe will be sorted on descending total score."""
+        The dataframe will be sorted on descending total score.
+
+        Returns:
+            A pandas DataFrame with columns:
+                'name', 'total score', 'round', 'kills', 'deaths',
+                'k/d'"""
         columns = {'name': [], 'total score': [],
                    'rounds': [], 'kills': [], 'deaths': []}
         for user_stats in self._user_stats_list:
@@ -215,6 +373,22 @@ class TotalStats:
         return df
 
 def create_high_score_viewer(stats_dao, n_top_players, menu_input, screen):
+    """A factory function for HighScoreViewer.
+
+    Arguments:
+        `stats_dao`: A StatsDao
+            Used to fetch the scores.
+        `n_top_players`: A non-negative integer
+            The number of top players whose score will be shown.
+        `menu_input`: A MenuInput
+            The inputs of the HighScoreViewer
+        `screen`: A Screen
+            The Screen to which the viewer will be rendered
+
+    Returns:
+        A HighScoreViewer
+    """
+
     dataframe_renderer = DataFrameRenderer(
         cell_size=(0.22, 0.05),
         font_color=(50, 69, 63),
@@ -228,8 +402,22 @@ def create_high_score_viewer(stats_dao, n_top_players, menu_input, screen):
         Clock(2, sleep_wait))
 
 class HighScoreViewer(StatsViewer):
-    """A class for viewing high scores"""
-    def __init__(self, stats_dao, n_top_players, menu_input, high_score_renderer, clock):
+    """A class for viewing high scores."""
+    def __init__(self, stats_dao, n_top_players, menu_input, high_score_renderer,
+                 clock):
+        """Initializes a HighScoreViewer.
+
+        Arguments:
+            `stats_dao`: A StatsDao
+                Used to fetch the scores.
+            `n_top_players`: A non-negative integer
+                The number of top players whose score will be shown.
+            `menu_input`: A MenuInput
+                The inputs of the HighScoreViewer
+            `high_score_renderer`: A HighScoreRenderer
+            `clock`: A Clock
+                The Clock setting the refresh rate of `self.run()`
+        """
         super().__init__(menu_input, clock)
         self._stats_dao = stats_dao
         self._n_top_players = n_top_players

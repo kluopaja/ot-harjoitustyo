@@ -5,6 +5,7 @@ from database_connection import get_database_connection
 from menu.setup import create_main_menu
 
 def main():
+    """Function for running the application"""
     config = Config(CONFIG_PATH)
 
     screen = Screen(config.window_width, config.window_height, config.font_size)
