@@ -11,8 +11,8 @@ from game.game_objects import Ground
 from game.inputs import PlayerInput
 
 project_root = Path(__file__).parent.parent
-DATABASE_PATH = project_root / "data/database.sqlite"
 CONFIG_PATH = project_root / "assets/config.json"
+DEFAULT_DATABASE_PATH = project_root / "data/database.sqlite"
 
 class Config:
     """A class for storing all of the configs."""
@@ -28,6 +28,8 @@ class Config:
             self.player_input_configs = player_input_configs_loader(keys_config_path)
             self.game_input_config = GameInputConfig.from_file(keys_config_path)
             self.menu_input_config = MenuInputConfig.from_file(keys_config_path)
+
+            self.database_path = file_dir / data["database_path"]
 
             self.window_width = data["window_width"]
             self.window_height = data["window_height"]

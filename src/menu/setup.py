@@ -11,9 +11,8 @@ from menu.menus import NewGameMenu, AddUserMenu, MainMenu
 from user import UserFactory, User
 from utils.timing import Clock, sleep_wait
 
-def create_main_menu(screen, event_handler, assets_path, config, database_connection):
+def create_main_menu(screen, event_handler, config, database_connection):
     user_dao = UserDao(database_connection)
-    user_dao.create(User("default user"))
 
     game_factory = GameFactory(config, user_dao, event_handler, screen)
 

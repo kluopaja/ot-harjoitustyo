@@ -1,4 +1,6 @@
+import sys
 from database_connection import get_database_connection
+from config import DEFAULT_DATABASE_PATH
 
 def drop_tables(connection):
     cursor = connection.cursor()
@@ -26,11 +28,11 @@ def create_tables(connection):
     """)
     connection.commit()
 
-def init_database():
-    connection = get_database_connection()
+def init_database(database_path):
+    connection = get_database_connection(database_path)
 
     drop_tables(connection)
     create_tables(connection)
 
 if __name__ == '__main__':
-    init_database()
+    init_database(DEFAULT_DATABASE_PATH)

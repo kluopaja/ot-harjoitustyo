@@ -11,9 +11,8 @@ def main():
 
     screen = Screen(config.window_width, config.window_height, config.font_size)
     event_handler = EventHandler()
-    database_connection = get_database_connection()
-    main_menu = create_main_menu(screen, event_handler, ASSETS_PATH,
-                                 config, database_connection)
+    database_connection = get_database_connection(config.database_path)
+    main_menu = create_main_menu(screen, event_handler, config, database_connection)
     main_menu.run()
 
 if __name__ == '__main__':
