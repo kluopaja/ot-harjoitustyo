@@ -5,6 +5,9 @@ class Camera:
     The class for transforming drawing commands from world space
     to the relative DrawingSurface space.
 
+    Attributes:
+        `location`: A pygame.Vector2
+            The location the camera is pointing at.
     """
     def __init__(self, view_height):
         self.location = Vector2(0, 0)
@@ -39,6 +42,17 @@ class Camera:
         self._drawing_surface.draw_line(_begin, _end, color, _width, scaled=True)
 
     def draw_image(self, image, location, rotation, height):
+        """Draws image on Camera.
+
+        Arguments:
+            `image`: A Image
+            `location`: A pygame.Vector2
+                The center of the image in game world coordinates.
+            `rotation`: Radians (a float)
+                Positive rotation mean counter-clockwise
+            `height`: A float
+                The height of the image in the game world units.
+        """
         if self._drawing_surface is None:
             return
 

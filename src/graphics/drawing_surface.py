@@ -7,12 +7,27 @@ from utils.float_rect import FloatRect
 # but should work as long as we always create a new DrawingSurface
 # at each rendering
 class DrawingSurface:
+    """A drawing surface with own coordinate space.
+
+    The purpose of DrawingSurface is to separate drawing graphics
+    from the pixel coordinates and allow splitting the window
+    into multiple subwindows.
+
+
+    The DrawingSurface relative coordinates:
+        The origo is at the top left corner.
+        x axis grows right and y grows down.
+        The height of the DrawingSurface is 1 and the width depends
+        on the aspect ratio.
+    """
     def __init__(self, surface, screen, absolute_topleft):
         """Initializes a DrawingSurface.
 
-        Args:
+        Arguments:
             `surface`: A pygame.Surface
+                The Surface used for drawing.
             `screen`: A Screen object
+                The Screen containing the `surface` (maybe as a subsurface)
             `absolute_topleft`: Vector2
                 The absolute pixel coordinates of the top left corner
         """
@@ -22,6 +37,15 @@ class DrawingSurface:
         self._absolute_topleft = absolute_topleft
 
     def subsurface(self, area):
+        """Returns a new DrawingSurface corresponding to `area`.
+
+        Arguments:
+            `area`: A FloatRect (Relative DrawingSurface coordinates)
+                The area corresponding to the new subsurface.
+                Should have pixel area larger than 0!
+                Should be fully inside `self`
+        """
+
         rect_topleft = self._to_pixel_coordinates(area.topleft)
         size = self._to_pixel_coordinates(area.size)
         _area = Rect(rect_topleft[0], rect_topleft[1], size[0], size[1])
@@ -32,7 +56,11 @@ class DrawingSurface:
                               new_absolute_topleft)
 
     def aspect_ratio_subsurface(self, aspect_ratio):
-        """Returns the maximal subsurface with width/height = `aspect_ratio`."""
+        """Returns the maximal subsurface with width/height = `aspect_ratio`.
+
+        Arguments:
+            `aspect_ratio`: A positive float
+        """
         area = self.get_rect()
         width = area.width
         if width > aspect_ratio:
@@ -43,14 +71,26 @@ class DrawingSurface:
         return self.subsurface(area)
 
     def get_relative_width(self):
-        """The width of the drawing surface relative to the height.
+        """The width of the DrawingSurface relative to the height.
 
-        """
+        i.e. the width in DrawingSurface relative coordinates."""
         return self._surface.get_width() / self._surface.get_height()
 
-    def blur(self, radius):
+    def blur(self, n_pixels):
+        """Blurs `self`.
+
+        Blurs `self` by performing consecutive downscale and upscale operations.
+
+        NOTE: This is very slow!
+
+        Arguments:
+            `n_pixels`: A positive integer
+                The number of horizontal and vertical pixels in the downscaled
+                image.
+        """
         size = self._surface.get_size()
-        tmp = pygame.transform.smoothscale(self._surface, (size[0]//radius, size[1]//radius))
+        tmp = pygame.transform.smoothscale(
+            self._surface, (size[0]//n_pixels, size[1]//n_pixels))
         dirty_rect = self._surface.blit(
             pygame.transform.scale(tmp, self._surface.get_size()),
             (0, 0)
@@ -58,12 +98,12 @@ class DrawingSurface:
         self._add_dirty_rect(dirty_rect)
 
     def draw_line(self, begin, end, color, width=1, scaled=True):
-        """Draws a line to `self._surface`
+        """Draws a line to `self`.
 
-        Args:
+        Arguments:
             `color` a tuple of length 3 or 4
-            `begin` a Vector2
-            `end` a Vector2
+            `begin` a Vector2 (relative DrawingSurface coordinates)
+            `end` a Vector2 (relative DrawingSurface coordinates)
             `width` a positive number
                 If scaled == False:
                     the fraction of the self._screen's height
@@ -82,11 +122,11 @@ class DrawingSurface:
         self._add_dirty_rect(dirty_rect)
 
     def draw_image(self, image, position, rotation, height):
-        """Draws image
+        """Draws image to `self`
 
-        Args:
-            `image`
-            `position` Vector2
+        Arguments:
+            `image`: Image
+            `position` Vector2 (relative DrawingSurface coordinates)
                 The position of the center of the image
             `rotation`: radians
                 The rotation, positive is to the ccw
@@ -107,10 +147,14 @@ class DrawingSurface:
     def draw_image_from_array(self, array, position, height):
         """Draws image from a numpy array.
 
-        Args:
+        NOTE: SLOW!
+
+        Arguments:
             `array` a numpy array of shape (?, ?, 4) (ARGB)
-            `position` Vector2
+            `position` Vector2 (relative DrawingSurface coordinates)
                 The position of the top left corner.
+            `height`: a positive number
+                height of the image as the fraction of self's height
 
         """
         _position = self._to_pixel_coordinates(position)
@@ -127,7 +171,7 @@ class DrawingSurface:
     def fill(self, color, update=False):
         """Fills `self._surface` with `color`
 
-        Args:
+        Arguments:
             `color` a tuple of length 3 or 4
             `update` a boolean
                 True: the screen will be forced to update
@@ -158,6 +202,11 @@ class DrawingSurface:
 
     def centered_text(self, text, position, color):
         """Draws `text` centered at `position`
+
+        Arguments:
+            `text`: A string
+            `position`: pygame.Vector2
+            `color`: A tuple of 3
         """
         _position = self._to_pixel_coordinates(position)
         text_surface = self._screen.font.render(text, True, color)
@@ -202,7 +251,7 @@ class DrawingSurface:
 
         NOTE: modifies `dirty_rect`!
 
-        Args:
+        Arguments:
             `dirty_rect`: A pygame.Rect
                 The pixel coordinates of the rect with respect to
                 `self._surface`

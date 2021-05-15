@@ -9,7 +9,28 @@ from user import UserSelector
 
 
 class GameFactory:
+    """A Factory class for Game.
+
+    Attributes:
+        `user_selectors`: A list of UserSelector objects
+            The objects used to select the players in the next game.
+            The length of the list will always be least self.get_n_players().
+    """
+
     def __init__(self, config, user_dao, event_handler, screen, n_players=2):
+        """Initializes GameFactory.
+
+        Attributes:
+            `config`: A Config class
+            `user_dao`: A UserDao class
+                Provides access to the user database
+            `event_handler`: A EventHandler class
+                The EventHandler to be used by the Game
+            `screen`: A Screen
+                The Screen to which the Game will be rendered
+            `n_players`:
+                The initial number of players selected for the Game
+        """
         self._config = config
         self._level_config_selector = self._config.level_config_selector
         self._n_players = n_players
@@ -20,6 +41,7 @@ class GameFactory:
         self._update_players()
 
     def game(self):
+        """Creates a Game based on the state of the `self`"""
         level_config = self._level_config_selector.get_selected()
         game_input = GameInput(self._event_handler, self._config.game_input_config)
 
@@ -70,25 +92,31 @@ class GameFactory:
         return game
 
     def add_player(self):
+        """Add a new player to the new Game"""
         self._n_players += 1
         self._update_players()
 
     def remove_player(self):
+        """Remove a player from the new Game"""
         self._n_players -= 1
         self._update_players()
 
     def get_n_players(self):
+        """Returns current number of players in the new Game"""
         return self._n_players
 
     def next_level(self):
+        """Select the next level for the new Game"""
         self._level_config_selector.next_level()
         self._update_players()
 
     def previous_level(self):
+        """Select the previous level for the new Game"""
         self._level_config_selector.previous_level()
         self._update_players()
 
     def get_level_name(self):
+        """Returns the name of currently selected level as a string"""
         return self._level_config_selector.level_name()
 
     def _update_players(self):
