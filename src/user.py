@@ -1,5 +1,6 @@
 import logging
 import sys
+from database_connection import DatabaseError
 class User:
     """A class representing a game user.
 
@@ -25,20 +26,31 @@ class UserFactory:
     def name_valid(self):
         """Checks if the current name is unique.
 
+        NOTE: Exits the program if the operation was not successful.
+
         Returns:
             True if the user's name is unique in `user_dao`.
             False otherwise.
         """
-        return self.user_dao.get_by_name(self.get_name()) is None
+        try:
+            user = self.user_dao.get_by_name(self.get_name())
+            return user is None
+        except DatabaseError:
+            logging.critical("Error accessing database! "
+                             "Try reinitializing the database.")
+            sys.exit()
+
 
     def create_user(self):
         """Stores the currently modified user to the database.
 
-        Returns:
-            True if the operation was successful.
-            False otherwise.
-        """
-        return self.user_dao.create(self._user)
+        NOTE: Exits the program if the operation was not successful."""
+        try:
+            self.user_dao.create(self._user)
+        except DatabaseError:
+            logging.critical("Error creating a new user to the database! "
+                             "Try reinitializing the database.")
+            sys.exit()
 
     def get_name(self):
         """Returns the name of the currently modified user"""
@@ -70,7 +82,7 @@ class UserSelector:
 
         try:
             self._selected = self._user_dao.get_first()
-        except Exception:
+        except DatabaseError:
             self._error()
 
     def _error(self):
@@ -88,7 +100,7 @@ class UserSelector:
 
         try:
             next_selected = self._user_dao.get_next(self._selected)
-        except Exception:
+        except DatabaseError:
             self._error()
 
         if next_selected is not None:
@@ -103,8 +115,9 @@ class UserSelector:
             return
         try:
             next_selected = self._user_dao.get_previous(self._selected)
-        except Exception:
+        except DatabaseError:
             self._error()
+
         if next_selected is not None:
             self._selected = next_selected
 

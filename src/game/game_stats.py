@@ -1,3 +1,5 @@
+import logging
+import sys
 import pandas as pd
 from pygame import Vector2
 
@@ -5,6 +7,8 @@ from graphics.plotter import Plotter
 from utils.timing import Clock, sleep_wait
 from graphics.stats_rendering import DataFrameRenderer, ResultsRenderer
 from graphics.stats_rendering import HighScoreRenderer
+
+from database_connection import DatabaseError
 
 class UserRecorder:
     def __init__(self, user, timer):
@@ -150,7 +154,7 @@ class StatsViewer:
         self._menu_input = menu_input
         self._clock = clock
 
-    
+
     def _run(self, render_function):
         self._menu_input.clear_bindings()
         self._menu_input.bind_quit(self._quit)
@@ -237,6 +241,11 @@ class HighScoreViewer(StatsViewer):
 
     def run(self):
         """Queries high scores from the database and shows them"""
-        total_stats = self._stats_dao.get_top_scorers(self._n_top_players)
+        try:
+            total_stats = self._stats_dao.get_top_scorers(self._n_top_players)
+        except DatabaseError:
+            logging.critical("Failed reading high scores from the database"
+                             "Try reinitializing the database.")
+            sys.exit()
         summary_table = total_stats.get_summary_table()
         self._run(lambda : self._renderer.render(summary_table))

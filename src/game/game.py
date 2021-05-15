@@ -1,3 +1,4 @@
+import sys
 import random
 from pygame import Rect
 from pygame import Vector2
@@ -10,6 +11,7 @@ import math
 import itertools
 
 from game.game_stats import RoundStats
+from database_connection import DatabaseError
 
 class GameNotification:
     def __init__(self, press_key_to_start_msg, until_spawn_msg):
@@ -206,6 +208,11 @@ class GameOrganizer:
         game.run()
 
         round_stats = RoundStats(game.get_user_recorders())
-        self._stats_dao.save_user_rounds(round_stats.get_user_rounds())
+        try:
+            self._stats_dao.save_user_rounds(round_stats.get_user_rounds())
+        except DatabaseError:
+            logging.critical("Failed saving results to the database! "
+                             "Try reinitializing the database.")
+            sys.exit()
 
         self._results_viewer.run(round_stats)
