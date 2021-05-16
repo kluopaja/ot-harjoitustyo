@@ -36,13 +36,32 @@ def sleep_wait(until):
 class Clock:
     """A class for timing the game speed.
 
-        NOTE: Using similar class from Pygame resulted in jitter"""
+        NOTE: Using similar class from Pygame resulted in jitter.
 
-    def __init__(self, fps, wait_fn):
+        Attributes:
+            `delta_time`: The target time between frames
+        """
+
+    def __init__(self, fps, wait_fn, log_skipping_frames):
+        """Initializes Clock
+
+        Arguments:
+            `fps`: float
+                The target frames per second
+            `wait_fn`: either busy_wait or sleep_wait
+                The function used to wait the free time between frames
+            `log_skipping_frames`: boolean
+                If True, then log the possible frame skips
+                otherwise ignore the frame skips.
+
+                This is to suppress the unnecessary frame skipping warnings
+                in menus.
+        """
         self.delta_time = 1/fps
         self._previous_time = time.time()
         self._last_sleep = 0
-        self.wait_fn = wait_fn
+        self._wait_fn = wait_fn
+        self._log_skipping_frames = log_skipping_frames
 
     def reset(self):
         self._previous_time = time.time()
@@ -51,10 +70,10 @@ class Clock:
     def tick(self):
         next_time = self._previous_time + self.delta_time
         self._last_sleep = next_time - time.time()
-        if self._last_sleep < 0:
-            logging.warning("Skipping frames!")
+        if self._log_skipping_frames and self._last_sleep < 0:
+            logging.warning("Skipping frames?")
 
-        self.wait_fn(next_time)
+        self._wait_fn(next_time)
 
         self._previous_time = time.time()
 

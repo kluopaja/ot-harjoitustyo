@@ -87,7 +87,7 @@ class GameFactory:
         renderer = GameRenderer(self._screen, game_views, background,
                                 pause_overlay, info_bar)
 
-        game_clock = Clock(self._config.game_fps, busy_wait)
+        game_clock = Clock(self._config.game_fps, busy_wait, True)
         game = Game(game_input, game_state, renderer, game_clock)
         return game
 

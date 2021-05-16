@@ -21,7 +21,8 @@ def create_main_menu(screen, event_handler, config, database_connection):
         item_spacing=config.menu_item_spacing, item_renderer=menu_item_renderer)
     menu_input = MenuInput(event_handler, config.menu_input_config)
 
-    menu_list_factory = MenuListFactory(menu_list_renderer, menu_input, Clock(20, sleep_wait))
+    menu_list_factory = MenuListFactory(
+        menu_list_renderer, menu_input, Clock(20, sleep_wait, False))
 
     results_viewer = create_results_viewer(menu_input, screen)
 

@@ -236,7 +236,8 @@ def create_results_viewer(menu_input, screen):
     plotter = Plotter()
     results_renderer = ResultsRenderer(screen, dataframe_renderer, plotter)
 
-    return ResultsViewer(menu_input, results_renderer, Clock(2, sleep_wait))
+    return ResultsViewer(menu_input, results_renderer,
+                         Clock(2, sleep_wait, False))
 
 class StatsViewer:
     """The base class for views showing statistics."""
@@ -399,7 +400,7 @@ def create_high_score_viewer(stats_dao, n_top_players, menu_input, screen):
 
     return HighScoreViewer(
         stats_dao, n_top_players, menu_input, high_score_renderer,
-        Clock(2, sleep_wait))
+        Clock(2, sleep_wait, False))
 
 class HighScoreViewer(StatsViewer):
     """A class for viewing high scores."""
