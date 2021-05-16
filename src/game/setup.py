@@ -2,7 +2,7 @@ from utils.timing import Timer, Clock, busy_wait
 from game.game import Player, GameState, Game, GameNotification
 from game.game_objects import PlaneFactory
 from game.inputs import GameInput, PlayerInput
-from game.game_stats import UserRecorder
+from game.game_stats import PlayerRecorder
 from graphics.game_rendering import GameRenderer, GameView, PauseOverlay, GameBackground, InfoBar
 from graphics.camera import Camera
 from user import UserSelector
@@ -66,7 +66,7 @@ class GameFactory:
             spawn_timer = Timer(self._config.player_spawn_time)
             players.append(Player(plane_factories[i], player_input,
                                   game_notifications[i],
-                                  UserRecorder(user, Timer()), user, spawn_timer))
+                                  PlayerRecorder(user, Timer()), user, spawn_timer))
             camera = Camera(self._config.game_camera_height)
             font_color = self._config.game_view_font_color
             game_views.append(GameView(players[-1], camera, font_color))

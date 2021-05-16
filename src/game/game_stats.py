@@ -9,16 +9,15 @@ from graphics.stats_rendering import HighScoreRenderer
 
 from database_connection import DatabaseError
 
-class UserRecorder:
-    """A class for recording the statistics of a User associated with a Player.
+class PlayerRecorder:
+    """A class for recording the statistics of a Player associated with a User.
 
     NOTE: Currently is is possible for a single user to control many
-    Players in a Game. Possibly this class will be renamed to PlayerRecorder
-    in the future.
+    Players in a Game.
 
     Attributes:
         `user`: A User
-            The user with who the statistics should be associated.
+            The user who is playing the Player being recorded
         `scores`: A list of tuples `(score, time)`
             The `score` is the score got at time `time`
         `shots_fired`: A list of floats
@@ -29,11 +28,11 @@ class UserRecorder:
             The times at which the associated Player died.
         """
     def __init__(self, user, timer):
-        """Initializes a UserRecorder.
+        """Initializes a PlayerRecorder.
 
         Arguments:
             `user`: A User
-                The user with who the statistics should be associated.
+                The user who is playing the Player being recorded
             `timer`: A Timer
                 The Timer for adding the time information for some events.
         """
@@ -63,28 +62,27 @@ class UserRecorder:
         self.deaths.append(self._timer.current_time())
 
     def record_end_time(self):
-        """Returns the last time the UserRecorder was active."""
+        """Returns the last time the PlayerRecorder was active."""
         return self._timer.current_time()
 
     def update(self, delta_time):
-        """Updates the UserRecorder timer."""
+        """Updates the PlayerRecorder timer."""
         self._timer.update(delta_time)
 
 
-class UserRound:
-    """A class for storing some key user round statistics.
+class PlayerRound:
+    """A class for storing some key player round statistics.
 
     NOTE: Currently is is possible for a single user to control many
-    Players in a Game. In this case, there can be many UserRound
-    classes associated with the same User in a single round. This class
-    will possibly be renamed to PlayerRound in the future.
+    Players in a Game. In this case, there can be many PlayerRound
+    classes associated with the same User in a single round.
 
     Attributes:
         `user`: A User
-            The User with who the statistics are associated with.
+            The user who is playing the Player whose stats are stored
         `score`: A float
         `shots`: An integer
-            The number of shots the User fired.
+            The number of shots the Player
         `kills`:
             The number of times the Player killed another Player.
         `deaths`:
@@ -92,14 +90,14 @@ class UserRound:
     """
 
     def __init__(self, user, score, shots, kills, deaths):
-        """Initializes a UserRound.
+        """Initializes a PlayerRound.
 
         Arguments:
         `user`: A User
-            The User with who the statistics are associated with.
+            The user who is playing the Player whose stats are stored
         `score`: A float
         `shots`: An integer
-            The number of shots the User fired.
+            The number of shots the Player
         `kills`:
             The number of times the Player killed another Player.
         `deaths`:
@@ -113,38 +111,38 @@ class UserRound:
         self.deaths = deaths
 
     @classmethod
-    def from_user_recorder(cls, user_recorder):
-        """Construct UserRound object from a UserRecorder object."""
+    def from_player_recorder(cls, player_recorder):
+        """Construct PlayerRound object from a PlayerRecorder object."""
         return cls(
-            user = user_recorder.user,
-            score = user_recorder.total_score(),
-            shots = len(user_recorder.shots_fired),
-            kills = len(user_recorder.kills),
-            deaths = len(user_recorder.deaths)
+            user = player_recorder.user,
+            score = player_recorder.total_score(),
+            shots = len(player_recorder.shots_fired),
+            kills = len(player_recorder.kills),
+            deaths = len(player_recorder.deaths)
         )
 
 class RoundStats:
     """Class for storing statistics for a single Game"""
-    def __init__(self, user_recorders):
+    def __init__(self, player_recorders):
         """Initializes a RoundStats object.
 
         Arguments:
-            `user_recorders`: A list of UserRecorder objects.
-                The UserRecorders of the Game
+            `player_recorders`: A list of PlayerRecorder objects.
+                The PlayerRecorders of the Game
         """
-        if len(user_recorders) == 0:
-            raise ValueError("At least one UserRecorder must be provided")
-        self._recorders = user_recorders
+        if len(player_recorders) == 0:
+            raise ValueError("At least one PlayerRecorder must be provided")
+        self._recorders = player_recorders
 
     def get_round_length(self):
         """Returns the round length in seconds"""
         return self._recorders[0].record_end_time()
 
-    def get_user_rounds(self):
-        """Returns a list of UserRound objects."""
+    def get_player_rounds(self):
+        """Returns a list of PlayerRound objects."""
         stats_list = []
-        for user_recorder in self._recorders:
-            stats_list.append(UserRound.from_user_recorder(user_recorder))
+        for player_recorder in self._recorders:
+            stats_list.append(PlayerRound.from_player_recorder(player_recorder))
         return stats_list
 
     def get_summary_table(self):
@@ -157,15 +155,15 @@ class RoundStats:
                 'name', 'score', 'shots_fired', 'kills', 'deaths', 'k/d',
                 'shots/kills'
                 sorted descending by the column 'score'"""
-        user_rounds = sorted(self.get_user_rounds(), key=lambda x: -x.score)
+        player_rounds = sorted(self.get_player_rounds(), key=lambda x: -x.score)
         columns = {'name': [], 'score': [],
                    'shots_fired': [], 'kills': [], 'deaths': []}
-        for user_round in user_rounds:
-            columns['name'].append(user_round.user.name)
-            columns['score'].append(user_round.score)
-            columns['shots_fired'].append(user_round.shots)
-            columns['kills'].append(user_round.kills)
-            columns['deaths'].append(user_round.deaths)
+        for player_round in player_rounds:
+            columns['name'].append(player_round.user.name)
+            columns['score'].append(player_round.score)
+            columns['shots_fired'].append(player_round.shots)
+            columns['kills'].append(player_round.kills)
+            columns['deaths'].append(player_round.deaths)
 
         df = pd.DataFrame(columns)
         df['k/d'] = df['kills'] / df['deaths']
@@ -186,31 +184,31 @@ class RoundStats:
         columns = {'name': [], 'score_time': [], 'score_value': [],
                    'shot_time': [], 'kill_time': [], 'death_time': []}
 
-        for user_recorder in self._recorders:
-            max_len = max(len(user_recorder.scores), len(user_recorder.shots_fired))
-            max_len = max(max_len, len(user_recorder.kills))
-            max_len = max(max_len, len(user_recorder.deaths))
+        for player_recorder in self._recorders:
+            max_len = max(len(player_recorder.scores), len(player_recorder.shots_fired))
+            max_len = max(max_len, len(player_recorder.kills))
+            max_len = max(max_len, len(player_recorder.deaths))
             for i in range(max_len):
-                columns['name'].append(user_recorder.user.name)
-                if i < len(user_recorder.scores):
-                    columns['score_time'].append(user_recorder.scores[i][0])
-                    columns['score_value'].append(user_recorder.scores[i][1])
+                columns['name'].append(player_recorder.user.name)
+                if i < len(player_recorder.scores):
+                    columns['score_time'].append(player_recorder.scores[i][0])
+                    columns['score_value'].append(player_recorder.scores[i][1])
                 else:
                     columns['score_time'].append(None)
                     columns['score_value'].append(None)
 
-                if i < len(user_recorder.shots_fired):
-                    columns['shot_time'].append(user_recorder.shots_fired[i])
+                if i < len(player_recorder.shots_fired):
+                    columns['shot_time'].append(player_recorder.shots_fired[i])
                 else:
                     columns['shot_time'].append(None)
 
-                if i < len(user_recorder.kills):
-                    columns['kill_time'].append(user_recorder.kills[i])
+                if i < len(player_recorder.kills):
+                    columns['kill_time'].append(player_recorder.kills[i])
                 else:
                     columns['kill_time'].append(None)
 
-                if i < len(user_recorder.deaths):
-                    columns['death_time'].append(user_recorder.deaths[i])
+                if i < len(player_recorder.deaths):
+                    columns['death_time'].append(player_recorder.deaths[i])
                 else:
                     columns['death_time'].append(None)
 

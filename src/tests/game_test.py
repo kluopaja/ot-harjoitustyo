@@ -9,7 +9,7 @@ from utils.timing import Timer, Clock
 from game.inputs import GameInput
 from graphics.game_rendering import GameRenderer
 
-from game.game_stats import UserRecorder, ResultsViewer
+from game.game_stats import PlayerRecorder, ResultsViewer
 from stats_dao import StatsDao
 from user import User
 
@@ -44,13 +44,13 @@ class TestPlayer(unittest.TestCase):
         self.game_notification = GameNotification("press key", " until spawn")
         self.spawn_timer_mock = Mock()
         self.spawn_timer_mock.time_left.return_value = 10
-        self.user_recorder_mock = Mock()
+        self.player_recorder_mock = Mock()
         self.spawn_timer_mock.expired.return_value = False
         self.user_mock = Mock()
 
         self.player = Player(self.plane_factory_mock, self.player_input_mock,
                              self.game_notification,
-                             self.user_recorder_mock, self.user_mock,
+                             self.player_recorder_mock, self.user_mock,
                              self.spawn_timer_mock)
 
     def test_view_location_without_plane(self):
@@ -59,7 +59,7 @@ class TestPlayer(unittest.TestCase):
 
     def test_user_recoder_updates(self):
         self.player.update(10)
-        self.user_recorder_mock.update.assert_called_with(10)
+        self.player_recorder_mock.update.assert_called_with(10)
 
     def test_spawn_timer_updates(self):
         self.player.update(10)
@@ -116,28 +116,28 @@ class TestPlayer(unittest.TestCase):
         self.player.update(10)
         # shouldn't have an effect
         self.player.update(10)
-        self.user_recorder_mock.add_death.assert_called_once()
-        self.user_recorder_mock.add_score.assert_called_with(-123)
+        self.player_recorder_mock.add_death.assert_called_once()
+        self.player_recorder_mock.add_score.assert_called_with(-123)
 
     def test_process_reward_self_ignored(self):
         self.player.process_reward(10, self.player)
-        self.user_recorder_mock.add_score.assert_not_called()
+        self.player_recorder_mock.add_score.assert_not_called()
 
     def test_process_reward_other_accepted(self):
         self.player.process_reward(10, Mock())
-        self.user_recorder_mock.add_score.assert_called_with(10)
+        self.player_recorder_mock.add_score.assert_called_with(10)
 
     def test_add_kill_self_ignored(self):
         self.player.add_kill(self.player)
-        self.user_recorder_mock.add_kill.assert_not_called()
+        self.player_recorder_mock.add_kill.assert_not_called()
 
     def test_add_kill_other_not_ignored(self):
         self.player.add_kill(Mock())
-        self.user_recorder_mock.add_kill.assert_called_once()
+        self.player_recorder_mock.add_kill.assert_called_once()
 
     def test_add_shot_fired(self):
         self.player.add_shot_fired()
-        self.user_recorder_mock.add_shot.assert_called_once()
+        self.player_recorder_mock.add_shot.assert_called_once()
 
 class TestGameState:
     def game_object_mock(self):
@@ -249,14 +249,14 @@ class TestGame(unittest.TestCase):
         self.game_input.handle_pause_inputs.assert_called()
         self.game_renderer.render_pause.assert_called()
 
-    def test_get_user_recorders(self):
+    def test_get_player_recorders(self):
         player_1 = Mock()
-        player_1.user_recorder = UserRecorder(player_1, Timer(1))
+        player_1.player_recorder = PlayerRecorder(player_1, Timer(1))
         player_2 = Mock()
-        player_2.user_recorder = UserRecorder(player_2, Timer(2))
+        player_2.player_recorder = PlayerRecorder(player_2, Timer(2))
         self.game_state.players = [player_1, player_2]
-        assert self.game.get_user_recorders() == [player_1.user_recorder,
-                                                  player_2.user_recorder]
+        assert self.game.get_player_recorders() == [player_1.player_recorder,
+                                                  player_2.player_recorder]
 
 class TestGameOrganizer(unittest.TestCase):
     def setUp(self):
@@ -270,7 +270,7 @@ class TestGameOrganizer(unittest.TestCase):
         user.id = 123
         timer = Timer(1)
         game = create_autospec(Game)
-        game.get_user_recorders.side_effect = lambda: [UserRecorder(user, timer)]
+        game.get_player_recorders.side_effect = lambda: [PlayerRecorder(user, timer)]
         self.game_organizer.organize(game)
         game.run.assert_called_once()
         assert self.stats_dao.save_user_rounds.call_args is not None

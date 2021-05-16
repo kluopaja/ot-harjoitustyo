@@ -5,14 +5,14 @@ from unittest.mock import Mock, create_autospec
 
 from utils.timing import Timer
 
-from game.game_stats import UserRecorder, RoundStats
+from game.game_stats import PlayerRecorder, RoundStats
 
-class TestUserRecorder(unittest.TestCase):
+class TestPlayerRecorder(unittest.TestCase):
     def setUp(self):
         self.timer = create_autospec(Timer)
         self.timer.current_time.return_value = 1
         self.user = Mock()
-        self.recorder = UserRecorder(self.user, self.timer)
+        self.recorder = PlayerRecorder(self.user, self.timer)
 
     def test_add_score(self):
         self.recorder.add_score(10)
@@ -53,7 +53,7 @@ class TestRoundStats(unittest.TestCase):
         self.timer.current_time.return_value = 1
         self.user_1 = Mock()
         self.user_1.name = "a"
-        self.recorder_1 = UserRecorder(self.user_1, self.timer)
+        self.recorder_1 = PlayerRecorder(self.user_1, self.timer)
         self.recorder_1.add_score(100)
         self.recorder_1.add_shot()
         self.recorder_1.add_kill()
@@ -64,7 +64,7 @@ class TestRoundStats(unittest.TestCase):
 
         self.user_2 = Mock()
         self.user_2.name = "b"
-        self.recorder_2 = UserRecorder(self.user_2, self.timer)
+        self.recorder_2 = PlayerRecorder(self.user_2, self.timer)
         self.recorder_2.add_score(50)
         self.recorder_2.add_shot()
         self.recorder_2.add_kill()

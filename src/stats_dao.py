@@ -12,17 +12,17 @@ class StatsDao:
         self._connection = connection
         self._cursor = self._connection.cursor()
 
-    def save_user_rounds(self, user_rounds):
-        """Saves a list of UserRound object to the database.
+    def save_player_rounds(self, player_rounds):
+        """Saves a list of PlayerRound object to the database.
 
         Ignores User objects with User.id == None.
 
         Arguments:
-            `user_rounds`: list of UserRound objects
+            `player_rounds`: list of PlayerRound objects
         """
         try:
-            for user_round in user_rounds:
-                user = user_round.user
+            for player_round in player_rounds:
+                user = player_round.user
                 if user.id is None:
                     continue
 
@@ -31,8 +31,8 @@ class StatsDao:
                         RoundStats (user_id, score, shots, kills, deaths)
                     VALUES
                         (?, ?, ?, ?, ?)""",
-                    (user.id, user_round.score, user_round.shots,
-                    user_round.kills, user_round.deaths)
+                    (user.id, player_round.score, player_round.shots,
+                    player_round.kills, player_round.deaths)
                 )
             self._connection.commit()
         except Exception:

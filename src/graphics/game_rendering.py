@@ -268,7 +268,7 @@ class GameView:
 
     def _render_score(self, surface):
         text_topleft = Vector2(surface.get_rect().topleft)
-        surface.topleft_text(str(self._player.user_recorder.total_score()),
+        surface.topleft_text(str(self._player.player_recorder.total_score()),
                              text_topleft, self._font_color)
 
     def _render_name(self, surface):

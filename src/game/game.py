@@ -53,13 +53,13 @@ class Player:
 
     Attributes:
         notification: A GameNotification
-        user_recorder: A UserRecorder
+        player_recorder: A PlayerRecorder
         user: A User
             The user playing the player.
         """
 
     def __init__(self, plane_factory, player_input, game_notification,
-                 user_recorder, user, spawn_timer):
+                 player_recorder, user, spawn_timer):
         """Initializes the Player.
 
         Arguments:
@@ -69,7 +69,7 @@ class Player:
                 The inputs controlling the Player
             `game_notification`: A GameNotification
                 The object used to show messages to the Player
-            `user_recorder`: A UserRecorder
+            `player_recorder`: A PlayerRecorder
                 The object recording statistics for the Player
             `user`: A user
                 The user playing the Player
@@ -77,7 +77,7 @@ class Player:
                 The timer for the time until a new plane is ready to spawn.
         """
         self.notification = game_notification
-        self.user_recorder = user_recorder
+        self.player_recorder = player_recorder
         self.user = user
 
         self._plane_factory = plane_factory
@@ -100,7 +100,7 @@ class Player:
                 The passed time since last update.
         """
         self._spawn_timer.update(delta_time)
-        self.user_recorder.update(delta_time)
+        self.player_recorder.update(delta_time)
         if self._plane is None:
             self.notification.until_spawn(self._spawn_timer.time_left())
             if self._spawn_timer.expired():
@@ -109,8 +109,8 @@ class Player:
             return
 
         if not self._plane.alive():
-            self.user_recorder.add_death()
-            self.user_recorder.add_score(-self._plane_factory.get_plane_cost())
+            self.player_recorder.add_death()
+            self.player_recorder.add_score(-self._plane_factory.get_plane_cost())
             self._plane = None
             self._spawn_timer.start()
 
@@ -143,7 +143,7 @@ class Player:
     def process_reward(self, score, issuer):
         """Gives score reward to `self` by `issuer`.
 
-        Saves the rewarded score to the `self.user_recorder`.
+        Saves the rewarded score to the `self.player_recorder`.
 
         NOTE: A Player object cannot give a reward to itself!
 
@@ -156,7 +156,7 @@ class Player:
         if issuer is self:
             return
 
-        self.user_recorder.add_score(score)
+        self.player_recorder.add_score(score)
 
     def add_kill(self, target_owner):
         """Informs `self` that they killed a target owner by `target_owner`
@@ -170,11 +170,11 @@ class Player:
         if target_owner is self:
             return
 
-        self.user_recorder.add_kill()
+        self.player_recorder.add_kill()
 
     def add_shot_fired(self):
         """Informs `self` that a Plane owned by `self` fired a shot"""
-        self.user_recorder.add_shot()
+        self.player_recorder.add_shot()
 
 
 class GameState:
@@ -310,13 +310,13 @@ class Game:
     def _mean(self, v):
         return sum(v)/len(v)
 
-    def get_user_recorders(self):
+    def get_player_recorders(self):
         """Returns the information about partiticipants' game performance
 
         Returns:
-            A list of UserRecorder objects."""
+            A list of PlayerRecorder objects."""
 
-        return [player.user_recorder for player in self.game_state.players]
+        return [player.player_recorder for player in self.game_state.players]
 
 
     def _toggle_pause(self):
@@ -349,9 +349,9 @@ class GameOrganizer:
         """
         game.run()
 
-        round_stats = RoundStats(game.get_user_recorders())
+        round_stats = RoundStats(game.get_player_recorders())
         try:
-            self._stats_dao.save_user_rounds(round_stats.get_user_rounds())
+            self._stats_dao.save_player_rounds(round_stats.get_player_rounds())
         except DatabaseError:
             logging.critical("Failed saving results to the database! "
                              "Try reinitializing the database.")

@@ -155,11 +155,11 @@ class TestGameFactoryIntegration:
         factory.user_selectors[2].next()
         factory.user_selectors[2].next()
         game = factory.game()
-        user_recorders = game.get_user_recorders()
-        assert len(user_recorders) == 3
-        assert user_recorders[0].user.name == "banaani"
-        assert user_recorders[1].user.name == "apina"
-        assert user_recorders[2].user.name == "cembalo"
+        player_recorders = game.get_player_recorders()
+        assert len(player_recorders) == 3
+        assert player_recorders[0].user.name == "banaani"
+        assert player_recorders[1].user.name == "apina"
+        assert player_recorders[2].user.name == "cembalo"
 
     def test_level_selection(self, game_factory_factory):
         factory = game_factory_factory(0.5, EventHandlerMock([], []))
@@ -199,14 +199,14 @@ class TestGameIntegration:
         game = factory.game()
         game.run()
 
-        user_recorders = game.get_user_recorders()
+        player_recorders = game.get_player_recorders()
 
-        assert user_recorders[0].total_score() == 80
-        assert len(user_recorders[0].kills) == 1
-        assert len(user_recorders[0].deaths) == 1
-        assert user_recorders[1].total_score() == 80
-        assert len(user_recorders[1].kills) == 1
-        assert len(user_recorders[1].deaths) == 1
+        assert player_recorders[0].total_score() == 80
+        assert len(player_recorders[0].kills) == 1
+        assert len(player_recorders[0].deaths) == 1
+        assert player_recorders[1].total_score() == 80
+        assert len(player_recorders[1].kills) == 1
+        assert len(player_recorders[1].deaths) == 1
 
     def test_shooting(self, game_factory_factory):
 
@@ -226,14 +226,14 @@ class TestGameIntegration:
         game = factory.game()
         game.run()
 
-        user_recorders = game.get_user_recorders()
+        player_recorders = game.get_player_recorders()
 
-        assert user_recorders[0].total_score() == 100
-        assert len(user_recorders[0].kills) == 1
-        assert len(user_recorders[0].deaths) == 0
-        assert user_recorders[1].total_score() == -20
-        assert len(user_recorders[1].kills) == 0
-        assert len(user_recorders[1].deaths) == 1
+        assert player_recorders[0].total_score() == 100
+        assert len(player_recorders[0].kills) == 1
+        assert len(player_recorders[0].deaths) == 0
+        assert player_recorders[1].total_score() == -20
+        assert len(player_recorders[1].kills) == 0
+        assert len(player_recorders[1].deaths) == 1
 
     # used to check that the bullets are large enough to
     # not be able to pass the wall between frames
@@ -287,10 +287,10 @@ class TestGameIntegration:
 
         game = factory.game()
         game.run()
-        user_recorders = game.get_user_recorders()
+        player_recorders = game.get_player_recorders()
 
-        assert user_recorders[0].total_score() == -40
-        assert len(user_recorders[0].deaths) == 2
+        assert player_recorders[0].total_score() == -40
+        assert len(player_recorders[0].deaths) == 2
 
 @pytest.fixture()
 def stats_dao(database_connection):
