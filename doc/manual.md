@@ -12,6 +12,9 @@ The following commands should be run at the project root.
 3. Start game:
 ```poetry run invoke start```
 
+If the game window is too big or the game runs too slowly,
+see Configuration section on how to adjust the game window resolution.
+
 ## Running tests
 Tests can be run with:
 ```poetry run invoke test```
@@ -24,7 +27,8 @@ Pylint can be run with;
 
 ## Usage
 
-Navigation in the menu is done with arrow keys, esc and enter.
+Navigation in the menu is done with arrow keys, esc and enter (by default,
+can be configured).
 
 
 ### Add user menu
@@ -40,12 +44,13 @@ The players should have different names to make the game results
 more interpretable.
 
 The number of supported players depends on the number of player keymaps defined
-and on the map support. Currently these support 4 players.
+and on the map support. Currently these support maximum of 4 players.
 
 ### Game
 
-The timer to end the game hasn't been implemented yet so the players
-have to press `Esc` to finish the game.
+By default each game lasts 120 seconds or until the player pressed `Esc` key.
+
+The game can be paused by pressing `p`.
 
 The player's score is shown in the top left corner of the game view.
 
@@ -122,3 +127,24 @@ From 0 the lift increases rapidly to its maximum at 20 degrees. After this, the
 lift immediately decreases to about 60 % of its maximum and starts to increase again.
 
 The drag increases monotonously from 0 to 90 degrees.
+
+
+## Configuration
+
+The game reads the configs from a file `assets/config.json`. By default the game also uses
+configuration files `assets/background.json`, `assets/bullet.json`, `assets/gun.json`,
+`assets/keys.json`, `assets/plane.json` and level configs located at `assets/levels`.
+These other configuration files are not fixed but can be set at the
+configuration files that uses them (for example, `assets/plane.json` has the property
+`gun_config_path`).
+
+The paths inside configuration files are always relative paths to directory containing
+the configuration file.
+
+The parameters have some limitations. For example, `health` property in a plane configuration
+file has to be a positive integer. These limitations are defined using JSON Schema and
+can be viewed in `assets/schemas`. In addition, the value of the parameters in key configuration file (default
+`assets/keys.json`) should be valid pygame key descriptions (see here https://www.pygame.org/docs/ref/key.html).
+
+The game window resolution can be adjusted by changing `window_width` and `window_height` in
+`assets/config.json`.
