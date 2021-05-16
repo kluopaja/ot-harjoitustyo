@@ -164,7 +164,6 @@ class GameBackground:
         """
         self._graphic = graphic
         self._n_graphics = n_graphics
-        # TODO rename to size or something
         self._repeat_area = repeat_area
         self.fill_color = fill_color
         self._graphic_locations = self._generate_graphic_locations()

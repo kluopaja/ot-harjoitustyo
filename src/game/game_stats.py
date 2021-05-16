@@ -165,10 +165,10 @@ class RoundStats:
             columns['kills'].append(player_round.kills)
             columns['deaths'].append(player_round.deaths)
 
-        df = pd.DataFrame(columns)
-        df['k/d'] = df['kills'] / df['deaths']
-        df['shots/kills'] = df['shots_fired'] / df['kills']
-        return df
+        data_frame = pd.DataFrame(columns)
+        data_frame['k/d'] = data_frame['kills'] / data_frame['deaths']
+        data_frame['shots/kills'] = data_frame['shots_fired'] / data_frame['kills']
+        return data_frame
 
     def get_verbose_table(self):
         """Construct a pandas dataframe containing more detailed results.
@@ -213,8 +213,7 @@ class RoundStats:
                     columns['death_time'].append(None)
 
 
-        df = pd.DataFrame(columns)
-        return df
+        return pd.DataFrame(columns)
 
 def create_results_viewer(menu_input, screen):
     """A factory function for ResultsViewer.
@@ -367,9 +366,9 @@ class TotalStats:
             columns['kills'].append(user_stats.kills)
             columns['deaths'].append(user_stats.deaths)
 
-        df = pd.DataFrame(columns)
-        df['k/d'] = df['kills'] / df['deaths']
-        return df
+        data_frame = pd.DataFrame(columns)
+        data_frame['k/d'] = data_frame['kills'] / data_frame['deaths']
+        return data_frame
 
 def create_high_score_viewer(stats_dao, n_top_players, menu_input, screen):
     """A factory function for HighScoreViewer.

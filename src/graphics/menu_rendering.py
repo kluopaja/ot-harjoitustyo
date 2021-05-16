@@ -27,12 +27,12 @@ class MenuListRenderer:
                 None if none of the items is selected
         """
         self._screen.surface.fill(self._background_color, update=True)
-        for i in range(len(menu_items)):
+        for i, menu_item in enumerate(menu_items):
             item_center = self._item_center(i, len(menu_items))
             is_active = False
             if i == selected_index:
                 is_active = True
-            self._item_renderer.render(self._screen.surface, menu_items[i],
+            self._item_renderer.render(self._screen.surface, menu_item,
                                        item_center, is_active)
         self._screen.update()
 
