@@ -12,8 +12,16 @@ def test(ctx):
 def coverage(ctx):
     ctx.run("coverage run --branch -m pytest src")
 
+@task
+def coverage_only_unit(ctx):
+    ctx.run("coverage run --branch -m pytest src --ignore=./src/tests/integration/")
+
 @task(coverage)
 def coverage_report(ctx):
+    ctx.run("coverage html")
+
+@task(coverage_only_unit)
+def coverage_report_only_unit(ctx):
     ctx.run("coverage html")
 
 @task
