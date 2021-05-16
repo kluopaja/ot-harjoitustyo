@@ -90,18 +90,9 @@ turn down: l
 shoot: u
 ```
 
-They keymaps can be configured by modifying the `assets/keys.json` file.
+They keymaps can be configured by modifying the configuration files. (See Configuration section)
 Please note that in single player mode the keymappings for player 1 will
 be used.
-
-
-The game can be further configured by modifying the following files:
-
-```assets/plane.json```
-
-```assets/bullet.json```
-
-```assets/gun.json```
 
 
 ### Results
@@ -109,7 +100,7 @@ The results view will be shown automatically after the game has finished.
 
 
 ### Levels
-The levels are defined in ```assets/levels/```. Currently the only way
+The levels are defined by default in ```assets/levels/```. Currently the only way
 to edit the levels or to create new levels is to manually edit the level files.
 
 
