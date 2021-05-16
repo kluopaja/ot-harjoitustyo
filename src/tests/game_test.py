@@ -71,8 +71,8 @@ class TestPlayer(unittest.TestCase):
 
         self.player.update(1)
 
-        assert self.player_input_mock.bind_shoot.call_args.args[0] is not None
-        self.player_input_mock.bind_shoot.call_args.args[0]()
+        assert self.player_input_mock.bind_shoot.call_args[0][0] is not None
+        self.player_input_mock.bind_shoot.call_args[0][0]()
 
     def test_shoot_key_creates_new_plane_when_spawn_timer_expired(self):
         self._create_plane_by_shoot_key_with_timer_expired()
@@ -274,5 +274,5 @@ class TestGameOrganizer(unittest.TestCase):
         self.game_organizer.organize(game)
         game.run.assert_called_once()
         assert self.stats_dao.save_player_rounds.call_args is not None
-        assert self.stats_dao.save_player_rounds.call_args.args[0][0].user.name == "user"
+        assert self.stats_dao.save_player_rounds.call_args[0][0][0].user.name == "user"
         self.results_viewer.run.assert_called_once()
