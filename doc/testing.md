@@ -39,7 +39,10 @@ game. No problems have been noticed here.
 
 ### Configuration file validation
 Some validation but a lot of problems remain. Problems in the JSON syntax don't
-show meaningful errors.
+show meaningful errors. Stack trace is printed if the JSON file has syntax problems
+or if the pygame keycodes are wrongs. This was intentional choice to help the
+user to debug the config file problems and other choice would have been no
+errors (as I didn't have time to make them well)
 
 ### Drawing
 Sometimes lines are drawn too long (the ground can be seen flickering). I'm quite
