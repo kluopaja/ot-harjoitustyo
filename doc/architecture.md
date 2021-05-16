@@ -158,3 +158,8 @@ Although most of the parameters in the application are configurable
 either through menus or configuration files, there are still some
 hard coded constants left in application at least
 in the menus and statistics rendering.
+
+Some factory functions are too long. The `Config` class could
+also be split into smaller classes.
+
+Graphic and Shape classes are suspiciously similar.
