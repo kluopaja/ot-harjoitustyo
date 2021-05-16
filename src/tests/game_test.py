@@ -273,6 +273,6 @@ class TestGameOrganizer(unittest.TestCase):
         game.get_player_recorders.side_effect = lambda: [PlayerRecorder(user, timer)]
         self.game_organizer.organize(game)
         game.run.assert_called_once()
-        assert self.stats_dao.save_user_rounds.call_args is not None
-        assert self.stats_dao.save_user_rounds.call_args.args[0][0].user.name == "user"
+        assert self.stats_dao.save_player_rounds.call_args is not None
+        assert self.stats_dao.save_player_rounds.call_args.args[0][0].user.name == "user"
         self.results_viewer.run.assert_called_once()
