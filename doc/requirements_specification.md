@@ -9,8 +9,8 @@ get shot by others.
 
 ## Users
 
-The software will support at least 2 simultaneous players. In the beginning the
-game will not have any AI and thus single-player mode will not be very useful.
+The software supports as many players as are supported by they key configuration
+file and the levels.
 
 ## Basic functionality
 
@@ -21,7 +21,7 @@ game will not have any AI and thus single-player mode will not be very useful.
 - [x] The players can select the number of players
 - [x] The players can select their usernames
 - [x] The players will be stored into a database
-- [ ] The players can view the list of the most successful players
+- [x] The players can view the list of the most successful players
 - [x] The players can quit the game
 
 ### Game
@@ -32,13 +32,13 @@ game will not have any AI and thus single-player mode will not be very useful.
 - [x] The players can see their current score
 - [x] The players can pause the game
 - [x] Hitting a bullet or ground will damage the plane
-- [x] Enough damage will destroy the plane causing the player to lose points **Tehty**
+- [x] Enough damage will destroy the plane causing the player to lose points
 - [x] The destroyed planes will spawn again after a while
 
 ### After game
 
 - [x] The players can see their final scores
-- [ ] Game statistics will be saved to a database
+- [x] Game statistics will be saved to a database
 
 ## Further development ideas
 
