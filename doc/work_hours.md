@@ -25,6 +25,13 @@ Date | Hours | What did I do
 1.5 | 6      | Think about improving the drawing, start implementing
 2.5 | 8      | Continue improving drawing, add more configuration files, fix tests
 3.5 | 5      | Optimize rendering speed, refactor module structure
-3.5 | 5      | Add tests, finish weekly project requirements
+4.5 | 5      | Add tests, finish weekly project requirements
+9.5 | 2      | Refactoring
+10.5 | 4      | Add high score list, add info bar, refactoring
+11.5 | 4      | Add configuration files
+12.5 | 1      | Fix tests
+14.5. | 5     | Refactoring and more unit tests
+15.5. | 10     | Refactoring, more tests, add documentation
+15.5. | 10     | Refactoring, more tests, documentation and finish course requirements
 ---- | ----- | ---
-Total 104
+Total 140
