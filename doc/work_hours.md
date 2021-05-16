@@ -32,6 +32,6 @@ Date | Hours | What did I do
 12.5 | 1      | Fix tests
 14.5. | 5     | Refactoring and more unit tests
 15.5. | 10     | Refactoring, more tests, add documentation
-15.5. | 10     | Refactoring, more tests, documentation and finish course requirements
+16.5. | 10     | Refactoring, more tests, documentation and finish course requirements
 ---- | ----- | ---
 Total 140
