@@ -1,0 +1,35 @@
+title MainMenu
+
+
+create_main_menu->*MainMenu: MainMenu(menu_list_factory, ...)
+
+
+MainMenu->*menu_item_collection: MenuItemCollection()
+
+MainMenu->*add_user_button: ButtonMenuItem(add_user_menu.run, "Add user")
+
+
+MainMenu->+menu_item_collection: add_item(add_user_button)
+menu_item_collection-->-MainMenu:
+
+MainMenu->*new_game_button: ButtonMenuItem(new_game_menu.run, "New game")
+MainMenu->+menu_item_collection: add_item(new_game_button)
+menu_item_collection-->-MainMenu:
+
+MainMenu->*high_score_button: ButtonMenuItem(high_score_view.run, "View high scores")
+MainMenu->+menu_item_collection: add_item(high_score_button)
+menu_item_collection-->-MainMenu:
+
+
+main->+MainMenu: run()
+MainMenu->+menu_list_factory: menu(menu_item_collection)
+menu_list_factory->*menu_list: MenuList(...)
+
+menu_list_factory-->-MainMenu: menu_list
+MainMenu->+menu_list: should_quit()
+menu_list-->-MainMenu: False
+MainMenu->+menu_list: run_tick()
+menu_list-->-MainMenu:
+MainMenu->+menu_list: should_quit()
+menu_list-->-MainMenu: True
+MainMenu-->-main:

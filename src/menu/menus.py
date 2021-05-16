@@ -21,14 +21,14 @@ class MainMenu:
             ButtonMenuItem(new_game_menu.run, "New game")
         )
         self.item_collection.add_item(
-            ButtonMenuItem(high_score_view.run, "View high score")
+            ButtonMenuItem(high_score_view.run, "View high scores")
         )
 
     def run(self):
         """Runs the menu until the user quits it"""
-        menu = self.menu_list_factory.menu(self.item_collection)
-        while not menu.should_quit():
-            menu.run_tick()
+        menu_list = self.menu_list_factory.menu(self.item_collection)
+        while not menu_list.should_quit():
+            menu_list.run_tick()
 
 class NewGameMenu:
     """A class representing the new game menu"""
