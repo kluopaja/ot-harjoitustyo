@@ -1,0 +1,15 @@
+[MenuList]*-1[MenuListRenderer]
+[MenuListRenderer]1-1[MenuItemRenderer]
+[MenuList]*-1[MenuInput]
+[MenuList]1-1[MenuItemCollection]
+[MenuList]*-1[Clock]
+[MenuItemCollection]1-Recursively*[MenuItemCollection]
+[MenuItemCollection]1-1[MenuItem]
+
+[MenuItem]-.-active bound to>[MenuInput]
+[MenuItem]^[ValueBrowserMenuItem]
+[MenuItem]^[ButtonMenuItem]
+[MenuItem]^[TextInputMenuItem]
+
+[MenuListRenderer]-.->[MenuItem]
+[MenuItemRenderer]-.->[MenuItem]

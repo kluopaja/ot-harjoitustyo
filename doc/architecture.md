@@ -54,6 +54,9 @@ in `src/menu/setup.py`.
 Internally these menus organize various MenuItem objects into MenuItemCollections
 which are then made into a MenuList class.
 
+## MenuList
+![MenuList class diagram](./menu_list_class_diagram.png)
+
 A MenuList object manages the menu rendering, MenuInput and a collection of
 MenuItem objects.
 
