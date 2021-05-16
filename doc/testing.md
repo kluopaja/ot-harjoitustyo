@@ -16,6 +16,8 @@ The database access was also only tested with automated system testing.
 
 The test branch coverage excluding testing code was 91 %.
 
+![Test coverage](./coverage_report.png)
+
 ## Manual testing
 
 The functionalities described in the requirements specification have been tried.
