@@ -81,6 +81,7 @@ for a single participation of `User` in a `Game`. Statistics are
 accessed with the `StatsDao`.
 
 # Game
+![Game class diagram](./game_class_diagram.png)
 
 A single round of the game is represented by `Game` class. The `Game` class
 runs the game loop and manages `GameInput` and `GameState`.
