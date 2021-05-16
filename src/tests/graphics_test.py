@@ -91,7 +91,7 @@ class TestImageGraphics:
         )
         image_graphic.draw(camera_stub)
         camera_stub.draw_image.assert_called()
-        image = camera_stub.draw_image.call_args.args[0]
+        image = camera_stub.draw_image.call_args[0][0]
         assert image.get_height_pixels() == image.get_width_pixels()
 
     def test_from_image_path_with_offset(self, camera_stub):
