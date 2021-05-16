@@ -3,7 +3,7 @@ import unittest
 from pygame import Vector2
 import math
 
-from game.physics import BasePhysics, BodyPhysics, angle_between
+from game.physics import BasePhysics, BodyPhysics, angle_between, WingPhysics, PhysicsController
 from constants import EPS
 
 class TestBasePhysics(unittest.TestCase):
@@ -54,6 +54,70 @@ class TestBodyPhysics(unittest.TestCase):
         self.physics.update(2)
         self.physics.update(2)
         assert (self.physics.velocity - self.velocity_start).magnitude() < EPS
+
+class TestWingPhysics(unittest.TestCase):
+    def setUp(self):
+        tmp = BasePhysics(Vector2(0), Vector2(0), Vector2(1, 0))
+        self.physics = WingPhysics(tmp, 1)
+        self.only_base = BasePhysics(Vector2(0), Vector2(0), Vector2(1, 0))
+
+    def test_wing_at_zero_angle_of_attack(self):
+        self.physics.velocity = Vector2(1, 0)
+        self.only_base.velocity = Vector2(1, 0)
+        self.physics.update(2)
+        self.only_base.update(2)
+        assert (self.physics.location - self.only_base.location).magnitude() < EPS
+
+    def test_wing_lift(self):
+        self.physics.front = Vector2(1, -1)
+        self.physics.front /= self.physics.front.magnitude()
+        self.physics.velocity = Vector2(2, 0)
+        # the pi/4 angle should cause 1 lift, so 
+        # after first update velocity should be 2 * 2 * (?, -1) * 2 = (?, 8)
+        self.physics.update(2)
+        # and the location after second (?, -16)
+        self.physics.update(2)
+        assert abs(self.physics.location[1] + 16) < EPS
+
+    def test_wing_has_drag(self):
+        self.physics.front = Vector2(1, -1)
+        self.physics.front /= self.physics.front.magnitude()
+        self.physics.velocity = Vector2(2, 0)
+        # the pi/4 angle should cause 1 drag
+        # after first update velocity should be (2, ?) + 4 * (-1, ?) * 2 = (-6, 0)
+        # after first update location should be (4, ?)
+        self.physics.update(2)
+        # after second update location should be (4, ? ) - 2 *(-6, ?) = (-8, ?)
+        self.physics.update(2)
+        assert abs(self.physics.location[0] + 8) < EPS
+
+class TestPhysicsController(unittest.TestCase):
+    def setUp(self):
+        tmp = BasePhysics(Vector2(0), Vector2(0), Vector2(1, 0))
+        self.physics = PhysicsController(tmp, 2, math.pi)
+
+    def test_up(self):
+        self.physics.up()
+        self.physics.update(0.5)
+        assert (self.physics.front - Vector2(0, -1)).magnitude() < EPS
+
+    def test_down(self):
+        self.physics.down()
+        self.physics.update(0.5)
+        assert (self.physics.front - Vector2(0, 1)).magnitude() < EPS
+
+    def test_accelerate(self):
+        self.physics.accelerate()
+        self.physics.update(0.5)
+        assert (self.physics.velocity - Vector2(1, 0)).magnitude() < EPS
+
+    def test_accelerate_after_up(self):
+        self.physics.up()
+        self.physics.update(0.5)
+        self.physics.accelerate()
+        self.physics.update(0.5)
+        assert (self.physics.velocity - Vector2(0, -1)).magnitude() < EPS
+
 
 class TestAngleBetween(unittest.TestCase):
     def test_returns_zero_if_magnitude_too_small(self):
