@@ -1,3 +1,5 @@
+import logging
+import sys
 import math
 from abc import ABC, abstractmethod
 from game.shapes import Rectangle
@@ -141,7 +143,12 @@ class ImageGraphic(Graphic):
         helper_rect.center = (math.floor(
             center_offset[0]), math.floor(center_offset[1]))
         rectangle = Rectangle.from_rect(helper_rect)
-        image = Image(image_path)
+        try:
+            image = Image(image_path)
+        except Exception:
+            logging.critical(f"Failed loading image from {image_path}.")
+            logging.critical(f"Are the configuration files OK?")
+            sys.exit()
         image.set_aspect_ratio(helper_rect.width, helper_rect.height)
         return ImageGraphic(rectangle, image)
 
