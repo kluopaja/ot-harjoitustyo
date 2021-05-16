@@ -6,14 +6,16 @@ import numpy as np
 logging.getLogger('matplotlib').setLevel(logging.WARNING)
 
 class Plotter:
+    """A class for plotting pandas DataFrames to a numpy array"""
     def __init__(self):
-        self.figure = plt.figure(frameon = False)
+        """Initializes Plotter"""
+        self._figure = plt.figure(frameon = False)
 
     def plot_histogram_to_image(self, data, x, hue, bin_range,
                                 bins=10, title="", width=100, height=100):
-        """
+        """Plots a histogram and stores the image to a numpy array.
 
-        Args:
+        Arguments:
             `data`: a dataframe
             `x`: a string
                 The name of the column to be plotted
@@ -36,27 +38,30 @@ class Plotter:
         """
         try:
             plt.ioff()
-            ax = self.figure.gca()
+            ax = self._figure.gca()
             ax.patch.set_visible(False)
-            self.figure.patch.set_visible(False)
+            self._figure.patch.set_visible(False)
 
             sns.histplot(data, x=x, hue=hue, binrange = bin_range,
                          bins=bins, element="poly", fill=False, ax=ax)
 
             ax.set_title(title)
 
-            dpi = self.figure.get_dpi()
+            dpi = self._figure.get_dpi()
 
             # add small value for numerical errors
-            self.figure.set_size_inches(width/float(dpi) + 1e-5, height/float(dpi) + 1e-5)
+            self._figure.set_size_inches(
+                width/float(dpi) + 1e-5, height/float(dpi) + 1e-5)
 
-            self.figure.canvas.draw()
+            self._figure.canvas.draw()
 
-            image = np.frombuffer(self.figure.canvas.tostring_argb(), dtype=np.uint8)
+            image = np.frombuffer(self._figure.canvas.tostring_argb(),
+                                  dtype=np.uint8)
             image = image.reshape(height, width, 4)
             image = np.swapaxes(image, 0, 1)
-            self.figure.clf()
+            self._figure.clf()
             return image
         except Exception:
             # the plotting seemed to fail on some macOS versions.
+            logging.warning("Plotting failed. Showing an empty image instead.")
             return np.zeros(shape=(width, height, 4))
