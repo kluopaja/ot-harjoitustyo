@@ -31,7 +31,7 @@ class ResultsRenderer:
         self._screen.surface.fill(self.background_color, update=True)
         subsurface = self._screen.surface.aspect_ratio_subsurface(self._aspect_ratio)
 
-        self._dataframe_renderer.render(subsurface, summary_table, (0, 0.1))
+        self._dataframe_renderer.render(subsurface, summary_table, (0.1, 0.1))
 
         bin_range = (0, round_length)
 
@@ -75,7 +75,7 @@ class HighScoreRenderer:
         self._screen.surface.fill(self.background_color, update=True)
         subsurface = self._screen.surface.aspect_ratio_subsurface(self._aspect_ratio)
 
-        self._dataframe_renderer.render(subsurface, high_score_table, (0, 0.1))
+        self._dataframe_renderer.render(subsurface, high_score_table, (0.1, 0.1))
 
         self._screen.update()
 

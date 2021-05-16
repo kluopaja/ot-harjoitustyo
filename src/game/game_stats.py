@@ -227,7 +227,7 @@ def create_results_viewer(menu_input, screen):
     dataframe_renderer = DataFrameRenderer(
         cell_size=(0.22, 0.05),
         font_color=(50, 69, 63),
-        max_cell_text_length=10
+        max_cell_text_length=14
     )
 
     plotter = Plotter()
@@ -390,7 +390,7 @@ def create_high_score_viewer(stats_dao, n_top_players, menu_input, screen):
     dataframe_renderer = DataFrameRenderer(
         cell_size=(0.22, 0.05),
         font_color=(50, 69, 63),
-        max_cell_text_length=10
+        max_cell_text_length=15
     )
 
     high_score_renderer = HighScoreRenderer(screen, dataframe_renderer)

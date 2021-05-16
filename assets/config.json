@@ -7,7 +7,7 @@
 
 	"window_width": 1920,
 	"window_height": 1080,
-	"font_size": 0.02,
+	"font_size": 0.015,
 	"menu_font_color": [50, 69, 63],
 	"menu_background_color": [186, 204, 200],
 	"menu_item_spacing": 0.1,
