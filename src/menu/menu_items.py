@@ -1,15 +1,16 @@
 class MenuItem:
     """Base class for menu items."""
-    # TODO make abstract
 
     def text(self):
         """Returns the text for the menu item"""
         return "0"
 
     def bind(self, menu_input):
+        """Binds the MenuItem to a MenuInput `menu_input`"""
         pass
 
 class ValueBrowserMenuItem(MenuItem):
+    """A MenuItem supporting browsing through a list of values"""
     def __init__(self, decrease_function, increase_function, value_function,
                  description, accept_function=lambda: None):
         self.decrease_function = decrease_function
@@ -28,6 +29,7 @@ class ValueBrowserMenuItem(MenuItem):
 
 
 class ButtonMenuItem(MenuItem):
+    """A MenuItem supporting "press" operation"""
     def __init__(self, button_function, description):
         self.button_function = button_function
         self.description = description
@@ -40,6 +42,7 @@ class ButtonMenuItem(MenuItem):
 
 
 class TextInputMenuItem(MenuItem):
+    """A MenuItem with a text input box"""
     def __init__(self, description, get_text, set_text):
         self.description = description
         self.get_text = get_text
@@ -52,25 +55,39 @@ class TextInputMenuItem(MenuItem):
         menu_input.bind_text(self.get_text, self.set_text)
 
 class MenuItemCollection:
+    """A class for organizing the MenuItems.
+
+    Holds either other MenuItemCollection or single items.
+
+    Useful for having a list of MenuItems that has to support
+    adding and deleting MenuItems at some positions in the middle
+    of the list.
+    """
     def __init__(self):
+        """Initializes an empty MenuItemsCollection"""
         self._subcollections = []
 
     def add_item(self, item):
-        self._subcollections.append(SingleMenuItemCollection(item))
+        """Adds a single MenuItem `item` to the end of `self`"""
+        self._subcollections.append(_SingleMenuItemCollection(item))
 
     def add_collection(self, collection):
+        """Adds another MenuItemCollection to the end of `self`"""
         self._subcollections.append(collection)
 
     def clear(self):
+        """Empties `self`"""
         self._subcollections = []
 
     def get_item_list(self):
+        """Transforms `self` into a list of MenuItems"""
         result = []
         for subcollection in self._subcollections:
             result.extend(subcollection.get_item_list())
         return result
 
-class SingleMenuItemCollection:
+class _SingleMenuItemCollection:
+    """A helper class to store a single MenuItem"""
     def __init__(self, item):
         self._item = item
 

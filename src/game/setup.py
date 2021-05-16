@@ -80,12 +80,12 @@ class GameFactory:
         pause_overlay = PauseOverlay(self._config.pause_message,
                                      self._config.pause_font_color,
                                      self._config.pause_blur_radius)
-        round_info = InfoBar(self._config.info_bar_level_message,
+        info_bar = InfoBar(self._config.info_bar_level_message,
                              self._config.info_bar_time_left_message,
                              self._config.info_bar_font_color,
                              self._config.info_bar_background_color)
         renderer = GameRenderer(self._screen, game_views, background,
-                                pause_overlay, round_info)
+                                pause_overlay, info_bar)
 
         game_clock = Clock(self._config.game_fps, busy_wait)
         game = Game(game_input, game_state, renderer, game_clock)

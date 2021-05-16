@@ -1,11 +1,21 @@
 class MenuListFactory:
+    """A Factory class for MenuList"""
     def __init__(self, menu_renderer, menu_input, clock):
-        self.menu_renderer = menu_renderer
-        self.menu_input = menu_input
-        self.clock = clock
+        """Initializes MenuListFactory
+
+        Arguments:
+            `menu_renderer`: A MenuRenderer
+            `menu_input`: A MenuInput
+            `clock`: A Clock
+                The clock used to set the refreshing rate of the MenuList
+        """
+        self._menu_renderer = menu_renderer
+        self._menu_input = menu_input
+        self._clock = clock
 
     def menu(self, menu_item_collection):
-        return MenuList(self.menu_renderer, self.menu_input, menu_item_collection, self.clock)
+        return MenuList(self._menu_renderer, self._menu_input,
+                        menu_item_collection, self._clock)
 
 
 class MenuList:

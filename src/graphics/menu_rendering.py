@@ -45,12 +45,34 @@ class MenuListRenderer:
 
 
 class MenuItemRenderer:
+    """A rendering class for MenuItems"""
     def __init__(self, font_color):
-        self.font_color = font_color
+        """Initializes MenuItemRenderer.
+
+        Arguments:
+            `font_color`: A tuple of 3
+                The font color of the menu item texts.
+        """
+        self._font_color = font_color
 
     def render(self, surface, menu_item, center, is_active):
+        """Renders the `menu_item` on surface.
+
+        Arguments:
+            `surface`: A DrawingSurface
+                The target of the drawing
+            `menu_item`: A MenuItem
+                The drawn object
+            `center`: A pygame.Vector2
+                The location of the drawn MenuItem in relative
+                DrawingSurface coordinates.
+            `is_active`: boolean
+                Whether the `menu_item` should be drawn as active (selected)
+                or not
+        """
+
         text = menu_item.text()
         if is_active:
             text = "-> " + text + " <-"
 
-        surface.centered_text(text, center, self.font_color)
+        surface.centered_text(text, center, self._font_color)

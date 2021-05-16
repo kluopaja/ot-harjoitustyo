@@ -1,5 +1,14 @@
 class ResultsRenderer:
+    """A rendering class for Game results."""
     def __init__(self, screen, dataframe_renderer, plotter):
+        """Initializes ResultsRenderer.
+
+        Arguments:
+            `screen`: A Screen
+                Target of the rendering
+            `dataframe_renderer`: A DataFrameRenderer
+            `plotter`: A Plotter
+        """
         self._screen = screen
         self._dataframe_renderer = dataframe_renderer
         self._plotter = plotter
@@ -43,8 +52,14 @@ class ResultsRenderer:
         self._screen.update()
 
 class HighScoreRenderer:
-    """Class for the high score view"""
+    """A rendering class for HighScoreView"""
     def __init__(self, screen, dataframe_renderer):
+        """Initializes HighScoreRenderer.
+
+        Arguments:
+            `screen`: A Screen
+            `dataframe_renderer`: A DataFrameRenderer
+        """
         self._screen = screen
         self._dataframe_renderer = dataframe_renderer
         self.background_color = (186, 204, 200)
@@ -65,6 +80,7 @@ class HighScoreRenderer:
         self._screen.update()
 
 class DataFrameRenderer:
+    """A rendering class for pandas DataFrames"""
     def __init__(self, cell_size, font_color, max_cell_text_length):
         """Initializes DataFrameRenderer
 
@@ -79,22 +95,22 @@ class DataFrameRenderer:
         self.font_color = font_color
         self.max_cell_text_length = max_cell_text_length
 
-    def render(self, surface, df, position):
+    def render(self, surface, data_frame, position):
         """Renders dataframe.
 
         Args:
             `surface`: A DrawingSurface
-             `df`: A pandas DataFrame
+             `data_frame`: A pandas DataFrame
              `position`: a pygame Vector2
                 The position of the table's top left corner
         """
-        for i, text in enumerate(df.columns):
+        for i, text in enumerate(data_frame.columns):
             self._render_cell(surface, text, 0, i+1, position)
 
-        for i in range(df.shape[0]):
+        for i in range(data_frame.shape[0]):
             self._render_cell(surface, str(i+1), i+1, 0, position)
-            for j in range(df.shape[1]):
-                self._render_cell(surface, str(df.iloc[i, j]), i+1, j+1, position)
+            for j in range(data_frame.shape[1]):
+                self._render_cell(surface, str(data_frame.iloc[i, j]), i+1, j+1, position)
 
     def _render_cell(self, surface, text, row, column, position):
         text = text[:self.max_cell_text_length]

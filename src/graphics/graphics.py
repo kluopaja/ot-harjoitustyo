@@ -6,6 +6,18 @@ from utils.float_rect import FloatRect
 
 
 class Graphic(ABC):
+    """A base class for movable and rotatable graphics.
+
+    Attributes:
+        `location`: A pygame.Vector2
+            The location of the Graphic
+        `rotation`: Radians
+            Positive rotation mean counter-clockwise
+            (in coordinates where x grows right and y grows down)
+
+        NOTE: See Shape class for more detailed descriptions.
+
+    """
     @abstractmethod
     def draw(self, camera):
         pass
@@ -32,7 +44,18 @@ class Graphic(ABC):
 
 
 class PolylineGraphic(Graphic):
+    """A class for drawing a polyline"""
     def __init__(self, polyline, color, width):
+        """Initializes PolylineGraphic.
+
+        Arguments:
+            `polyline`: A Polyline
+                The polyline to be drawn.
+            `color`: A tuple of 3
+                The color of the polyline
+            `width`: A positive float
+                The width of the line in game world coordinates
+        """
         self._polyline = polyline
         self.color = color
         self.width = width
@@ -43,7 +66,6 @@ class PolylineGraphic(Graphic):
         Arguments:
             `camera`: Camera
                 The target of drawing
-
         """
         for line in self._polyline.lines:
             camera.draw_line(line.begin, line.end, self.color, self.width)
@@ -69,10 +91,15 @@ class ImageGraphic(Graphic):
     """Class for movable and rotatable images."""
 
     def __init__(self, rectangle, image):
-        """
+        """Initializes ImageGraphic.
 
-        Args:
+        Arguments:
             `rectangle`: A Rectangle
+                Defines the area to which the image is drawn.
+                NOTE: Should really be unrotated (i.e. topleft at topleft, etc)
+                when the `rectangle.rotation` == 0. This is because
+                `rectangle.rotation` is used to determine the rotation
+                of the drawn `image`.
             `image`: An Image
 
         NOTE: The drawing of the image is done by setting its height to
@@ -121,6 +148,8 @@ class ImageGraphic(Graphic):
     def draw(self, camera):
         """Draws image on `camera`.
 
+        Arguments:
+            `camera`: A Camera
         """
         camera.draw_image(self._image, self._rectangle.center(),
                     self._rectangle.rotation, self._rectangle.size()[1])
