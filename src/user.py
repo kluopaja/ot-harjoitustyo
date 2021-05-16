@@ -24,7 +24,7 @@ class UserFactory:
 
     def reset(self):
         """Resets the user currently being modified to the default"""
-        self._user = User("User")
+        self._user = User("")
 
     def name_valid(self):
         """Checks if the current name is unique.
