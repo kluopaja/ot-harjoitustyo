@@ -1,7 +1,13 @@
 from database_connection import DatabaseError
 from user import User
 class UserDao:
+    """Class for User related database queries"""
     def __init__(self, connection):
+        """Initializes UserDao
+
+        Arguments:
+            `connection`: sqlite3.Connection
+        """
         self._connection = connection
         self._cursor = self._connection.cursor()
 
@@ -31,7 +37,7 @@ class UserDao:
             raise DatabaseError
 
     def get_next(self, user):
-        """Returns the user after `user` in lexicographical order by name"""
+        """Returns the User after `user` in lexicographical order by name"""
         try:
             self._cursor.execute(
                 "SELECT * from Users WHERE name > ? ORDER BY name LIMIT 1",
@@ -43,7 +49,7 @@ class UserDao:
             raise DatabaseError
 
     def get_previous(self, user):
-        """Returns the user after `user` in lexicographical order by name"""
+        """Returns the User after `user` in lexicographical order by name"""
         try:
             self._cursor.execute(
                 "SELECT * from Users WHERE name < ? ORDER BY name DESC LIMIT 1",
@@ -55,7 +61,14 @@ class UserDao:
             raise DatabaseError
 
     def create(self, user):
-        """Saves user `user` to the database."""
+        """Creates a new user to the database.
+
+        Arguments:
+            `user`: User
+                The user to be created to the database
+                `user.id` should be None
+        """
+
 
         if user.id is not None:
             raise ValueError("`user.id` should be None")

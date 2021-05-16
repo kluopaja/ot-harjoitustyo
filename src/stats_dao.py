@@ -2,7 +2,13 @@ from game.game_stats import UserStats, TotalStats
 from user import User
 from database_connection import DatabaseError
 class StatsDao:
+    """A class for game statistics related database queries"""
     def __init__(self, connection):
+        """Initializes StatsDao
+
+        Arguments:
+            `connection`: sqlite3.Connection
+        """
         self._connection = connection
         self._cursor = self._connection.cursor()
 
@@ -10,6 +16,9 @@ class StatsDao:
         """Saves a list of UserRound object to the database.
 
         Ignores User objects with User.id == None.
+
+        Arguments:
+            `user_rounds`: list of UserRound objects
         """
         try:
             for user_round in user_rounds:
@@ -30,7 +39,14 @@ class StatsDao:
             raise DatabaseError
 
     def get_top_scorers(self, n_players):
-        """Returns a TotalStats object corresponding to the top `n_players`."""
+        """Returns a statistics for top `n_players`.
+
+        Arguments:
+            `n_players`: a non-negative integer
+        Returns:
+            TotalStats
+                an object corresponding to the top `n_players`.
+        """
         try:
             self._cursor.execute("""
             SELECT

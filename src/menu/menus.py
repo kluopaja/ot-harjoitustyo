@@ -1,7 +1,17 @@
 from menu.menu_items import TextInputMenuItem, ButtonMenuItem, MenuItemCollection
 from menu.menu_items import ValueBrowserMenuItem
 class MainMenu:
+    """A class representing the main menu"""
     def __init__(self, menu_list_factory, new_game_menu, add_user_menu, high_score_view):
+        """Initializes MainMenu
+
+        Arguments:
+            `menu_list_factory`: A MenuListFactory
+                Used to make a runnable menu from MenuItems
+            `new_game_menu`: A NewGameMenu
+            `add_user_menu`: An AddUserMenu
+            `high_score_view`: A HighScoreView
+        """
         self.menu_list_factory = menu_list_factory
         self.item_collection = MenuItemCollection()
         self.item_collection.add_item(
@@ -15,12 +25,25 @@ class MainMenu:
         )
 
     def run(self):
+        """Runs the menu until the user quits it"""
         menu = self.menu_list_factory.menu(self.item_collection)
         while not menu.should_quit():
             menu.run_tick()
 
 class NewGameMenu:
+    """A class representing the new game menu"""
     def __init__(self, game_factory, menu_list_factory, game_organizer):
+        """Initializes NewGameMenu.
+
+        Arguments:
+            `game_factory`: A GameFactory
+                The game factory modified by the menu
+            `menu_list_factory`: A MenuListFactory
+                Used to make a runnable menu from MenuItems
+            `game_organizer`: A GameOrganizer
+                Used to organize the game that has been constructed
+                by `game_factory`
+        """
         self.game_factory = game_factory
         self.menu_list_factory = menu_list_factory
         self.game_organizer = game_organizer
@@ -64,7 +87,16 @@ class NewGameMenu:
 
 
 class AddUserMenu:
+    """A class representing the menu for adding a new user"""
     def __init__(self, menu_list_factory, user_factory):
+        """Initializes AddUserMenu
+
+        Arguments:
+            `menu_list_factory`: A MenuListFactory
+                Used to make a runnable menu from MenuItems
+            `user_factory`: A UserFactory
+                The user factory modified by the menu
+        """
         self.menu_list_factory = menu_list_factory
         self.user_factory = user_factory
         self.item_collection = MenuItemCollection()
@@ -77,6 +109,7 @@ class AddUserMenu:
         self._should_quit = False
 
     def run(self):
+        """Runs the menu until the user creates a new User or quits the menu."""
         self._should_quit = False
         self.user_factory.reset()
         menu = self.menu_list_factory.menu(self.item_collection)

@@ -7,6 +7,9 @@ class User:
     Attributes:
         name: a string
             The name of the user
+        id: An integer or None
+            The database id of the user
+            None if the User doesn't exist in a database.
     """
     def __init__(self, name):
         self.id = None
@@ -16,7 +19,7 @@ class User:
 class UserFactory:
     """A class for creating a new user to the database"""
     def __init__(self, user_dao):
-        self.user_dao = user_dao
+        self._user_dao = user_dao
         self.reset()
 
     def reset(self):
@@ -33,7 +36,7 @@ class UserFactory:
             False otherwise.
         """
         try:
-            user = self.user_dao.get_by_name(self.get_name())
+            user = self._user_dao.get_by_name(self.get_name())
             return user is None
         except DatabaseError:
             logging.critical("Error accessing database! "
@@ -46,7 +49,7 @@ class UserFactory:
 
         NOTE: Exits the program if the operation was not successful."""
         try:
-            self.user_dao.create(self._user)
+            self._user_dao.create(self._user)
         except DatabaseError:
             logging.critical("Error creating a new user to the database! "
                              "Try reinitializing the database.")

@@ -11,6 +11,18 @@ from user import UserFactory
 from utils.timing import Clock, sleep_wait
 
 def create_main_menu(screen, event_handler, config, database_connection):
+    """A Factory method for MainMenu.
+
+    Creates a main menu and along it basically the whole application
+
+    Arguments:
+        `screen`: Screen
+            The target to which the application will be rendered
+        `event_handler`: An EventHandler
+            The input events of the application
+        `config`: Config
+        `database_connection`: sqlite3.Connection
+    """
     user_dao = UserDao(database_connection)
 
     game_factory = GameFactory(config, user_dao, event_handler, screen)

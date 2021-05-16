@@ -1,7 +1,17 @@
 class FloatRect:
-    """Similar class to pygame.Rect except also with floats"""
+    """Similar class to pygame.Rect but with floats"""
 
     def __init__(self, x, y, width, height):
+        """Initializes FloatRect
+
+        Arguments:
+            `x`: float
+                x coordinate of the top left corner
+            `y`: float
+                y coordinate of the top left corner
+            `width`: float
+            `height`: float
+        """
         self._x = x
         self._y = y
         self._width = width
@@ -110,6 +120,7 @@ class FloatRect:
         self._y = value[1] - self._height
 
     def copy(self):
+        """Creates a copy of `self`"""
         return FloatRect(self._x, self._y, self._width, self._height)
 
     def __repr__(self):
