@@ -33,7 +33,10 @@ can be configured).
 
 ### Add user menu
 New users can be added in the `Add user` menu by typing the player
-name to the `Name` field and selecting`Create user`.
+name to the `Name` field and selecting`Create user`. If no users have
+been added to the database, the game can still be played with the "default user".
+This user will not be saved to the database and will disappear when a
+first user is saved to the database.
 
 
 ### New game menu
