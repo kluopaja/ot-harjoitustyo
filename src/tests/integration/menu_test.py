@@ -1,4 +1,5 @@
 import pytest
+import time
 import pygame
 from unittest.mock import Mock, ANY, create_autospec
 import sqlite3
@@ -52,6 +53,50 @@ class TestGameMenuIntegration:
         main_menu.run()
         user_dao = UserDao(database_connection)
         assert user_dao.get_by_name("abc") is not None
+
+    def test_user_name_field_ignores_whitespaces(self, main_menu_factory, database_connection):
+        events = [
+            MockEvent(pygame.key.key_code("return"), "?"),
+            MockEvent(pygame.key.key_code("space"), " "),
+            MockEvent(pygame.key.key_code("b"), "b"),
+            MockEvent(pygame.key.key_code("c"), "c"),
+            MockEvent(pygame.key.key_code("down"), "?"),
+            MockEvent(pygame.key.key_code("return"), "?"),
+            MockEvent(pygame.key.key_code("escape"), "?"),
+            MockEvent(pygame.key.key_code("escape"), "?")]
+        event_times = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4]
+        event_handler = EventHandlerMock(events=events, event_times=event_times)
+        main_menu = main_menu_factory(event_handler)
+        main_menu.run()
+        user_dao = UserDao(database_connection)
+        assert user_dao.get_by_name("bc") is not None
+
+    def test_creating_new_user_with_existing_name_failsr(self, main_menu_factory, database_connection):
+        old_apina = UserDao(database_connection).get_by_name("apina")
+        start = time.time()
+        events = [
+            MockEvent(pygame.key.key_code("return"), "?"),
+            MockEvent(pygame.key.key_code("a"), "a"),
+            MockEvent(pygame.key.key_code("p"), "p"),
+            MockEvent(pygame.key.key_code("i"), "i"),
+            MockEvent(pygame.key.key_code("n"), "n"),
+            MockEvent(pygame.key.key_code("a"), "a"),
+            MockEvent(pygame.key.key_code("down"), "?"),
+            MockEvent(pygame.key.key_code("return"), "?"),
+            MockEvent(pygame.key.key_code("escape"), "?"),
+            MockEvent(pygame.key.key_code("escape"), "?")]
+        event_times = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 7]
+
+        # should only quit at 7 seconds (second escape) if the
+        # creation was unsuccessful
+
+        assert (time.time() - start - 7) < 0.5
+
+        event_handler = EventHandlerMock(events=events, event_times=event_times)
+        main_menu = main_menu_factory(event_handler)
+        main_menu.run()
+        new_apina = UserDao(database_connection).get_by_name("apina")
+        assert old_apina.id == new_apina.id
 
     def test_creating_erasing_new_user_text(self, main_menu_factory, database_connection):
         events = [
