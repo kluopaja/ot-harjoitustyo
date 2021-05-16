@@ -6,6 +6,7 @@ A 2D shoot 'em up flying game inspired by Sopwith.
 
 * Release for week 5: https://github.com/kluopaja/ot-harjoitustyo/releases/tag/viikko5
 * Release for week 6: https://github.com/kluopaja/ot-harjoitustyo/releases/tag/viikko6
+* Release for week 7: https://github.com/kluopaja/ot-harjoitustyo/releases/tag/week7
 
 
 ## Documentation
