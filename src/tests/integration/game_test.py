@@ -111,7 +111,7 @@ def config():
 
 @pytest.fixture()
 def screen():
-    return Screen(300, 300, 0.02)
+    return Screen(500, 500, 0.02)
 
 @pytest.fixture()
 def game_factory_factory(config, database_connection, screen):
