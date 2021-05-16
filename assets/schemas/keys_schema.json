@@ -1,0 +1,71 @@
+{
+	"type": "object",
+	"properties": {
+		"game_keys": {
+			"type": "object",
+			"properties": {
+				"quit": {
+					"type": "string"
+				},
+				"pause": {
+					"type": "string"
+				},
+				"player_keys": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"accelerate": {
+								"type": "string"
+							},
+							"up": {
+								"type": "string"
+							},
+							"down": {
+								"type": "string"
+							},
+							"shoot": {
+								"type": "string"
+							}
+						},
+						"required": ["accelerate", "up", "down", "shoot"],
+						"additionalProperties": false
+					},
+					"minItems": 1
+				}
+			},
+			"required": ["quit", "pause", "player_keys"],
+			"additionalProperties": false
+		},
+		"menu_keys": {
+			"type": "object",
+			"properties": {
+				"quit": {
+					"type": "string"
+				},
+				"next_item": {
+					"type": "string"
+				},
+				"previous_item": {
+					"type": "string"
+				},
+				"increase": {
+					"type": "string"
+				},
+				"decrease": {
+					"type": "string"
+				},
+				"accept": {
+					"type": "string"
+				},
+				"erase": {
+					"type": "string"
+				}
+			},
+			"required": ["quit", "next_item", "previous_item", "increase", "decrease", "accept", "erase"],
+			"additionalProperties": false
+		}
+	},
+	"required": ["game_keys", "menu_keys"],
+    "additionalProperties": false
+}

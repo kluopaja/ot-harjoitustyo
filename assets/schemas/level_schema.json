@@ -1,0 +1,54 @@
+{
+	"type": "object",
+	"properties": {
+		"name": {
+			"type": "string"
+		},
+		"background_config_path": {
+			"type": "string"
+		},
+		"starting_locations": {
+			"type": "array",
+			"items": {
+				"type": "array",
+				"items": {
+					"type": "number"
+				},
+				"minItems": 2,
+				"maxItems": 2
+			},
+			"minItems": 1
+		},
+		"ground_lines": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"points": {
+						"type": "array",
+						"items": {
+							"type": "array",
+							"items": {
+								"type": "number"
+							},
+							"minItems": 2,
+							"maxItems": 2
+						}
+					},
+					"color": {
+						"type": "array",
+						"items": {
+							"type": "integer",
+							"minimum": 0,
+							"maximum": 255
+						}
+					},
+					"width": {
+						"type": "number",
+						"minimum": 0
+					}
+				}
+			}
+		}
+	}
+}

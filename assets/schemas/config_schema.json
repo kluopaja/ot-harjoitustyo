@@ -1,0 +1,151 @@
+{
+	"type": "object",
+	"properties": {
+		"database_path": {
+			"type": "string"
+		},
+		"level_dir": {
+			"type": "string"
+		},
+		"plane_config_path": {
+			"type": "string"
+		},
+		"keys_config_path": {
+			"type": "string"
+		},
+		"background_config_path": {
+			"type": "string"
+		},
+
+		"window_width": {
+			"type": "integer",
+			"minimum": 100
+		},
+		"window_height": {
+			"type": "integer",
+			"minimum": 100
+		},
+		"font_size": {
+			"type": "number",
+			"minimum": 0.005,
+			"maximum": 0.3
+		},
+		"menu_font_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		},
+		"menu_background_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		},
+		"menu_item_spacing": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 0.3
+		},
+		"camera_height": {
+			"type": "number",
+			"minimum": 0
+		},
+		"press_key_to_start_message": {
+			"type": "string"
+		},
+		"until_spawn_message": {
+			"type": "string"
+		},
+		"game_view_font_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		},
+		"player_spawn_time": {
+			"type": "number",
+			"minimum": 0
+		},
+		"game_length": {
+			"type": "number",
+			"minimum": 0
+		},
+		"pause_message": {
+			"type": "string"
+		},
+		"pause_font_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		},
+		"pause_blur_radius": {
+			"type": "integer",
+			"minimum": 1,
+			"maximum": 40
+		},
+		"info_bar_level_message": {
+			"type": "string"
+		},
+		"info_bar_time_left_message": {
+			"type": "string"
+		},
+		"info_bar_font_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		},
+		"info_bar_background_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		},
+		"game_fps": {
+			"type": "number",
+			"minimum": 1
+		}
+	},
+	"required": [
+		"database_path",
+		"level_dir",
+		"plane_config_path",
+		"keys_config_path",
+		"background_config_path",
+		"window_width",
+		"window_height",
+		"font_size",
+		"menu_font_color",
+		"menu_background_color",
+		"menu_item_spacing",
+		"camera_height",
+		"press_key_to_start_message",
+		"until_spawn_message",
+		"game_view_font_color",
+		"player_spawn_time",
+		"game_length",
+		"pause_message",
+		"pause_font_color",
+		"pause_blur_radius",
+		"info_bar_level_message",
+		"info_bar_time_left_message",
+		"info_bar_font_color",
+		"info_bar_background_color",
+		"game_fps"
+	],
+	"additionalProperties": false
+}

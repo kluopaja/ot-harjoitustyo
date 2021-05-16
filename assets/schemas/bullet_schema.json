@@ -1,0 +1,35 @@
+{
+	"type": "object",
+	"properties": {
+		"image_file_path": {
+			"type": "string"
+		},
+		"diameter": {
+			"type": "integer",
+			"minimum": 10
+		},
+		"gravity": {
+			"type": "number",
+			"minimum": 0
+		},
+		"body_drag": {
+			"type": "number",
+			"minimum": 0
+		},
+		"health": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"collision_damage": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"timeout": {
+			"type": "number",
+			"minimum": 0,
+			"maximum": 20
+		}
+	},
+	"required": ["image_file_path", "diameter", "gravity", "body_drag", "health", "collision_damage", "timeout"],
+	"additionalProperties": false
+}

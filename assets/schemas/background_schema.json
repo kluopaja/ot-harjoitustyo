@@ -1,0 +1,53 @@
+{
+	"type": "object",
+	"properties": {
+		"image_file_path": {
+			"type": "string"
+		},
+		"image_size": {
+			"type": "object",
+			"properties": {
+				"width": {
+					 "type": "integer",
+					 "minimum": 0
+				},
+				"height": {
+					 "type": "integer",
+					 "minimum": 0
+				}
+			},
+			"required": ["width", "height"],
+			"additionalProperties": false
+		},
+		"n_images": {
+			"type": "integer",
+			"minimum": 0,
+			"maximum": 200
+		},
+		"repeat_area": {
+			"type": "object",
+			"properties": {
+				"width": {
+					 "type": "integer",
+					 "minimum": 0
+				},
+				"height": {
+					 "type": "integer",
+					 "minimum": 0
+				}
+			},
+			"required": ["width", "height"],
+			"additionalProperties": false
+		},
+		"fill_color": {
+			"type": "array",
+			"items": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			}
+		}
+	},
+	"required": ["image_file_path", "image_size", "n_images", "repeat_area", "fill_color"],
+	"additionalProperties": false
+}

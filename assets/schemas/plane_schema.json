@@ -1,0 +1,82 @@
+{
+	"type": "object",
+	"properties": {
+		"image_file_path": {
+			"type": "string"
+		},
+		"gun_config_path": {
+			"type": "string"
+		},
+		"size": {
+			"type": "object",
+			"properties": {
+				"width": {
+					 "type": "integer",
+					 "minimum": 0
+				},
+				"height": {
+					 "type": "integer",
+					 "minimum": 0
+				}
+			},
+			"required": ["width", "height"],
+			"additionalProperties": false
+		},
+		"acceleration": {
+			"type": "number",
+			"minimum": 0
+		},
+		"rotation": {
+			"type": "number",
+			"minimum": 0
+		},
+		"body_drag": {
+			"type": "number",
+			"minimum": 0
+		},
+		"wing_size": {
+			"type": "number",
+			"minimum": 0
+		},
+		"gravity": {
+			"type": "number",
+			"minimum": 0
+		},
+		"health": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"collision_damage": {
+			"type": "integer",
+			"minimum": 1
+		},
+		"score_per_damage": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"score_when_destroyed": {
+			"type": "integer",
+			"minimum": 0
+		},
+		"cost": {
+			"type": "integer",
+			"minimum": 0
+		}
+	},
+	"required": [
+		"image_file_path",
+		"gun_config_path",
+		"size",
+		"acceleration",
+		"rotation",
+		"body_drag",
+		"wing_size",
+		"gravity",
+		"health",
+		"collision_damage",
+		"score_per_damage",
+		"score_when_destroyed",
+		"cost"
+	],
+	"additionalProperties": false
+}
