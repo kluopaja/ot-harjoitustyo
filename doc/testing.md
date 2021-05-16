@@ -4,7 +4,10 @@ The program has been tested with automated unit and integration testa and manual
 
 ## Unit and integration testing
 ### Unit tests
-The unit tests were concentrated on the classes related to game logic. Low level drawing
+The unit tests were concentrated on the classes related to game logic.
+These include `src/game/game.py`, `src/game/shapes.py`, `src/game/physics.py`
+and `src/game/game_objects.py` (see the test coverage for only unit tests).
+Low level drawing
 code and game ui code was not tested with unit tests.
 
 ### System/Integration tests
@@ -14,9 +17,13 @@ The database access was also only tested with automated system testing.
 
 ### Test coverage
 
-The test branch coverage excluding testing code was 91 %.
+The test branch coverage excluding testing code was 91 %:
 
 ![Test coverage](./coverage_report.png)
+
+If only unit tests were consired, then the coverage was 59 %:
+
+![Test coverage](./only_unit_coverage_report.png)
 
 ## Manual testing
 
